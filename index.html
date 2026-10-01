@@ -526,7 +526,11 @@ const I18N={
 };
 const LANGS=[["pt","🇧🇷","Português"],["en","🇺🇸","English"],["es","🇪🇸","Español"]];
 const MEM={};const store={get(k){try{const v=localStorage.getItem(k);if(v!==null)return JSON.parse(v)}catch(e){}return k in MEM?MEM[k]:null},set(k,v){MEM[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){delete MEM[k];try{localStorage.removeItem(k)}catch(e){}}};
-function migrateLegacyKey(currentKey,legacyKey){const current=store.get(currentKey);if(current!==null)return current;const legacy=store.get(legacyKey);if(legacy!==null){store.set(currentKey,legacy);store.del(legacyKey);return legacy}return null}\n// One-time migration from the prototype storage namespace.\nmigrateLegacyKey("heroes.lang","wraps.lang");\nmigrateLegacyKey("heroes.session","wraps.session");\nconst $=s=>document.querySelector(s);
+function migrateLegacyKey(currentKey,legacyKey){const current=store.get(currentKey);if(current!==null)return current;const legacy=store.get(legacyKey);if(legacy!==null){store.set(currentKey,legacy);store.del(legacyKey);return legacy}return null}
+// One-time migration from the prototype storage namespace.
+migrateLegacyKey("heroes.lang","wraps.lang");
+migrateLegacyKey("heroes.session","wraps.session");
+const $=s=>document.querySelector(s);
 const H={push(o){try{history.pushState(o,"")}catch(e){}},rep(o){try{history.replaceState(o,"")}catch(e){}}};
 let lang=store.get("heroes.lang")||((navigator.language||"pt").slice(0,2) in I18N?(navigator.language||"pt").slice(0,2):"pt");
 const t=k=>I18N[lang][k]||k;
