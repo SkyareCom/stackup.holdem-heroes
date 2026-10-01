@@ -51,7 +51,25 @@ box-shadow:var(--shadow)}
 .hero:before{content:"";position:absolute;inset:0;background:
 linear-gradient(115deg,transparent 0 52%,rgba(216,178,142,.045) 52% 53%,transparent 53%),
 radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointer-events:none}
-.photo-slot{position:absolute;inset:0;opacity:.08;filter:grayscale(1) saturate(.4) blur(10px);background-size:cover;background-position:center;pointer-events:none}
+.photo-slot{position:absolute;inset:-18px;opacity:.34;filter:grayscale(.2) saturate(.55) blur(4px);background-size:cover;background-position:center;pointer-events:none;transform:scale(1.05)}
+.photo-slot:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(42,17,20,.28),rgba(15,9,9,.88) 72%),linear-gradient(90deg,rgba(42,17,20,.62),transparent 68%)}
+.screen-visual{position:relative;overflow:hidden;border-radius:26px;min-height:188px;margin:2px 0 22px;border:1px solid var(--line-1);box-shadow:var(--shadow);display:flex;align-items:flex-end;padding:22px;background:#160B0D}
+.screen-visual:before{content:"";position:absolute;inset:-14px;background-image:var(--photo);background-size:cover;background-position:var(--pos,center);filter:grayscale(.15) saturate(.52) brightness(.62) blur(2px);transform:scale(1.04)}
+.screen-visual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,11,13,.08),rgba(22,11,13,.48) 45%,rgba(15,9,9,.95)),linear-gradient(90deg,rgba(42,17,20,.55),transparent)}
+.screen-visual-content{position:relative;z-index:1}
+.screen-visual .section-kicker{color:var(--champ-1)}
+.screen-visual-title{font-family:var(--display);font-size:32px;line-height:1;color:var(--cream-2);margin-top:6px}
+.screen-visual-copy{font-size:11px;line-height:1.5;color:var(--cream-1);opacity:.8;max-width:330px;margin-top:8px}
+.scenario-stack{display:grid;gap:16px}
+.scenario-section{border:1px solid var(--line-1);border-radius:22px;padding:18px;background:linear-gradient(155deg,rgba(50,20,25,.72),rgba(22,11,13,.72))}
+.scenario-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line-1)}
+.scenario-name{font-family:var(--display);font-size:22px;color:var(--cream-2)}
+.scenario-desc{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.scenario-cell{border:1px solid rgba(216,178,142,.12);border-radius:14px;padding:12px 10px;background:rgba(15,9,9,.34)}
+.scenario-cell strong{display:block;font-family:var(--display);font-size:24px;font-weight:400;color:var(--cream-2);margin-top:4px}
+.scenario-cell span{font-size:8px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted-2)}
+.scenario-cell em{display:block;font-style:normal;font-size:9px;color:var(--muted-1);margin-top:3px}
 .eyebrow{position:relative;font-size:10px;letter-spacing:.23em;text-transform:uppercase;color:var(--champ-1)}
 .display-xl{position:relative;font-family:var(--display);font-size:46px;line-height:.94;font-weight:400;margin:12px 0 6px;color:var(--cream-2)}
 .hero-copy{position:relative;max-width:330px;color:var(--muted-1);font-size:13px;line-height:1.55}
@@ -158,6 +176,8 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
   .display-xl{font-size:39px}
   .dna-grid{gap:12px}
   .matrix{grid-template-columns:repeat(2,1fr)}
+  .scenario-grid{grid-template-columns:repeat(2,1fr)}
+  .scenario-head{align-items:flex-start;flex-direction:column;gap:4px}
   .cta-row{grid-template-columns:1fr}
 }
 @media (min-width:430px){
@@ -194,7 +214,7 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
 
       <section id="home" class="screen active" data-screen="home">
         <div class="hero">
-          <div class="photo-slot" data-photo-slot="home"></div>
+          <div class="photo-slot" data-photo-slot="home" style="background-image:url('https://images.unsplash.com/photo-1638057628438-4b42313f19e3?auto=format&fit=crop&w=1600&q=82')"></div>
           <div class="eyebrow">YOUR POKER DNA</div>
           <h1 class="display-xl">Quem é você<br>como jogador hoje?</h1>
           <p class="hero-copy">Seu perfil atual combina agressividade acima da média com forte adaptação. O ponto de atenção aparece quando a pressão cresce e a decisão exige disciplina.</p>
@@ -245,6 +265,9 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
       </section>
 
       <section class="screen" data-screen="dna">
+        <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1780091891244-8e6d48ce53a4?auto=format&fit=crop&w=1600&q=82');--pos:center 58%">
+          <div class="screen-visual-content"><div class="section-kicker">IDENTITY PROFILING</div><div class="screen-visual-title">Seu jogo deixa uma assinatura.</div><div class="screen-visual-copy">Cartas, decisões e padrões formam um perfil que muda conforme você joga.</div></div>
+        </div>
         <div class="section-head">
           <div><div class="section-kicker">PLAYER IDENTITY</div><h1 class="section-title">YOUR POKER DNA</h1></div>
           <button class="section-link" id="dnaInfo">How it works</button>
@@ -261,6 +284,9 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
       </section>
 
       <section class="screen" data-screen="leaks">
+        <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1518133120397-258d5eb470c6?auto=format&fit=crop&w=1600&q=82');--pos:center">
+          <div class="screen-visual-content"><div class="section-kicker">POKER DIAGNOSTICS</div><div class="screen-visual-title">Onde seu jogo perde valor.</div><div class="screen-visual-copy">Leaks organizados por impacto, frequência e contexto — sem ruído visual.</div></div>
+        </div>
         <div class="section-head">
           <div><div class="section-kicker">YOUR LEAKS</div><h1 class="section-title">WHAT COSTS YOU EV?</h1></div>
         </div>
@@ -275,18 +301,23 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
       </section>
 
       <section class="screen" data-screen="analysis">
+        <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1670251400844-26c200b75a0f?auto=format&fit=crop&w=1600&q=82');--pos:center">
+          <div class="screen-visual-content"><div class="section-kicker">PERFORMANCE ANALYSIS</div><div class="screen-visual-title">Cada cenário revela um padrão.</div><div class="screen-visual-copy">Posição, stack, street, fase, pressão e perfil do oponente separados para leitura rápida.</div></div>
+        </div>
         <div class="section-head">
           <div><div class="section-kicker">GAME MATRIX</div><h1 class="section-title">ANALYSIS</h1></div>
         </div>
         <div class="filterbar" id="analysisFilters">
-          <button class="filter active">POSITION</button>
-          <button class="filter">STACK</button>
-          <button class="filter">STREET</button>
-          <button class="filter">PHASE</button>
-          <button class="filter">GAME TYPE</button>
+          <button class="filter active" data-scenario-filter="all">ALL</button>
+          <button class="filter" data-scenario-filter="position">POSITION</button>
+          <button class="filter" data-scenario-filter="stack">STACK</button>
+          <button class="filter" data-scenario-filter="street">STREET</button>
+          <button class="filter" data-scenario-filter="phase">PHASE</button>
+          <button class="filter" data-scenario-filter="pressure">PRESSURE</button>
+          <button class="filter" data-scenario-filter="opponent">OPPONENT</button>
         </div>
 
-        <div class="matrix" id="matrix"></div>
+        <div id="scenarioStack" class="scenario-stack"></div>
 
         <div class="section">
           <div class="pressure">
@@ -308,6 +339,9 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
       </section>
 
       <section class="screen" data-screen="profile">
+        <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1768839723101-b55bdb4e3ced?auto=format&fit=crop&w=1600&q=82');--pos:center 42%">
+          <div class="screen-visual-content"><div class="section-kicker">PLAYER IDENTITY</div><div class="screen-visual-title">Seu histórico. Seu perfil.</div><div class="screen-visual-copy">Identidade StackUp, confiança do DNA e evolução do jogador em um só lugar.</div></div>
+        </div>
         <div class="profile-hero">
           <div class="section-kicker">STACKUP ID</div>
           <div class="profile-name">Player 0217</div>
@@ -399,17 +433,14 @@ const leaks=[
   {level:"moderate",area:"POSITION",title:"BTN EV below baseline",freq:"18%",impact:"-4 EV",context:"BTN",rec:"Amplie pressão contra blinds passivos e refine defesa versus 3-bet."}
 ];
 
-const matrixData=[
-  ["BTN",84,"strong"],
-  ["CO",86,"strongest"],
-  ["HJ",78,"stable"],
-  ["UTG",76,"disciplined"],
-  ["SB",67,"volatile"],
-  ["BB",61,"leak zone"],
-  ["30–50bb",88,"best stack"],
-  ["<20bb",58,"pressure drop"],
-  ["River",64,"showdown leak"]
-];
+const scenarioData={
+  position:{title:"BY POSITION",desc:"onde sua posição altera decisões",items:[["BTN",84,"strong"],["CO",86,"strongest"],["HJ",78,"stable"],["UTG",76,"disciplined"],["SB",67,"volatile"],["BB",61,"leak zone"]]},
+  stack:{title:"BY STACK DEPTH",desc:"como profundidade muda seu perfil",items:[["<20bb",58,"pressure drop"],["20–30bb",73,"recovering"],["30–50bb",88,"best stack"],["50–80bb",81,"controlled"],["80bb+",74,"more passive"]]},
+  street:{title:"BY STREET",desc:"onde a qualidade cai ao longo da mão",items:[["Pre-flop",79,"solid"],["Flop",82,"best street"],["Turn",71,"passive spots"],["River",64,"showdown leak"]]},
+  phase:{title:"BY TOURNAMENT PHASE",desc:"mudanças em momentos críticos",items:[["Early",77,"stable"],["Middle",81,"balanced"],["Bubble",59,"overaggressive"],["Late",72,"adaptive"],["Final Table",68,"ICM tension"]]},
+  pressure:{title:"BY PRESSURE",desc:"como você reage quando a decisão pesa",items:[["Big Pot",63,"discipline drop"],["All-in",57,"volatile"],["Deep Run",74,"focused"],["Large Field",76,"comfortable"],["Bubble",58,"high aggression"]]},
+  opponent:{title:"BY OPPONENT TYPE",desc:"adaptação contra perfis diferentes",items:[["REC",87,"strong exploit"],["REG",75,"balanced"],["PRO",66,"more passive"],["Aggressive",72,"defensive"],["Passive",84,"high pressure"]]}
+};
 
 const patterns=[
   ["Fast decisions after losing a pot","Tilt-adjacent timing pattern"],
@@ -441,9 +472,15 @@ function renderLeaks(filter="all"){
       <div class="recommend">${x.rec}</div>
     </div>`).join("") || '<div class="body-copy">Nenhum leak nesta faixa.</div>';
 }
-function renderMatrix(){
-  document.getElementById("matrix").innerHTML=matrixData.map(([l,s,n])=>`
-    <div class="matrix-cell"><div class="matrix-label">${l}</div><div class="matrix-score">${s}</div><div class="matrix-note">${n}</div></div>`).join("");
+function renderScenarios(filter="all"){
+  const entries=Object.entries(scenarioData).filter(([key])=>filter==="all"||key===filter);
+  document.getElementById("scenarioStack").innerHTML=entries.map(([key,group])=>`
+    <section class="scenario-section" data-scenario="${key}">
+      <div class="scenario-head"><div class="scenario-name">${group.title}</div><div class="scenario-desc">${group.desc}</div></div>
+      <div class="scenario-grid">${group.items.map(([label,score,note])=>`
+        <div class="scenario-cell"><span>${label}</span><strong>${score}</strong><em>${note}</em></div>`).join("")}
+      </div>
+    </section>`).join("");
 }
 function renderPatterns(){
   document.getElementById("patternList").innerHTML=patterns.map(([t,n])=>`
@@ -468,6 +505,7 @@ document.getElementById("analysisFilters").addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
   document.querySelectorAll("#analysisFilters .filter").forEach(x=>x.classList.remove("active"));
   btn.classList.add("active");
+  renderScenarios(btn.dataset.scenarioFilter||"all");
 });
 
 const sheet=document.getElementById("sheetBackdrop");
@@ -482,7 +520,7 @@ document.getElementById("dnaInfo").addEventListener("click",()=>openSheet("HOW D
 document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet();showScreen("dna")});
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
 
-renderDNA();renderLeaks();renderMatrix();renderPatterns();
+renderDNA();renderLeaks();renderScenarios();renderPatterns();
 const initial=location.hash.replace("#","");if(["home","dna","leaks","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
 </script>
