@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  validate:
+  web:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,3 +24,22 @@ jobs:
         run: npm test
       - name: Build web artifact
         run: npm run build
+
+  android-scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned dependencies
+        run: npm install --ignore-scripts
+      - name: Generate Android shell
+        run: npm run android:init
+      - name: Verify Android 16 target
+        run: |
+          grep -Eq "compileSdkVersion\s*=\s*36" android/variables.gradle
+          grep -Eq "targetSdkVersion\s*=\s*36" android/variables.gradle
+          grep -R "applicationId \"com.stackupholdem.heroes\"" android/app/build.gradle
