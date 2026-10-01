@@ -7,6 +7,10 @@ for(const label of ['DISCOVER YOUR POKER DNA','YOUR POKER DNA','THE CONTROLLED A
 for(const tab of ['HOME','DNA','LEAKS','ANALYSIS','PROFILE']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
 expect((html.match(/data-tab=/g)||[]).length===5,'bottom navigation must contain exactly 5 tabs');
 expect(html.includes('data-photo-slot="home"'),'Premium background/photo slot missing');
+expect((html.match(/images\.unsplash\.com\/photo-/g)||[]).length >= 5,'expected at least 5 real photographic poker backgrounds');
+for(const scenario of ['BY POSITION','BY STACK DEPTH','BY STREET','BY TOURNAMENT PHASE','BY PRESSURE','BY OPPONENT TYPE']) expect(html.includes(scenario),`missing scenario division: ${scenario}`);
+expect(html.includes('data-scenario-filter="position"'),'scenario filters must be data-driven');
+expect(html.includes('renderScenarios'),'scenario rendering function missing');
 expect(!/neon/i.test(html),'neon styling/reference should not be present');
 expect(!/XP|coins|stars/i.test(html),'childlike gamification terms should not be present');
 if(failures.length){console.error('Heroes product-design validation failed:');failures.forEach(f=>console.error('- '+f));process.exit(1)}
