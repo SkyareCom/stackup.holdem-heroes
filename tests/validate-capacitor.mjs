@@ -10,7 +10,7 @@ const cap=fs.existsSync(new URL('../capacitor.config.ts',import.meta.url))
 
 expect(pkg.dependencies?.['@capacitor/core']==='8.5.2','@capacitor/core must be pinned to 8.5.2');
 expect(pkg.dependencies?.['@capacitor/android']==='8.5.2','@capacitor/android must be pinned to 8.5.2');
-expect(pkg.devDependencies?.['@capacitor/cli']==='8.5.2','@capacitor/cli must be pinned to 8.5.2');
+expect(pkg.devDependencies?.['@capacitor/cli']==='8.5.2','@capacitor/cli must be pinned to 8.5.2');\nexpect(pkg.devDependencies?.typescript==='7.0.2','typescript must be pinned to 7.0.2 for capacitor.config.ts');
 expect(pkg.scripts?.['android:init'],'android:init script missing');
 expect(pkg.scripts?.['cap:sync'],'cap:sync script missing');
 
