@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "npm run validate",
-    "validate": "node tests/validate-heroes.mjs && node tests/validate-product.mjs",
+    "validate": "node tests/validate-heroes.mjs && node tests/validate-product.mjs && node tests/validate-services.mjs",
     "build": "node scripts/build.mjs"
   }
 }
