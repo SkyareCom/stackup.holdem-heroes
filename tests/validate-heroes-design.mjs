@@ -12,6 +12,6 @@ for(const scenario of ['BY POSITION','BY STACK DEPTH','BY STREET','BY TOURNAMENT
 expect(html.includes('data-scenario-filter="position"'),'scenario filters must be data-driven');
 expect(html.includes('renderScenarios'),'scenario rendering function missing');
 expect(!/neon/i.test(html),'neon styling/reference should not be present');
-expect(!/XP|coins|stars/i.test(html),'childlike gamification terms should not be present');
+expect(!/\bXP\b|\bcoins\b|\bstars\b/i.test(html),'childlike gamification terms should not be present');
 if(failures.length){console.error('Heroes product-design validation failed:');failures.forEach(f=>console.error('- '+f));process.exit(1)}
 console.log('Heroes product-design validation passed.');
