@@ -1,0 +1,11 @@
+{
+  "name": "stackup-holdem-heroes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run validate",
+    "validate": "node tests/validate-heroes.mjs && node tests/validate-product.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}
