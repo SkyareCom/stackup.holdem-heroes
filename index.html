@@ -503,6 +503,7 @@ label{display:block;font-size:12px;font-weight:700;letter-spacing:.8px;text-tran
 
 </div>
 
+<script src="stackup-app-bridge.js"></script>
 <script>
 const I18N={
  pt:{t_home:"Home",t_ajustes:"Ajustes",t_spots:"Spots",t_advance:"Advance",t_stats:"Stats",t_personal:"Personal",t_api:"API x API",t_hist:"Histórico",t_rel:"Relatórios",t_ia:"Assistência IA",t_perfil:"Perfil",t_planos:"Planos",t_loja:"Loja",d_ajustes:"Idioma, preferências e conta",d_spots:"Treine situações específicas de PLO",d_advance:"Treinos avançados e desafios",d_stats:"Seu desempenho em números",d_personal:"Treino personalizado para o seu jogo",d_api:"Integrações e comparação entre ferramentas",d_hist:"Suas sessões anteriores",d_rel:"Relatórios da sua evolução",d_ia:"Tire dúvidas com a inteligência artificial",d_perfil:"Seus dados e forma de acesso",d_planos:"Assinaturas e benefícios",d_loja:"Pacotes e conteúdos extras",soon:"Em breve",soonTxt:"Esta área está em construção.",account:"Conta",lang:"Idioma",hi2:"Olá,",method:"Acesso",tag:"Seu DNA de poker.",m1:"Idioma",m1s:"Escolha o idioma principal",m2:"Entrar com biometria",m2s:"Digital ou Face ID",m3:"Entrar com Google",m3s:"Use sua conta Google",m4:"Entrar com StackUp ID",m4s:"Use seu cadastro StackUp",gLead:"Entre com a sua conta Google. Vamos usar só seu nome e e-mail.",gBtn:"Continuar com Google",gEmail:"E-mail da conta Google",bLead:"Use sua digital ou reconhecimento facial para entrar sem senha.",bTap:"Toque para escanear",bScan:"Escaneando…",bOk:"Identidade confirmada",bName:"Jogador",
@@ -528,6 +529,77 @@ const LANGS=[["pt","🇧🇷","Português"],["en","🇺🇸","English"],["es","�
 const MEM={};const store={get(k){try{const v=localStorage.getItem(k);if(v!==null)return JSON.parse(v)}catch(e){}return k in MEM?MEM[k]:null},set(k,v){MEM[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){delete MEM[k];try{localStorage.removeItem(k)}catch(e){}}};
 const $=s=>document.querySelector(s);
 const H={push(o){try{history.pushState(o,"")}catch(e){}},rep(o){try{history.replaceState(o,"")}catch(e){}}};
+
+const heroesBridge=window.StackUpAppBridge?.create?.('heroes')||null;
+const HEROES_GRINDER_FOCUS=Object.freeze({
+  preflop_position:{title:'PRÉ-FLOP POR POSIÇÃO',filters:{gameType:'MTT',streets:['PRE-FLOP'],special:{pre_special:['open_by_pos','vs_open_ip','vs_open_oop']}}},
+  blind_defense:{title:'DEFESA DE BLINDS',filters:{gameType:'MTT',special:{pre_special:['bb_ep','bb_mp','bb_lp'],blind_special:['blind_war','bb_limpers']}}},
+  aggression_3bet_4bet:{title:'3-BET / 4-BET',filters:{gameType:'MTT',streets:['PRE-FLOP'],special:{aggr_special:['3bet_ip','3bet_oop','facing_4bet','4bet_bluff','4bet_value','call_4bet']}}},
+  short_stack:{title:'SHORT STACK',filters:{gameType:'MTT',effectiveStacks:[5,10,15,18,20,25],special:{short_special:['open_shove','call_shove','reshove','push_fold']}}},
+  icm:{title:'ICM',filters:{gameType:'MTT',special:{icm_special:['icm_bubble','icm_pay_jump','icm_final_table','big_stack_pressure','mid_stack_pressure','short_stack_survival']}}},
+  pko:{title:'PKO',filters:{gameType:'MTT',tournamentType:'pko',special:{pko_special:['pko_math','bounty_call','bounty_shove','bounty_iso','covering_stack','covered_stack']}}},
+  postflop:{title:'PÓS-FLOP',filters:{gameType:'MTT',streets:['FLOP','TURN'],special:{post_special:['check_raise','delayed_cbet','probe_bet','double_barrel','turn_check_raise','float_flop']}}},
+  river:{title:'RIVER',filters:{gameType:'MTT',streets:['RIVER'],special:{river_special:['river_bluff_catch','vs_overbet','block_bet_20_25','river_check_raise','thin_value','value_river']}}},
+  sizing_texture:{title:'TEXTURAS E SIZINGS',filters:{gameType:'MTT',streets:['FLOP','TURN','RIVER'],special:{texture_special:['board_dry','board_connected','board_paired','board_monotone','board_twotone','board_dynamic','bet_33','bet_50','bet_75','pot_bet','overbet_125']}}},
+  poker_math:{title:'MATEMÁTICA',filters:{gameType:'MTT',special:{math_special:['pot_odds','implied_odds','reverse_implied_odds','mdf','breakeven_bluff','breakeven_call','combos','blockers','equity_realization']}}}
+});
+function heroesPrescriptionFromFocus(focus,meta={}){
+  const def=HEROES_GRINDER_FOCUS[String(focus||'')];
+  if(!def)return null;
+  return {
+    prescriptionId:meta.prescriptionId||('heroes-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)),
+    title:meta.title||def.title,
+    focus:String(focus),
+    reason:String(meta.reason||''),
+    priority:String(meta.priority||'normal'),
+    profileVersion:meta.profileVersion||null,
+    sampleSize:Number(meta.sampleSize)||250,
+    grinderFilters:{...def.filters,sampleSize:Number(meta.sampleSize)||250}
+  };
+}
+function heroesPublishProfile(profile,meta={}){
+  if(!heroesBridge)return null;
+  return heroesBridge.send('player_profile','grinder',{
+    profileVersion:meta.profileVersion||profile?.version||'1',
+    generatedAt:new Date().toISOString(),
+    profile:profile||{},
+    weaknesses:Array.isArray(meta.weaknesses)?meta.weaknesses:[],
+    strengths:Array.isArray(meta.strengths)?meta.strengths:[]
+  });
+}
+function heroesPrescribeTraining(input){
+  if(!heroesBridge)return null;
+  const prescription=input?.focus?heroesPrescriptionFromFocus(input.focus,input):input;
+  if(!prescription)return null;
+  return heroesBridge.send('training_prescription','grinder',prescription);
+}
+function heroesSuggestFromWeaknesses(weaknesses,meta={}){
+  return (Array.isArray(weaknesses)?weaknesses:[])
+    .map((w,i)=>{
+      const key=typeof w==='string'?w:(w?.focus||w?.id||'');
+      const severity=typeof w==='object'?Number(w?.severity||w?.score||0):0;
+      const prescription=heroesPrescriptionFromFocus(key,{
+        ...meta,
+        reason:typeof w==='object'?(w.reason||w.label||''):String(w),
+        priority:severity>=80?'critical':severity>=60?'high':severity>=35?'medium':'normal'
+      });
+      return prescription?heroesPrescribeTraining(prescription):null;
+    }).filter(Boolean);
+}
+window.StackUpHeroesIntegration=Object.freeze({
+  status:()=>heroesBridge?.status?.()||{app:'heroes',sameOrigin:false},
+  publishProfile:heroesPublishProfile,
+  prescribeTraining:heroesPrescribeTraining,
+  suggestFromWeaknesses:heroesSuggestFromWeaknesses,
+  prescriptionFromFocus:heroesPrescriptionFromFocus,
+  focuses:HEROES_GRINDER_FOCUS,
+  progress:()=>((heroesBridge?.inbox?.()||[]).filter(x=>x?.source==='grinder'&&(x?.type==='training_progress'||x?.type==='training_completed'))),
+  openGrinder:input=>{
+    const env=input?heroesPrescribeTraining(input):heroesBridge?.send?.('capabilities','grinder',{product:'heroes',produces:['player_profile','training_prescription'],accepts:['training_progress','training_completed']});
+    return env?heroesBridge.openTarget('grinder',env):null;
+  },
+  bridge:heroesBridge
+});
 let lang=store.get("wraps.lang")||((navigator.language||"pt").slice(0,2) in I18N?(navigator.language||"pt").slice(0,2):"pt");
 const t=k=>I18N[lang][k]||k;
 
@@ -582,6 +654,16 @@ const TKEY={home:"t_home",ajustes:"t_ajustes",spots:"t_spots",advance:"t_advance
 let curView="home";
 $("#homeCards").innerHTML=document.querySelector("#welcome .cards").innerHTML;$("#spCards").innerHTML=document.querySelector("#welcome .cards").innerHTML;
 
+function renderApiBridge(){
+ const st=heroesBridge?.status?.()||{},progress=window.StackUpHeroesIntegration?.progress?.()||[];
+ const inbox=(heroesBridge?.inbox?.()||[]).filter(x=>x?.source==='grinder');
+ const connection=st.sameOrigin?'MESMA ORIGEM · ATIVO':'ORIGEM NÃO COMPARTILHADA';
+ return `<div class="pcard"><div class="av">${svg("api")}</div><b>HEROES ↔ GRINDER</b><small>${connection}</small><small>PROTOCOLO ${st.version||'—'} · BROADCAST ${st.broadcast?'ON':'OFF'}</small></div>
+ <div class="pcard"><b>STACKUP CORE</b><small>IDENTIDADE: ${st.identity?.stackupUserId?'STACKUP ID':'DEVICE PREVIEW'}</small><small>INBOX: ${st.inbox||0} · OUTBOX: ${st.outbox||0}</small></div>
+ <div class="pcard"><b>RETORNO DO GRINDER</b><small>PROGRESSOS: ${progress.length} · MENSAGENS: ${inbox.length}</small></div>
+ <button class="btn" data-api-action="open-grinder">ABRIR GRINDER</button>
+ <button class="btn ghost" data-api-action="sync">SINCRONIZAR</button>`;
+}
 function renderTabs(){$("#tabbar").innerHTML=TABS.map(k=>`<button class="tab ${k===curView?"on":""}" data-tab="${k}">${svg(k)}<span>${t(TKEY[k])}</span></button>`).join("")}
 function renderView(){
  const v=$("#view");v.style.transform="";v.style.transition="";v.classList.remove("in","in-l","in-r");void v.offsetWidth;v.classList.add(slideDir>0?"in-l":slideDir<0?"in-r":"in");slideDir=0;
@@ -589,6 +671,7 @@ function renderView(){
  else{
   let body="";
   if(curView==="perfil"){const se=store.get("wraps.session")||{};body=`<div class="pcard"><div class="av">${svg("perfil")}</div><b>${se.name||""}</b><small>${t("method")}: ${({quick:t("m2"),whats:"WhatsApp",google:"Google",sid:"StackUp ID"}[se.method]||"")}</small></div><button class="btn ghost" data-logout>${t("logout")}</button>`}
+  else if(curView==="api"){body=renderApiBridge()}
   else body=`<div class="soon"><div class="big">${svg(curView)}</div><span class="badge">${t("soon")}</span><p>${t("soonTxt")}</p></div>`;
   v.innerHTML=`<div class="pbody">${body}</div>`}
  $("#hdrTitle").textContent=t(TKEY[curView]);renderTabs()}
@@ -599,7 +682,17 @@ function setView(k,push=true){if(k===curView)return;
 window.addEventListener("popstate",()=>{const top=stack[stack.length-1]||"";const v=top.startsWith("home:")?top.slice(5):(top==="home"?"home":null);if(v&&v!==curView){curView=v;renderView()}});
 document.addEventListener("click",e=>{const tb=e.target.closest("[data-tab]");if(tb){const a=TABS.indexOf(curView),b=TABS.indexOf(tb.dataset.tab);if(a>=0&&b>=0&&a!==b)slideDir=b>a?1:-1;setView(tb.dataset.tab)}
  const op=e.target.closest("[data-open]");if(op)setView(op.dataset.open);
+ const api=e.target.closest("[data-api-action]");
+ if(api){
+   if(api.dataset.apiAction==="open-grinder")window.StackUpHeroesIntegration?.openGrinder?.();
+   if(api.dataset.apiAction==="sync")renderView();
+ }
  if(e.target.closest("[data-logout]")){store.del("wraps.session");curView="home";reset("welcome")}});
+
+if(heroesBridge){
+ heroesBridge.onMessage(env=>{if(curView==="api"&&env?.source==="grinder")renderView();});
+ try{heroesBridge.send('capabilities','grinder',{product:'heroes',version:'1.0',produces:['player_profile','training_prescription'],accepts:['training_progress','training_completed'],sameOrigin:true});}catch(_){}
+}
 
 // ===== swipe between footer tabs =====
 let slideDir=0;
