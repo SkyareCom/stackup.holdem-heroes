@@ -357,11 +357,11 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
 
         <div class="section">
           <div class="section-head"><div><div class="section-kicker">PERFIL</div><h2 class="section-title">Conta & histórico</h2></div></div>
-          <div class="setting"><forte>Histórico de sessões</forte><span>24 analisadas</span></div>
-          <div class="setting"><forte>Preferências de análise</forte><span>MTT · NLH</span></div>
-          <div class="setting"><forte>Privacidade</forte><span>Gerenciar</span></div>
-          <div class="setting"><forte>Plano HEROES</forte><span>GRÁTIS</span></div>
-          <div class="setting"><forte>StackUp ID</forte><span>Conectar</span></div>
+          <div class="setting"><strong>Histórico de sessões</strong><span>24 analisadas</span></div>
+          <div class="setting"><strong>Preferências de análise</strong><span>MTT · NLH</span></div>
+          <div class="setting"><strong>Privacidade</strong><span>Gerenciar</span></div>
+          <div class="setting"><strong>Plano HEROES</strong><span>GRÁTIS</span></div>
+          <div class="setting"><strong>StackUp ID</strong><span>Conectar</span></div>
         </div>
       </section>
     </main>
@@ -479,7 +479,7 @@ function renderScenarios(filter="all"){
     <section class="scenario-section" data-scenario="${key}">
       <div class="scenario-head"><div class="scenario-name">${group.title}</div><div class="scenario-desc">${group.desc}</div></div>
       <div class="scenario-grid">${group.items.map(([label,score,note])=>`
-        <div class="scenario-cell"><span>${label}</span><forte>${score}</forte><em>${note}</em></div>`).join("")}
+        <div class="scenario-cell"><span>${label}</span><strong>${score}</strong><em>${note}</em></div>`).join("")}
       </div>
     </section>`).join("");
 }
