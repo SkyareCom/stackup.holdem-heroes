@@ -6,12 +6,12 @@ for(const token of ['#0F0909','#160B0D','#2A1114','#8D5B46','#D8B28E','#EEE1D1']
 expect(html.includes('@font-face{font-family:Dosis'),'Dosis typography must be embedded');
 expect(html.includes('--display:Dosis'),'display typography must use Dosis');
 expect(html.includes('--ui:Dosis'),'UI typography must use Dosis');
-for(const label of ['DISCOVER YOUR POKER DNA','YOUR POKER DNA','THE CONTROLLED AGGRESSOR','WHAT COSTS YOU EV?','PRESSURE DNA','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
-for(const tab of ['HOME','DNA','LEAKS','ANALYSIS','PROFILE']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
+for(const label of ['DESCUBRA SEU POKER DNA','SEU POKER DNA','O AGRESSOR CONTROLADO','O QUE ESTÁ CUSTANDO EV?','DNA SOB PRESSÃO','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
+for(const tab of ['INÍCIO','DNA','LEAKS','ANÁLISE','PERFIL']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
 expect((html.match(/data-tab=/g)||[]).length===5,'bottom navigation must contain exactly 5 tabs');
 expect(html.includes('data-photo-slot="home"'),'Premium background/photo slot missing');
 expect((html.match(/images\.unsplash\.com\/photo-/g)||[]).length >= 5,'expected at least 5 real photographic poker backgrounds');
-for(const scenario of ['BY POSITION','BY STACK DEPTH','BY STREET','BY TOURNAMENT PHASE','BY PRESSURE','BY OPPONENT TYPE']) expect(html.includes(scenario),`missing scenario division: ${scenario}`);
+for(const scenario of ['POR POSIÇÃO','POR STACK','POR STREET','POR FASE DO TORNEIO','POR PRESSÃO','POR TIPO DE OPONENTE']) expect(html.includes(scenario),`missing scenario division: ${scenario}`);
 expect(html.includes('data-scenario-filter="position"'),'scenario filters must be data-driven');
 expect(html.includes('renderScenarios'),'scenario rendering function missing');
 expect(!/neon/i.test(html),'neon styling/reference should not be present');
