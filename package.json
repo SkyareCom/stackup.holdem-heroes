@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "npm run validate",
-    "validate": "node tests/validate-heroes.mjs && node tests/validate-product.mjs && node tests/validate-services.mjs && node tests/validate-capacitor.mjs && node tests/validate-html.mjs && node tests/validate-heroes-design.mjs",
+    "validate": "node tests/validate-heroes.mjs && node tests/validate-product.mjs && node tests/validate-services.mjs && node tests/validate-capacitor.mjs && node tests/validate-html.mjs && node tests/validate-heroes-design.mjs && node tests/validate-solved-spots.mjs",
     "build": "node scripts/build.mjs",
     "android:init": "npm run build && npx cap add android",
     "cap:sync": "npm run build && npx cap sync android",
