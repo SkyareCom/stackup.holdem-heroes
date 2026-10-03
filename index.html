@@ -802,6 +802,29 @@ strong,b,em,i{
 .poker-card{border-radius:5px !important}
 .sheet{border-radius:28px 28px 0 0 !important}
 
+/* HEROES SHAPE SYSTEM — NO CAPSULES
+   Cards and buttons are rounded rectangles. Compact controls are rounded rectangles too. */
+.hero,.screen-visual,.scenario-section,.scenario-cell,.matrix-cell,.pressure,
+.profile-item,.spot-progress-card,.action-analysis,.action-quality,
+.action-quality-item,.swot-card,.splash-auth,.btn,.poker-action{
+  border-radius:18px !important;
+}
+
+.splash-lang,.filter,.pill,.severity,.bet-chip,.pot-label{
+  border-radius:10px !important;
+}
+
+/* Tracks/handles are not pills; keep only a minimal technical radius. */
+.profile-indicator-track,.sheet-handle{
+  border-radius:2px !important;
+}
+
+/* Naturally circular/special game elements only. */
+.hero-avatar,.dna-feed-dot{border-radius:50% !important}
+.poker-table{border-radius:48%/42% !important}
+.poker-card{border-radius:5px !important}
+.sheet{border-radius:28px 28px 0 0 !important}
+
 /* HEROES TYPOGRAPHY SYSTEM 10/12/14/16/20 · 400/600
    Brand identity (logo / STACKUP HOLD'EM / HEROES / POKER DNA) is intentionally excluded. */
 html,body,#app,.app,button,input,select,textarea{font-weight:400}
