@@ -46,6 +46,9 @@ expect(html.includes('updateProfileAccumulator(decision)'), 'every spot decision
 expect(html.includes('trackUsage("spot_viewed"'), 'viewing a solved spot must update usage history');
 expect(html.includes('trackUsage("decision"'), 'taking an action must update usage history');
 expect(html.includes('shouldPublishProfileToBridge'), 'cross-app profile sync must be throttled instead of publishing every interaction');
+expect(html.includes('window.StackUpHeroesData'), 'unified player-state API must be exposed for reports and future backend sync');
+expect(html.includes('stackup-heroes-player-state'), 'unified player-state schema must be declared');
+expect(html.includes('heroes:data-updated'), 'unified data update event must be emitted');
 
 if (failures.length) {
   console.error('Heroes validation failed:');
