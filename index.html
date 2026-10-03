@@ -2542,8 +2542,8 @@ trackUsage("app_open",{page:location.hash.replace("#","")||"home"});
 renderDNA();renderUnifiedProfileViews();renderLeaks();renderScenarios();renderPatterns();renderSwot();renderTrainingRecommendations();
 loadNextSolvedSpot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
-const existingSession=readJsonKey("heroes.session",{});
-if(existingSession?.authenticated===true)document.getElementById("splash")?.classList.add("hidden");
+// A tela de entrada deve aparecer em toda abertura. A sessão existente continua disponível
+// para os módulos internos, mas não pula a experiência visual de acesso.
 </script>
 </body>
 </html>
