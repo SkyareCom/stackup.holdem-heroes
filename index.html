@@ -297,6 +297,10 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
   color:var(--champ-1)
 }
 .splash-auth svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+.splash-auth-icon.biometric-icon{background:linear-gradient(180deg,rgba(216,178,142,.08),rgba(15,9,9,.42));border-color:rgba(216,178,142,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.splash-auth-icon.biometric-icon svg{width:21px;height:21px;stroke:var(--champ-2);stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.splash-auth-icon.google-icon{background:#fff;border-color:rgba(255,255,255,.72);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.splash-auth-icon.google-icon svg{width:20px;height:20px;stroke:none;fill:initial}
 .splash-auth-text{position:relative;z-index:1;display:grid;gap:4px;min-width:0}
 .splash-auth-text>span{
   font-size:10px;line-height:1.1;
@@ -839,14 +843,29 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
       </div>
 
       <button class="splash-auth" type="button" id="splashBiometric">
-        <span class="splash-auth-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6"/><path d="M18 9a6 6 0 0 0-6-6"/><path d="M5 12c0 4 1.6 7 4.4 9"/><path d="M19 12c0 4-1.6 7-4.4 9"/><path d="M8 10a4 4 0 0 1 8 0v3"/><path d="M12 8a2 2 0 0 0-2 2v4c0 2 .5 4 1.5 6"/><path d="M14 12v3c0 1.4-.2 2.7-.7 4"/></svg>
+        <span class="splash-auth-icon biometric-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2.75a7.25 7.25 0 0 0-7.25 7.25"/>
+            <path d="M19.25 10A7.25 7.25 0 0 0 12 2.75"/>
+            <path d="M6.3 12.2c0 3.7 1.15 6.7 3.5 9.05"/>
+            <path d="M17.7 12.2c0 3.55-1.02 6.42-3.15 8.75"/>
+            <path d="M8.2 10.6a3.8 3.8 0 0 1 7.6 0v2.65"/>
+            <path d="M12 8.45a2.15 2.15 0 0 0-2.15 2.15v3.55c0 2.15.48 4.12 1.45 5.9"/>
+            <path d="M14.15 11.1v3.1c0 1.7-.25 3.25-.8 4.65"/>
+          </svg>
         </span>
         <span class="splash-auth-text"><span id="splashBiometricLabel">Entrar com biometria</span><small id="splashBiometricSub">Acesso local neste dispositivo</small></span>
       </button>
 
       <button class="splash-auth" type="button" id="splashGoogle">
-        <span class="splash-auth-icon" aria-hidden="true">G</span>
+        <span class="splash-auth-icon google-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M21.35 12.22c0-.74-.07-1.45-.19-2.13H12v4.03h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.19 2.91-7.29z"/>
+            <path fill="#34A853" d="M12 21.72c2.62 0 4.82-.87 6.43-2.36l-3.14-2.45c-.87.58-1.98.92-3.29.92-2.53 0-4.67-1.71-5.44-4.01H3.32v2.52A9.72 9.72 0 0 0 12 21.72z"/>
+            <path fill="#FBBC05" d="M6.56 13.82a5.84 5.84 0 0 1 0-3.64V7.66H3.32a9.72 9.72 0 0 0 0 8.68l3.24-2.52z"/>
+            <path fill="#EA4335" d="M12 6.17c1.42 0 2.7.49 3.71 1.44l2.78-2.78C16.81 3.27 14.62 2.28 12 2.28a9.72 9.72 0 0 0-8.68 5.38l3.24 2.52C7.33 7.88 9.47 6.17 12 6.17z"/>
+          </svg>
+        </span>
         <span class="splash-auth-text"><span id="splashGoogleLabel">Entrar com Google</span><small id="splashGoogleSub">Conta Google</small></span>
       </button>
 
