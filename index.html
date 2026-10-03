@@ -1594,6 +1594,7 @@ const DECISION_QUALITY_META=[
   ["positionFit","AJUSTE POSICIONAL"],
   ["pressureControl","CONTROLE SOB PRESSÃO"],
   ["mathAwareness","QUALIDADE MATEMÁTICA"],
+  ["strategyAlignment","ALINHAMENTO À ESTRATÉGIA"],
   ["evAlignment","ALINHAMENTO DE EV"]
 ];
 
@@ -1641,12 +1642,27 @@ function resolveSolverAction(context,action,amount=0){
     const raises=ref.actions.filter(x=>String(x.key||"").startsWith("raise:"));
     if(raises.length)chosen=raises.sort((a,b)=>Math.abs(Number(String(a.key).split(":")[1])-amount)-Math.abs(Number(String(b.key).split(":")[1])-amount))[0];
   }
+  if(!chosen)return null;
+  const frequency=Number.isFinite(Number(chosen.frequency))?Number(chosen.frequency):0;
+  const maxFrequency=Math.max(0,...ref.actions.map(x=>Number(x.frequency)||0));
+  const strategyAlignment=clamp100(
+    frequency>=50?96:
+    frequency>=25?88:
+    frequency>=10?76:
+    frequency>=3?62:
+    frequency>0?46:18
+  );
   const evs=ref.actions.map(x=>Number(x.ev_bb)).filter(Number.isFinite);
-  if(!chosen||!evs.length||!Number.isFinite(Number(chosen.ev_bb)))return null;
-  const best=Math.max(...evs);
   const chosenEv=Number(chosen.ev_bb);
-  const loss=Math.max(0,best-chosenEv);
-  return {source:String(ref.source||"solver"),validated:true,chosen_ev_bb:chosenEv,best_ev_bb:best,ev_loss_bb:loss,frequency:Number.isFinite(Number(chosen.frequency))?Number(chosen.frequency):null,ev_alignment:clamp100(100-loss*35)};
+  const hasEv=evs.length>0&&Number.isFinite(chosenEv);
+  const best=hasEv?Math.max(...evs):null;
+  const loss=hasEv?Math.max(0,best-chosenEv):null;
+  return {
+    source:String(ref.source||"solver"),validated:true,has_ev:hasEv,
+    chosen_ev_bb:hasEv?chosenEv:null,best_ev_bb:hasEv?best:null,ev_loss_bb:hasEv?loss:null,
+    frequency,max_frequency:maxFrequency,strategy_alignment:strategyAlignment,
+    ev_alignment:hasEv?clamp100(100-loss*35):null
+  };
 }
 function evaluateDecisionContext(action,amount=0,context=getCurrentSpotContext()){
   const stack=Math.max(1,Number(context.effective_stack_bb)||1);
@@ -1673,16 +1689,21 @@ function evaluateDecisionContext(action,amount=0,context=getCurrentSpotContext()
   const pressureControl=clamp100(pressure<35?(action==="allin"?55:action==="raise"?78:82):action==="allin"?35:action==="raise"?62:84);
   const rangeDiscipline=clamp100(action==="fold"?84:action==="call"?74:action==="raise"?(amount<=Math.max(12,facing*2.5)?78:58):action==="allin"?(stack<=20?74:38):65);
   const mathAwareness=clamp100(action==="call"?(potOdds<=28?72:potOdds<=34?62:50):action==="raise"?(sizingQuality*.55+stackAwareness*.45):action==="allin"?stackAwareness:80);
-  const evAlignment=solver?solver.ev_alignment:null;
+  const strategyAlignment=solver?solver.strategy_alignment:null;
+  const evAlignment=solver?.has_ev?solver.ev_alignment:null;
   const contextualBase=(rangeDiscipline+sizingQuality+stackAwareness+positionFit+pressureControl+mathAwareness)/6;
-  const decisionQuality=clamp100(solver?contextualBase*.55+evAlignment*.45:Math.min(78,contextualBase));
+  const decisionQuality=clamp100(
+    solver?.has_ev?contextualBase*.40+strategyAlignment*.25+evAlignment*.35:
+    solver?contextualBase*.45+strategyAlignment*.55:
+    Math.min(78,contextualBase)
+  );
   const confidence=solver?clamp100(context?.solver_reference?.confidence||95):clamp100(38+(context?.range_context?.confidence||0)*.35);
 
   const aggressionIntensity=action==="allin"?100:action==="raise"?clamp100(72+investPct*.55):action==="call"?42:12;
   let aggressionClass="AGRESSIVIDADE BAIXA / CONTROLE";
   if(aggressionIntensity>=70){
-    if(solver&&evAlignment>=78)aggressionClass="AGRESSIVIDADE EFICIENTE";
-    else if(solver&&evAlignment<55)aggressionClass="AGRESSIVIDADE EXCESSIVA";
+    if(solver&&((solver.has_ev&&evAlignment>=78)||(!solver.has_ev&&strategyAlignment>=82)))aggressionClass="AGRESSIVIDADE EFICIENTE";
+    else if(solver&&((solver.has_ev&&evAlignment<55)||(!solver.has_ev&&strategyAlignment<50)))aggressionClass="AGRESSIVIDADE EXCESSIVA";
     else if(decisionQuality>=72&&sizingQuality>=70&&stackAwareness>=65)aggressionClass="AGRESSIVIDADE CONTEXTUALMENTE COERENTE";
     else if(decisionQuality<55||sizingQuality<50||stackAwareness<50)aggressionClass="AGRESSIVIDADE POTENCIALMENTE EXCESSIVA";
     else aggressionClass="AGRESSIVIDADE ALTA · A VALIDAR";
@@ -1690,10 +1711,10 @@ function evaluateDecisionContext(action,amount=0,context=getCurrentSpotContext()
   else if(action==="fold")aggressionClass="DISCIPLINA / PRESERVAÇÃO";
 
   return {
-    metrics:{decisionQuality,rangeDiscipline,sizingQuality,stackAwareness,positionFit,pressureControl,mathAwareness,evAlignment},
+    metrics:{decisionQuality,rangeDiscipline,sizingQuality,stackAwareness,positionFit,pressureControl,mathAwareness,strategyAlignment,evAlignment},
     confidence,aggressionIntensity,aggressionClass,solver,
     math:{pot_odds_required_pct:Number(potOdds.toFixed(1)),investment_pct_stack:Number(investPct.toFixed(1)),pot_before_action_bb:pot,facing_bet_bb:facing},
-    context_mode:solver?"solver-validated":"contextual-model",
+    context_mode:solver?(solver.has_ev?"solver-validated-ev":"solver-strategy-validated"):"contextual-model",
     context_snapshot:{street:context.street,hero_position:context.hero_position,villain_position:context.villain_position,effective_stack_bb:context.effective_stack_bb,tournament_phase:context.tournament_phase,icm_pressure:context.icm_pressure,opponent_profile:context.opponent_profile}
   };
 }
@@ -1722,13 +1743,19 @@ function renderDecisionQuality(evaluation){
   if(!evaluation)return;
   const q=evaluation.metrics.decisionQuality;
   if(grade)grade.textContent=q>=80?"MUITO FORTE":q>=68?"FORTE":q>=55?"NEUTRA":q>=42?"FRÁGIL":"MUITO FRÁGIL";
-  if(mode)mode.textContent=evaluation.solver?`SOLVER VALIDADO · CONFIANÇA ${evaluation.confidence}%`:`MODELO CONTEXTUAL · CONFIANÇA ${evaluation.confidence}% · EV PENDENTE`;
+  if(mode)mode.textContent=evaluation.solver
+    ?(evaluation.solver.has_ev?`SOLVER + EV · CONFIANÇA ${evaluation.confidence}%`:`ESTRATÉGIA SOLVER · CONFIANÇA ${evaluation.confidence}% · EV INDISPONÍVEL`)
+    :`MODELO CONTEXTUAL · CONFIANÇA ${evaluation.confidence}% · SOLVER PENDENTE`;
   if(list)list.innerHTML=DECISION_QUALITY_META.map(([key,label])=>{
     const value=evaluation.metrics[key];
     const shown=value===null||value===undefined?"—":clamp100(value);
     return `<div class="action-quality-item"><span>${label}</span><b>${shown}</b></div>`;
   }).join("")+`<div class="action-quality-item"><span>POT ODDS NECESSÁRIA</span><b>${evaluation.math.pot_odds_required_pct}%</b></div><div class="action-quality-item"><span>STACK INVESTIDO</span><b>${evaluation.math.investment_pct_stack}%</b></div>`;
-  if(read)read.textContent=`${evaluation.aggressionClass}. ${evaluation.solver?`EV escolhido ${evaluation.solver.chosen_ev_bb.toFixed(2)}bb · melhor EV ${evaluation.solver.best_ev_bb.toFixed(2)}bb · perda ${evaluation.solver.ev_loss_bb.toFixed(2)}bb.`:"O EV não é afirmado sem referência de solver validada; posição, stack, sizing, pressão e matemática objetiva entram na leitura contextual."}`;
+  if(read)read.textContent=`${evaluation.aggressionClass}. ${evaluation.solver
+    ?(evaluation.solver.has_ev
+      ?`Frequência solver ${evaluation.solver.frequency.toFixed(1)}% · EV escolhido ${evaluation.solver.chosen_ev_bb.toFixed(2)}bb · melhor EV ${evaluation.solver.best_ev_bb.toFixed(2)}bb · perda ${evaluation.solver.ev_loss_bb.toFixed(2)}bb.`
+      :`Frequência solver ${evaluation.solver.frequency.toFixed(1)}% · alinhamento estratégico ${evaluation.solver.strategy_alignment}/100. EV numérico não disponível neste solve.`)
+    :"O solver ainda não forneceu referência validada para esta leitura."}`;
 }
 
 function buildCanonicalDecisionSignals(base,evaluation,context,action,amount=0){
@@ -2216,16 +2243,18 @@ function recordSpotDecision(action,amount,button){
     context_snapshot:evaluation.context_snapshot,
     decision_quality:evaluation,
     ev_analysis:evaluation.solver?{
-      status:"validated",
+      status:evaluation.solver.has_ev?"validated":"strategy_validated_ev_unavailable",
       source:evaluation.solver.source,
       chosen_ev_bb:evaluation.solver.chosen_ev_bb,
       best_ev_bb:evaluation.solver.best_ev_bb,
       ev_loss_bb:evaluation.solver.ev_loss_bb,
-      alignment:evaluation.solver.ev_alignment
+      alignment:evaluation.solver.ev_alignment,
+      strategy_alignment:evaluation.solver.strategy_alignment,
+      frequency:evaluation.solver.frequency
     }:{
-      status:"solver_strategy_validated_ev_unavailable",
-      source:context.solver||"solver",
-      chosen_ev_bb:null,best_ev_bb:null,ev_loss_bb:null,alignment:null
+      status:"solver_reference_unavailable",
+      source:context.solver||null,
+      chosen_ev_bb:null,best_ev_bb:null,ev_loss_bb:null,alignment:null,strategy_alignment:null,frequency:null
     }
   };
   updateProfileAccumulator(decision);
@@ -2245,7 +2274,9 @@ function recordSpotDecision(action,amount,button){
   renderTrainingRecommendations();
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.classList.toggle("selected",btn===button);btn.disabled=true});
   if(spotDecisionText)spotDecisionText.textContent=`${label} registrado`;
-  if(spotDecisionMeta)spotDecisionMeta.textContent=`Solve ${context.solve_id||"validado"} · decisão adicionada ao DNA Player.`;
+  if(spotDecisionMeta)spotDecisionMeta.textContent=evaluation.solver?.has_ev
+    ?`Solve ${context.solve_id||"validado"} · estratégia e EV incorporados ao DNA Player.`
+    :`Solve ${context.solve_id||"validado"} · estratégia validada incorporada; EV numérico indisponível.`;
   if(nextSpotBtn)nextSpotBtn.hidden=false;
 }
 pokerActions?.addEventListener("click",e=>{
