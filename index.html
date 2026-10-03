@@ -2593,7 +2593,7 @@ function accessWithStackId(){
 document.getElementById("splashLanguages")?.addEventListener("click",e=>{
   const btn=e.target.closest("[data-splash-lang]");if(btn)setSplashLanguage(btn.dataset.splashLang);
 });
-document.getElementById("splashBiometric")?.addEventListener("click",accessWithBiometric);
+document.getElementById("splashBiometric")?.addEventListener("click",()=>document.getElementById("splash")?.classList.add("hidden"));
 document.getElementById("splashGoogle")?.addEventListener("click",accessWithGoogle);
 document.getElementById("splashStackId")?.addEventListener("click",accessWithStackId);
 setSplashLanguage(splashLanguage());
