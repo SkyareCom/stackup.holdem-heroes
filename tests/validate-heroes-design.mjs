@@ -19,13 +19,15 @@ expect(style.includes('.scenario-cell strong{font-size:30px'),'scenario scores m
 
 
 for(const token of ['#0F0909','#160B0D','#2A1114','#8D5B46','#D8B28E','#EEE1D1']) expect(html.includes(token),`missing HEROES palette token ${token}`);
-expect(html.includes('@font-face{font-family:"Roboto Slab"'),'Roboto Slab must be embedded');
-expect(html.includes('data:font/ttf;base64,'),'Roboto Slab must be self-contained');
-expect(html.includes('--display:"Roboto Slab"'),'display typography must use Roboto Slab');
-expect(html.includes('--ui:"Roboto Slab"'),'UI typography must use Roboto Slab');
-expect(html.includes('font-style:oblique 12deg'),'Heroes typography must use visible oblique styling');
-expect(!html.includes('fonts.googleapis.com'),'external font loading must be removed');
+expect(html.includes('@font-face{font-family:"Antic Slab"'),'Antic Slab must be embedded');
+expect(html.includes('data:font/ttf;base64,'),'Antic Slab must be self-contained');
+expect(html.includes('--display:"Antic Slab"'),'display typography must use Antic Slab');
+expect(html.includes('--ui:"Antic Slab"'),'UI typography must use Antic Slab');
+expect(!html.includes('font-family:"Roboto Slab"'),'Roboto Slab must be removed');
 expect(!html.includes('font-family:Dosis'),'legacy Dosis typography must be removed');
+expect(!html.includes('font-style:oblique'),'oblique typography must be removed');
+expect(!html.includes('font-style:italic'),'italic typography must be removed');
+expect(!html.includes('fonts.googleapis.com'),'external font loading must be removed');
 for(const label of ['DESCUBRA SEU POKER DNA','SEU POKER DNA','O AGRESSOR CONTROLADO','O QUE ESTÁ CUSTANDO EV?','DNA SOB PRESSÃO','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
 for(const tab of ['INÍCIO','DNA','LEAKS','ANÁLISE','PERFIL']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
 expect((html.match(/data-tab=/g)||[]).length===5,'bottom navigation must contain exactly 5 tabs');
