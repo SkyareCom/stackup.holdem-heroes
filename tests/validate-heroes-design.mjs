@@ -51,6 +51,8 @@ expect(!html.includes('page-dragging'),'footer swipe must not use live whole-pag
 expect(!html.includes('active.style.opacity'),'footer swipe must not animate opacity during drag');
 expect(!html.includes('setTimeout(()=>showScreen'),'footer swipe must not delay page changes with setTimeout');
 expect(style.includes('animation:pageEnterRight .16s ease-out'),'footer page change must use a short single-shot transition');
+expect(!html.includes('page-dragging') && !html.includes('page-returning'),'stale whole-page swipe classes must remain removed');
+expect(html.includes('addEventListener("animationend"'),'footer transition cleanup must use animationend instead of timers');
 expect(!html.includes('spotsScreen.addEventListener("touchstart"'),'legacy Spots-only swipe handler must be removed');
 expect(html.includes('data-photo-slot="home"'),'Premium background/photo slot missing');
 expect((html.match(/images\.unsplash\.com\/photo-/g)||[]).length >= 5,'expected at least 5 real photographic poker backgrounds');
