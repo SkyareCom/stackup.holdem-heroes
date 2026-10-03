@@ -769,11 +769,15 @@ strong,b,em,i{
 .player-seat.hero-position-seat{opacity:.08}
 .poker-action.loading{opacity:.35;pointer-events:none}
 
-/* HEROES TYPOGRAPHY SYSTEM 10/12/14 · 400/600 */
+/* HEROES TYPOGRAPHY SYSTEM 10/12/14/16/20 · 400/600
+   Brand identity (logo / STACKUP HOLD'EM / HEROES / POKER DNA) is intentionally excluded. */
 html,body,#app,.app,button,input,select,textarea{font-weight:400}
 
-/* 10px — microcopy, labels, navigation, metadata */
-.brand-kicker,.brand-sub,.eyebrow,.section-kicker,.section-link,
+/* Remove decorative online/status indicator from header. */
+.status-dot{display:none !important}
+
+/* 10px — microcopy, labels, navigation and metadata */
+.eyebrow,.section-kicker,.section-link,
 .dna-label,.baseline,.feature-meta,.mini-label,.scenario-desc,
 .filter,.severity,.tab,.spot-progress-card b,.pressure-stat span,
 .splash-lang,.splash-auth-text small,.splash-status{
@@ -781,39 +785,39 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
   font-weight:400 !important;
 }
 
-/* 12px — supporting copy */
-.hero-copy,.body-copy,.feature-note,.dna-row-copy,.recommend,
+/* 12px — secondary/supporting copy */
+.feature-note,.dna-row-copy,.recommend,
 .screen-visual-copy,.scenario-cell em,.setting span,.profile-id,
 .spot-session-copy,.splash-auth-text>span{
   font-size:12px !important;
   font-weight:400 !important;
 }
 
-/* 14px — section/card titles and primary UI copy */
-.section-title,.feature-title,.dna-row-name,.leak-title,.scenario-name,
-.scenario-cell span,.setting strong,.btn,.pill,.filter.active,
-.archetype,.screen-visual-title,.spot-session-title,.insight,
-.profile-item .mini-value,.mini-value,.pressure-stat b{
+/* 14px — primary body copy and controls */
+.hero-copy,.body-copy,.insight,.btn,.pill,
+.scenario-cell span,.setting strong,.dna-row-name{
   font-size:14px !important;
+  font-weight:400 !important;
+}
+
+/* 16px — card and subsection titles */
+.feature-title,.leak-title,.scenario-name,
+.spot-session-title,.profile-item .mini-value,.mini-value,
+.pressure-stat b,.archetype{
+  font-size:16px !important;
   font-weight:600 !important;
 }
 
-/* Opening hierarchy follows the same weights; only brand scale is exceptional. */
-.splash-kicker,.splash-copy{
-  font-size:14px !important;
-  font-weight:600 !important;
-}
-.splash-brand{
-  font-weight:600 !important;
-}
-.brand-title{
-  font-weight:600 !important;
-}
-.display-xl,.profile-name,.dna-value,.dna-row-score,.feature-score,
-.scenario-cell strong,.matrix-score,.archetype{
+/* 20px — page titles, scores and primary emphasis */
+.section-title,.screen-visual-title,.display-xl,
+.profile-name,.dna-value,.dna-row-score,.feature-score,
+.scenario-cell strong,.matrix-score{
+  font-size:20px !important;
   font-weight:600 !important;
 }
 
+/* Weight normalization outside protected brand identity. */
+.filter.active{font-weight:600 !important}
 </style>
 </head>
 <body data-build="heroes-emblem-97de056">
