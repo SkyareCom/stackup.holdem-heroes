@@ -406,38 +406,164 @@ strong,b,em,i{
   font-style:normal !important;
 }
 
-/* Spots horizontal swipe pager — deterministic transform */
-.screen[data-screen="spots"]{touch-action:pan-y}
-.spot-pager{width:100%;position:relative;overflow:hidden}
-.spot-viewport{
+/* HEROES premium 9-max Spots table */
+.spot-intro{margin-bottom:24px}
+.spot-intro .archetype{margin-top:6px}
+.spot-session-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 18px}
+.spot-session-title{font-family:var(--display);font-size:24px;line-height:1.05;color:var(--cream-2);margin-top:5px}
+.spot-session-copy{font-size:11px;line-height:1.45;color:var(--muted-1);margin-top:5px}
+.spot-progress-card{flex:0 0 auto;min-width:74px;text-align:center;border:1px solid var(--line-1);border-radius:14px;padding:9px 10px;background:rgba(42,17,20,.68)}
+.spot-progress-card span{display:block;font-size:14px;color:var(--champ-1)}
+.spot-progress-card b{display:block;margin-top:4px;font-size:8px;letter-spacing:.16em;color:var(--muted-1);font-weight:400}
+
+.poker-simulator{width:100%}
+.poker-table-wrap{position:relative;padding:34px 0 54px}
+.poker-table{
+  position:relative;
   width:100%;
-  overflow:hidden;
-  touch-action:pan-y;
+  aspect-ratio:1.46/1;
+  min-height:280px;
+  border-radius:48%/42%;
+  background:
+    radial-gradient(circle at 50% 48%,rgba(255,255,255,.035),transparent 38%),
+    linear-gradient(145deg,#0d4a32,#063724 58%,#05291d);
+  border:9px solid #291a18;
+  box-shadow:
+    inset 0 0 0 2px rgba(216,178,142,.24),
+    inset 0 0 34px rgba(0,0,0,.48),
+    0 18px 34px rgba(0,0,0,.34);
+  overflow:visible;
 }
-.spot-track{
-  display:flex;
-  width:100%;
-  transform:translate3d(0,0,0);
-  transition:transform .28s cubic-bezier(.22,.8,.25,1);
-  will-change:transform;
+.poker-table:before{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:inherit;
+  border:1px solid rgba(188,128,98,.45);
+  pointer-events:none
 }
-.spot-track.dragging{transition:none}
-.spot-page{
-  flex:0 0 100%;
-  width:100%;
-  min-width:100%;
-  padding:0 2px;
+.felt-mark{
+  position:absolute;left:50%;top:57%;transform:translate(-50%,-50%);
+  font-family:var(--display);font-size:28px;letter-spacing:.08em;color:rgba(238,225,209,.055);
+  pointer-events:none
 }
-.spot-page .scenario-section{height:100%;margin:0}
-.spot-pager-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px}
-.spot-counter{font-size:11px;letter-spacing:.12em;color:var(--muted-1)}
-.spot-dots{display:flex;align-items:center;gap:8px}
-.spot-dot{width:7px;height:7px;border:0;border-radius:999px;padding:0;background:var(--muted-2);opacity:.45;transition:width .2s ease,opacity .2s ease,background .2s ease}
-.spot-dot.active{width:22px;opacity:1;background:var(--champ-1)}
-.spot-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.spot-actions .btn:disabled{opacity:.32;cursor:default}
-@media (prefers-reduced-motion:reduce){
-  .spot-track,.spot-dot{transition:none}
+.player-seat,.hero-seat{position:absolute;z-index:5;text-align:center;transform:translate(-50%,-50%)}
+.player-seat{width:54px}
+.seat-avatar,.hero-avatar{
+  width:44px;height:44px;margin:0 auto;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(145deg,#261517,#100a0b);
+  border:1px solid rgba(216,178,142,.72);
+  box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 0 0 3px rgba(216,178,142,.045)
+}
+.seat-avatar span,.hero-avatar span{font-family:var(--display);font-size:10px;color:var(--cream-2);letter-spacing:.03em}
+.seat-stack,.hero-stack{margin-top:3px;font-size:9px;line-height:1;color:var(--cream-1);white-space:nowrap}
+.active-bettor .seat-avatar{border-color:var(--champ-1);box-shadow:0 0 0 2px rgba(216,178,142,.12),0 6px 14px rgba(0,0,0,.35)}
+.bet-chip{
+  position:absolute;left:-7px;top:48px;padding:3px 6px;border-radius:999px;
+  background:#160b0d;border:1px solid rgba(216,178,142,.35);
+  font-size:8px;color:var(--champ-1);white-space:nowrap
+}
+
+.seat-utg{left:31%;top:5%}
+.seat-utg1{left:51%;top:-1%}
+.seat-utg2{left:72%;top:6%}
+.seat-lj{left:91%;top:33%}
+.seat-hj{left:90%;top:68%}
+.seat-co{left:72%;top:91%}
+.seat-sb{left:27%;top:91%}
+.seat-bb{left:9%;top:63%}
+
+.table-center{
+  position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
+  z-index:4;width:68%;text-align:center
+}
+.pot-label{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:999px;background:rgba(8,18,13,.72);
+  border:1px solid rgba(216,178,142,.2);
+  font-size:8px;letter-spacing:.12em;color:var(--muted-1)
+}
+.pot-label strong{font-family:var(--display);font-size:13px;color:var(--champ-2);font-weight:400;letter-spacing:0}
+.board-cards,.hero-cards{display:flex;justify-content:center;gap:4px}
+.board-cards{margin-top:9px}
+.poker-card{
+  width:34px;height:48px;border-radius:5px;background:#f2eadf;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+  padding:4px 4px 2px;box-shadow:0 4px 8px rgba(0,0,0,.25);
+  font-family:Georgia,serif;font-style:normal!important;color:#111
+}
+.poker-card span{font-size:14px;line-height:1;font-weight:700}
+.poker-card b{font-size:15px;line-height:1;font-weight:400;margin-top:2px}
+.poker-card.red{color:#a32f35}
+.poker-card.back{
+  background:linear-gradient(135deg,#271316,#41191e);
+  border:1px dashed rgba(216,178,142,.4);
+  color:rgba(238,225,209,.4);
+  align-items:center;justify-content:center;padding:0
+}
+.poker-card.back span{font-family:var(--display);font-weight:400}
+.hero-turn{margin-top:9px;font-size:9px;letter-spacing:.18em;color:var(--champ-1)}
+
+.hero-seat{left:50%;top:99%;width:82px}
+.hero-cards{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);gap:2px}
+.hero-card{width:32px;height:45px;transform:rotate(-4deg)}
+.hero-card+ .hero-card{transform:rotate(4deg)}
+.hero-avatar{width:50px;height:50px;background:linear-gradient(145deg,#3a1c20,#120a0c);border:2px solid var(--champ-1)}
+.hero-avatar span{font-size:11px}
+.hero-label{margin-top:3px;font-family:var(--display);font-size:11px;color:var(--champ-2);letter-spacing:.08em}
+
+.dna-feed{
+  display:flex;align-items:flex-start;gap:10px;
+  margin:6px 0 14px;padding:11px 12px;
+  border-top:1px solid var(--line-1);border-bottom:1px solid var(--line-1)
+}
+.dna-feed-dot{width:7px;height:7px;border-radius:50%;margin-top:4px;background:var(--champ-1);box-shadow:0 0 0 4px rgba(216,178,142,.08)}
+.dna-feed div{display:grid;gap:2px}
+.dna-feed b{font-size:9px;letter-spacing:.14em;color:var(--champ-1);font-weight:400}
+.dna-feed span:not(.dna-feed-dot){font-size:10px;line-height:1.45;color:var(--muted-1)}
+
+.poker-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.poker-action{
+  min-width:0;min-height:62px;border:1px solid var(--line-1);border-radius:14px;
+  background:linear-gradient(150deg,rgba(50,20,25,.92),rgba(22,11,13,.96));
+  color:var(--cream-1);padding:9px 5px;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  box-shadow:0 7px 14px rgba(0,0,0,.18)
+}
+.poker-action span{font-family:var(--display);font-size:13px;line-height:1.05}
+.poker-action small{font-size:8px;line-height:1.2;color:var(--muted-1);margin-top:4px;text-align:center}
+.poker-action.call{border-color:rgba(114,137,110,.56);background:linear-gradient(150deg,rgba(32,70,50,.8),rgba(14,37,26,.95))}
+.poker-action.fold{border-color:rgba(150,63,68,.48);background:linear-gradient(150deg,rgba(92,28,34,.84),rgba(43,15,19,.95))}
+.poker-action.suggested{border-color:rgba(216,178,142,.52);background:linear-gradient(150deg,rgba(141,91,70,.5),rgba(42,17,20,.96))}
+.poker-action.allin{grid-column:span 2;border-color:rgba(188,128,98,.56);background:linear-gradient(150deg,rgba(118,31,39,.94),rgba(61,17,23,.98))}
+.poker-action:disabled{opacity:.34;box-shadow:none}
+.poker-action.selected{outline:2px solid var(--champ-1);outline-offset:1px}
+.poker-action:active:not(:disabled){transform:translateY(1px)}
+
+.spot-decision{
+  margin-top:12px;padding:14px 0 0;border-top:1px solid var(--line-1);
+  display:flex;align-items:center;justify-content:space-between;gap:14px
+}
+.spot-decision>div{display:grid;gap:3px}
+.spot-decision strong{font-family:var(--display);font-size:17px;color:var(--cream-2);font-weight:400}
+.spot-decision small{font-size:9px;line-height:1.4;color:var(--muted-1)}
+
+@media (max-width:380px){
+  .poker-table-wrap{padding-top:30px}
+  .seat-avatar{width:40px;height:40px}
+  .player-seat{width:50px}
+  .poker-card{width:30px;height:43px}
+  .poker-card span{font-size:12px}.poker-card b{font-size:13px}
+  .poker-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .poker-action.allin{grid-column:span 3}
+}
+@media (max-width:330px){
+  .poker-table{min-height:245px;border-width:7px}
+  .seat-avatar{width:36px;height:36px}
+  .seat-avatar span{font-size:8px}
+  .seat-stack{font-size:8px}
+  .poker-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .poker-action.allin{grid-column:span 2}
 }
 </style>
 </head>
@@ -543,77 +669,127 @@ strong,b,em,i{
           <div class="screen-visual-content">
             <div class="section-kicker">SPOTS DO JOGADOR</div>
             <div class="screen-visual-title">Decisões que revelam seu perfil.</div>
-            <div class="screen-visual-copy">Revise situações representativas do seu jogo e veja onde suas decisões reforçam ou alteram seu Poker DNA.</div>
+            <div class="screen-visual-copy">Treine situações reais e transforme cada decisão em informação para o seu Poker DNA.</div>
           </div>
         </div>
 
-        <div class="editorial-panel" style="margin-bottom:24px">
+        <div class="editorial-panel spot-intro">
           <div class="section-kicker">TREINO DE SPOTS</div>
-          <div class="archetype" style="margin-top:6px">Treine seus spots. Revele seu Poker DNA.</div>
-          <div class="body-copy">Cada decisão ajuda o HEROES a identificar padrões do seu jogo, revelar forças, detectar leaks e entender como você reage em diferentes contextos da mesa.</div>
+          <div class="archetype">Treine seus spots. Revele seu Poker DNA.</div>
+          <div class="body-copy">Cada decisão ajuda o HEROES a reconhecer padrões, forças, leaks e mudanças de comportamento. O DNA Player evolui conforme a amostra cresce.</div>
         </div>
 
-        <div class="section-head">
-          <div><div class="section-kicker">SPOTS RECENTES</div><h1 class="section-title">SPOTS</h1></div>
+        <div class="spot-session-head">
+          <div>
+            <div class="section-kicker">SPOT ATUAL</div>
+            <div class="spot-session-title">TURN · BTN vs HJ</div>
+            <div class="spot-session-copy">MTT 9-max · 44bb efetivos · pote single-raised</div>
+          </div>
+          <div class="spot-progress-card">
+            <span id="spotNumber">12 / 50</span>
+            <b>MÉDIO</b>
+          </div>
         </div>
-        <div class="body-copy" style="margin-bottom:18px">Revise situações representativas do seu jogo e observe como posição, stack, street e pressão moldam seu perfil.</div>
 
-        <div class="spot-pager" id="spotPager" aria-label="Navegação entre spots">
-          <div class="spot-viewport" id="spotViewport">
-            <div class="spot-track" id="spotTrack">
-            <article class="spot-page" data-spot-page="0">
-              <section class="scenario-section">
-                <div class="scenario-head">
-                  <div class="scenario-name">BOLHA · BTN vs BB</div>
-                  <div class="scenario-desc">22bb · MTT · decisão sob pressão</div>
-                </div>
-                <div class="scenario-grid">
-                  <div class="scenario-cell"><span>DECISÃO</span><strong>Raise</strong><em>agressividade acima da baseline</em></div>
-                  <div class="scenario-cell"><span>PRESSÃO</span><strong>82</strong><em>zona de maior variação</em></div>
-                </div>
-              </section>
-            </article>
+        <div class="poker-simulator" id="pokerSimulator">
+          <div class="poker-table-wrap">
+            <div class="poker-table" aria-label="Mesa de poker 9 jogadores">
+              <div class="felt-mark">HEROES</div>
 
-            <article class="spot-page" data-spot-page="1">
-              <section class="scenario-section">
-                <div class="scenario-head">
-                  <div class="scenario-name">CO vs BTN · 40bb</div>
-                  <div class="scenario-desc">pot 3-bet · adaptação posicional</div>
-                </div>
-                <div class="scenario-grid">
-                  <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>linha dentro do padrão</em></div>
-                  <div class="scenario-cell"><span>DISCIPLINA</span><strong>74</strong><em>boa manutenção de range</em></div>
-                </div>
-              </section>
-            </article>
+              <div class="player-seat seat-utg">
+                <div class="seat-avatar"><span>UTG</span></div>
+                <div class="seat-stack">52bb</div>
+              </div>
+              <div class="player-seat seat-utg1">
+                <div class="seat-avatar"><span>UTG+1</span></div>
+                <div class="seat-stack">68bb</div>
+              </div>
+              <div class="player-seat seat-utg2">
+                <div class="seat-avatar"><span>UTG+2</span></div>
+                <div class="seat-stack">37bb</div>
+              </div>
+              <div class="player-seat seat-lj">
+                <div class="seat-avatar"><span>LJ</span></div>
+                <div class="seat-stack">91bb</div>
+              </div>
+              <div class="player-seat seat-hj active-bettor">
+                <div class="seat-avatar"><span>HJ</span></div>
+                <div class="seat-stack">44bb</div>
+                <div class="bet-chip">6bb</div>
+              </div>
+              <div class="player-seat seat-co">
+                <div class="seat-avatar"><span>CO</span></div>
+                <div class="seat-stack">73bb</div>
+              </div>
+              <div class="player-seat seat-sb">
+                <div class="seat-avatar"><span>SB</span></div>
+                <div class="seat-stack">31bb</div>
+              </div>
+              <div class="player-seat seat-bb">
+                <div class="seat-avatar"><span>BB</span></div>
+                <div class="seat-stack">58bb</div>
+              </div>
 
-            <article class="spot-page" data-spot-page="2">
-              <section class="scenario-section">
-                <div class="scenario-head">
-                  <div class="scenario-name">BB · River</div>
-                  <div class="scenario-desc">pote grande · decisão de showdown</div>
+              <div class="table-center">
+                <div class="pot-label">POT <strong id="spotPot">10.5bb</strong></div>
+                <div class="board-cards" id="boardCards">
+                  <div class="poker-card black"><span>Q</span><b>♠</b></div>
+                  <div class="poker-card red"><span>8</span><b>♥</b></div>
+                  <div class="poker-card black"><span>3</span><b>♣</b></div>
+                  <div class="poker-card red"><span>J</span><b>♦</b></div>
+                  <div class="poker-card back"><span>?</span></div>
                 </div>
-                <div class="scenario-grid">
-                  <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>hero call acima do padrão</em></div>
-                  <div class="scenario-cell"><span>IMPACTO</span><strong>-7 EV</strong><em>spot ligado a leak recorrente</em></div>
+                <div class="hero-turn">SUA AÇÃO</div>
+              </div>
+
+              <div class="hero-seat">
+                <div class="hero-cards">
+                  <div class="poker-card hero-card black"><span>A</span><b>♠</b></div>
+                  <div class="poker-card hero-card red"><span>K</span><b>♥</b></div>
                 </div>
-              </section>
-            </article>
+                <div class="hero-avatar"><span>BTN</span></div>
+                <div class="hero-label">HERO</div>
+                <div class="hero-stack" id="heroStack">44bb</div>
+              </div>
             </div>
           </div>
 
-          <div class="spot-pager-meta">
-            <div class="spot-counter" id="spotCounter">1 / 3</div>
-            <div class="spot-dots" id="spotDots" aria-label="Posição atual">
-              <button class="spot-dot active" type="button" data-spot-index="0" aria-label="Spot 1"></button>
-              <button class="spot-dot" type="button" data-spot-index="1" aria-label="Spot 2"></button>
-              <button class="spot-dot" type="button" data-spot-index="2" aria-label="Spot 3"></button>
-            </div>
+          <div class="dna-feed">
+            <span class="dna-feed-dot"></span>
+            <div><b>DNA PLAYER</b><span>Esta decisão será incorporada ao seu perfil e à análise de leaks.</span></div>
           </div>
 
-          <div class="spot-actions">
-            <button class="btn secondary" id="spotPrev" type="button">ANTERIOR</button>
-            <button class="btn primary" id="spotNext" type="button">PRÓXIMO</button>
+          <div class="poker-actions" id="pokerActions">
+            <button class="poker-action" type="button" data-poker-action="check" disabled>
+              <span>CHECK</span><small>indisponível</small>
+            </button>
+            <button class="poker-action call" type="button" data-poker-action="call" data-amount="6">
+              <span>CALL</span><small>6bb</small>
+            </button>
+            <button class="poker-action fold" type="button" data-poker-action="fold">
+              <span>FOLD</span><small>encerrar mão</small>
+            </button>
+            <button class="poker-action" type="button" data-poker-action="raise" data-amount="12">
+              <span>RAISE</span><small>12bb · mínimo</small>
+            </button>
+            <button class="poker-action suggested" type="button" data-poker-action="raise" data-amount="15">
+              <span>RAISE 15bb</span><small>sugerido</small>
+            </button>
+            <button class="poker-action suggested" type="button" data-poker-action="raise" data-amount="20">
+              <span>RAISE 20bb</span><small>sugerido</small>
+            </button>
+            <button class="poker-action allin" type="button" data-poker-action="allin" data-amount="44">
+              <span>ALL IN</span><small>44bb</small>
+            </button>
+          </div>
+
+          <div class="spot-decision" id="spotDecision" aria-live="polite">
+            <div>
+              <span class="section-kicker">DECISÃO</span>
+              <strong id="spotDecisionText">Escolha sua ação.</strong>
+              <small id="spotDecisionMeta">A resposta será registrada no DNA Player.</small>
+            </div>
+            <button class="section-link" id="nextSpotBtn" type="button" hidden>PRÓXIMO SPOT</button>
           </div>
         </div>
       </section>
@@ -964,35 +1140,64 @@ document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet()
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
 
 
-const spotPager=document.getElementById("spotPager");
-const spotTrack=document.getElementById("spotTrack");
-const spotPages=[...document.querySelectorAll(".spot-page")];
-const spotDots=[...document.querySelectorAll(".spot-dot")];
-const spotCounter=document.getElementById("spotCounter");
-const spotPrev=document.getElementById("spotPrev");
-const spotNext=document.getElementById("spotNext");
-let spotIndex=0;
+const pokerActions=document.getElementById("pokerActions");
+const spotDecisionText=document.getElementById("spotDecisionText");
+const spotDecisionMeta=document.getElementById("spotDecisionMeta");
+const nextSpotBtn=document.getElementById("nextSpotBtn");
+const spotNumber=document.getElementById("spotNumber");
+let currentSpotSequence=12;
 
-function syncSpotPager(){
-  if(!spotPages.length)return;
-  if(spotCounter)spotCounter.textContent=`${spotIndex+1} / ${spotPages.length}`;
-  spotDots.forEach((dot,i)=>dot.classList.toggle("active",i===spotIndex));
-  if(spotPrev)spotPrev.disabled=spotIndex===0;
-  if(spotNext)spotNext.disabled=spotIndex===spotPages.length-1;
+function getSpotDecisionHistory(){
+  try{return JSON.parse(store.get("heroes.spotDecisions")||"[]")}catch{return []}
 }
-function setSpotTransform(){
-  if(!spotTrack)return;
-  spotTrack.style.transform=`translate3d(${-spotIndex*100}%,0,0)`;
+function recordSpotDecision(action,amount,button){
+  const label=action==="raise"&&amount?`RAISE ${amount}bb`:action==="allin"?"ALL IN":action.toUpperCase();
+  const decision={
+    spot_id:`heroes_spot_${currentSpotSequence}`,
+    timestamp:new Date().toISOString(),
+    game:"NLH",
+    format:"MTT",
+    table_size:9,
+    street:"turn",
+    hero_position:"BTN",
+    effective_stack_bb:44,
+    pot_bb:10.5,
+    facing_bet_bb:6,
+    board:["Qs","8h","3c","Jd"],
+    hero_hand:["As","Kh"],
+    action,
+    amount_bb:amount||0
+  };
+  const history=getSpotDecisionHistory();
+  history.unshift(decision);
+  store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,500)));
+
+  document.querySelectorAll("[data-poker-action]").forEach(btn=>{
+    btn.classList.toggle("selected",btn===button);
+    btn.disabled=true;
+  });
+  if(spotDecisionText)spotDecisionText.textContent=`${label} registrado`;
+  if(spotDecisionMeta)spotDecisionMeta.textContent="Decisão adicionada à amostra do DNA Player.";
+  if(nextSpotBtn)nextSpotBtn.hidden=false;
 }
-function goToSpot(index){
-  spotIndex=Math.max(0,Math.min(spotPages.length-1,index));
-  setSpotTransform();
-  syncSpotPager();
-}
-spotPrev?.addEventListener("click",()=>goToSpot(spotIndex-1));
-spotNext?.addEventListener("click",()=>goToSpot(spotIndex+1));
-spotDots.forEach(dot=>dot.addEventListener("click",()=>goToSpot(Number(dot.dataset.spotIndex))));
-goToSpot(0);
+pokerActions?.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-poker-action]");
+  if(!btn||btn.disabled)return;
+  const action=btn.dataset.pokerAction;
+  const amount=Number(btn.dataset.amount||0);
+  recordSpotDecision(action,amount,btn);
+});
+nextSpotBtn?.addEventListener("click",()=>{
+  currentSpotSequence=currentSpotSequence>=50?1:currentSpotSequence+1;
+  if(spotNumber)spotNumber.textContent=`${currentSpotSequence} / 50`;
+  document.querySelectorAll("[data-poker-action]").forEach(btn=>{
+    btn.classList.remove("selected");
+    if(btn.dataset.pokerAction!=="check")btn.disabled=false;
+  });
+  if(spotDecisionText)spotDecisionText.textContent="Escolha sua ação.";
+  if(spotDecisionMeta)spotDecisionMeta.textContent="A resposta será registrada no DNA Player.";
+  nextSpotBtn.hidden=true;
+});
 
 renderDNA();renderLeaks();renderScenarios();renderPatterns();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
