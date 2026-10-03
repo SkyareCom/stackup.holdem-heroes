@@ -914,14 +914,20 @@ strong,b,em,i{
         </div>
         <div class="profile-hero">
           <div class="section-kicker">STACKUP ID</div>
-          <div class="profile-name">Player 0217</div>
+          <div class="profile-name" id="profileName">Jogador local</div>
           <div class="profile-id" id="profileConfidenceLine">heroes / profile confidence —</div>
           <div class="profile-grid">
-            <div class="profile-item"><div class="mini-label">PLANO</div><div class="mini-value">GRÁTIS</div></div>
+            <div class="profile-item"><div class="mini-label">PLANO</div><div class="mini-value" id="profilePlan">GRÁTIS</div></div>
             <div class="profile-item"><div class="mini-label">DECISÕES ANALISADAS</div><div class="mini-value" id="profileDecisionCount">0</div></div>
             <div class="profile-item"><div class="mini-label">CONFIANÇA DO DNA</div><div class="mini-value" id="profileConfidenceValue">—</div></div>
             <div class="profile-item"><div class="mini-label">ÚLTIMA ATUALIZAÇÃO</div><div class="mini-value" id="profileUpdatedAt">—</div></div>
           </div>
+        </div>
+
+        <div class="section" id="profileActivity">
+          <div class="section-head"><div><div class="section-kicker">ATIVIDADE SINCRONIZADA</div><h2 class="section-title">USO DO HEROES</h2></div></div>
+          <div class="profile-grid" id="usageMetricsGrid"></div>
+          <div id="recentActivity" style="margin-top:12px"></div>
         </div>
 
         <div class="section">
@@ -936,7 +942,7 @@ strong,b,em,i{
           <div class="setting"><strong>Preferências de análise</strong><span>MTT · NLH</span></div>
           <div class="setting"><strong>Privacidade</strong><span>Gerenciar</span></div>
           <div class="setting"><strong>Plano HEROES</strong><span>GRÁTIS</span></div>
-          <div class="setting"><strong>StackUp ID</strong><span>Conectar</span></div>
+          <div class="setting"><strong>StackUp ID</strong><span id="stackupIdentityStatus">Modo local</span></div>
         </div>
       </section>
     </main>
@@ -1030,7 +1036,7 @@ function heroesPrescriptionFromFocus(focus,meta={}){
 function heroesPublishProfile(profile,meta={}){
   if(!heroesBridge)return null;
   return heroesBridge.send('player_profile','grinder',{
-    profileVersion:meta.profileVersion||profile?.version||'heroes-player-profile-v3',
+    profileVersion:meta.profileVersion||profile?.version||'heroes-player-profile-v4',
     generatedAt:new Date().toISOString(),
     profile:profile||{},
     weaknesses:Array.isArray(meta.weaknesses)?meta.weaknesses:[],
@@ -1161,8 +1167,9 @@ function renderUnifiedProfileViews(){
 
   const evolution=document.getElementById("dnaEvolution");
   if(evolution)evolution.innerHTML=PLAYER_INDICATORS.map(def=>{
-    const now=profile.scores[def.key],delta=now-def.baseline,n=profile.evidenceCounts[def.key]||0;
-    return `<div class="feature-line"><div><div class="feature-title">${def.label}</div><div class="feature-note">${def.baseline} → ${now} · n=${n}</div></div><div class="feature-score">${delta>=0?"+":""}${delta}</div></div>`;
+    const now=profile.scores[def.key],delta=now-def.baseline,n=profile.evidenceCounts[def.key]||0,trend=recentIndicatorTrend(def.key);
+    const recent=trend===null?"tendência recente —":`tendência recente ${trend>=0?"+":""}${trend}`;
+    return `<div class="feature-line"><div><div class="feature-title">${def.label}</div><div class="feature-note">base ${def.baseline} → atual ${now} · n=${n} · ${recent}</div></div><div class="feature-score">${delta>=0?"+":""}${delta}</div></div>`;
   }).join("");
 
   const analysisMeta=document.getElementById("analysisProfileMeta");
@@ -1185,7 +1192,21 @@ function renderUnifiedProfileViews(){
   const confLine=document.getElementById("profileConfidenceLine");if(confLine)confLine.textContent=`heroes / profile confidence ${profile.confidence}%`;
   const confValue=document.getElementById("profileConfidenceValue");if(confValue)confValue.textContent=`${profile.confidence}%`;
   const updated=document.getElementById("profileUpdatedAt");if(updated)updated.textContent=profile.updatedAt?new Date(profile.updatedAt).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"—";
-  const profileMeta=document.getElementById("profileIndicatorMeta");if(profileMeta)profileMeta.textContent=`Matriz única v3 · ${profile.sampleSize} decisões · cobertura média ${profile.coverage}%.`;
+  const profileMeta=document.getElementById("profileIndicatorMeta");if(profileMeta)profileMeta.textContent=`Matriz única v4 · ${profile.sampleSize} decisões acumuladas · cobertura média ${profile.coverage}%.`;
+  const usage=usageSnapshot(),usageGrid=document.getElementById("usageMetricsGrid");
+  if(usageGrid)usageGrid.innerHTML=[
+    ["SESSÕES",usage.sessions],["SPOTS ÚNICOS VISTOS",usage.runtime.viewed],["DECISÕES ACUMULADAS",profile.sampleSize],
+    ["DECISÕES NA SESSÃO",usage.current?.decisions||0],["ANÁLISES ABERTAS",usage.state.totals?.analysisViews||0],["FILTROS USADOS",usage.state.totals?.filtersUsed||0]
+  ].map(([label,value])=>`<div class="profile-item"><div class="mini-label">${label}</div><div class="mini-value">${value}</div></div>`).join("");
+  const recentHost=document.getElementById("recentActivity");
+  if(recentHost){
+    const labels={page_view:"Página aberta",spot_viewed:"Spot visualizado",decision:"Decisão registrada",analysis_view:"Análise consultada",filter_use:"Filtro utilizado",app_open:"App aberto"};
+    recentHost.innerHTML=(usage.state.recentEvents||[]).slice(0,6).map(ev=>`<div class="feature-line"><div><div class="feature-title">${labels[ev.type]||ev.type}</div><div class="feature-note">${new Date(ev.at).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</div></div></div>`).join("")||'<div class="body-copy">A atividade aparecerá aqui conforme o uso.</div>';
+  }
+  const identity=heroesBridge?.identity?.()||{},session=readJsonKey("heroes.session",{});
+  const displayName=session?.name||identity.emailHint?.split("@")?.[0]||(identity.stackupUserId?"StackUp Player":"Jogador local");
+  const nameEl=document.getElementById("profileName");if(nameEl)nameEl.textContent=displayName;
+  const identityEl=document.getElementById("stackupIdentityStatus");if(identityEl)identityEl.textContent=identity.stackupUserId?"Conectado":"Modo local";
 }
 function getDynamicLeaks(){
   const profile=getUnifiedPlayerProfile();
@@ -1234,14 +1255,11 @@ function scenarioBucket(decision,key){
   return "—";
 }
 function buildScenarioGroups(key){
-  const history=getSpotDecisionHistory().filter(d=>Number.isFinite(Number(d?.decision_quality?.metrics?.decisionQuality)));
-  const map=new Map();
-  history.forEach(d=>{
-    const bucket=scenarioBucket(d,key);
-    if(!map.has(bucket))map.set(bucket,[]);
-    map.get(bucket).push(Number(d.decision_quality.metrics.decisionQuality));
-  });
-  return [...map.entries()].map(([label,values])=>[label,clamp100(values.reduce((s,v)=>s+v,0)/values.length),`n=${values.length}`]).sort((a,b)=>b[1]-a[1]);
+  const acc=ensureProfileAccumulator(),group=acc.contexts?.[key]||{};
+  return Object.entries(group).map(([label,item])=>{
+    const count=Number(item.count)||0,score=count?clamp100((Number(item.qualitySum)||0)/count):0;
+    return [label,score,`n=${count} · solver ${Number(item.solverValidated)||0}`];
+  }).sort((a,b)=>b[1]-a[1]);
 }
 function renderScenarios(filter="all"){
   const entries=Object.entries(SCENARIO_META).filter(([key])=>filter==="all"||key===filter);
@@ -1252,24 +1270,21 @@ function renderScenarios(filter="all"){
   }).join("");
 }
 function renderPatterns(){
-  const history=getSpotDecisionHistory();
   const host=document.getElementById("patternList");if(!host)return;
-  if(!history.length){host.innerHTML='<div class="body-copy">Aguardando decisões para identificar padrões recorrentes.</div>';return;}
-  const counts={};history.forEach(d=>{const a=String(d.action||"—").toUpperCase();counts[a]=(counts[a]||0)+1;});
-  const dominant=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
-  const profile=getUnifiedPlayerProfile();
-  const efficient=history.filter(d=>/EFICIENTE|COERENTE/.test(String(d?.decision_quality?.aggressionClass||""))).length;
-  const excessive=history.filter(d=>/EXCESSIVA/.test(String(d?.decision_quality?.aggressionClass||""))).length;
+  const acc=ensureProfileAccumulator(),history=getSpotDecisionHistory();
+  if(!acc.totalDecisions){host.innerHTML='<div class="body-copy">Aguardando decisões para identificar padrões recorrentes.</div>';return;}
+  const dominant=Object.entries(acc.actions||{}).sort((a,b)=>b[1]-a[1])[0],profile=getUnifiedPlayerProfile(),recent=history.slice(0,50);
+  const recentAgg=recent.filter(d=>["raise","allin"].includes(String(d.action||"").toLowerCase())).length;
   const items=[
-    [`Ação mais frequente: ${dominant?.[0]||"—"}`,`${dominant?.[1]||0} de ${history.length} decisões`],
-    ["Qualidade média das decisões",`${profile.decisionQualityAverage??"—"}/100`],
-    ["Agressividade eficiente/coerente",`${efficient} decisões`],
-    ["Agressividade potencialmente excessiva",`${excessive} decisões`],
-    ["Cobertura por solver",`${profile.solverValidated} de ${history.length} decisões validadas`]
+    [`Ação mais frequente: ${String(dominant?.[0]||"—").toUpperCase()}`,`${dominant?.[1]||0} de ${acc.totalDecisions} decisões acumuladas`],
+    ["Qualidade média das decisões",`${profile.decisionQualityAverage??"—"}/100 · histórico acumulado`],
+    ["Agressividade eficiente/coerente",`${acc.aggression?.efficient||0} decisões`],
+    ["Agressividade potencialmente excessiva",`${acc.aggression?.excessive||0} decisões`],
+    ["Agressividade na janela recente",`${recentAgg} de ${recent.length||0} decisões recentes`],
+    ["Cobertura por solver",`${profile.solverValidated} de ${profile.sampleSize} decisões validadas`]
   ];
   host.innerHTML=items.map(([t,n])=>`<div class="feature-line"><div><div class="feature-title">${t}</div><div class="feature-note">${n}</div></div></div>`).join("");
 }
-
 
 const FOOTER_PAGES=["home","dna","spots","analysis","profile"];
 let pageTransitioning=false;
@@ -1300,6 +1315,7 @@ function showScreen(name,direction=0){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
   window.scrollTo({top:0,behavior:"auto"});
   history.replaceState({screen:name},"","#"+name);
+  if(currentName!==name)trackUsage("page_view",{page:name});
   renderUnifiedProfileViews();
   pageTransitioning=false;
 }
@@ -1317,12 +1333,13 @@ document.querySelectorAll("[data-go]").forEach(btn=>btn.addEventListener("click"
 document.getElementById("leakFilters")?.addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
   document.querySelectorAll("#leakFilters .filter").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active");renderLeaks(btn.dataset.filter);
+  btn.classList.add("active");trackUsage("filter_use",{group:"leaks",value:btn.dataset.filter});renderLeaks(btn.dataset.filter);
 });
 document.getElementById("analysisFilters").addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
   document.querySelectorAll("#analysisFilters .filter").forEach(x=>x.classList.remove("active"));
   btn.classList.add("active");
+  trackUsage("filter_use",{group:"scenario",value:btn.dataset.scenarioFilter||"all"});
   renderScenarios(btn.dataset.scenarioFilter||"all");
 });
 
@@ -1412,6 +1429,7 @@ function openSheet(title,copy){
 }
 function closeSheet(){sheet.classList.remove("open")}
 document.getElementById("analyzeBtn").addEventListener("click",()=>{
+  trackUsage("analysis_view",{source:"home"});
   const profile=getUnifiedPlayerProfile();
   const ranked=QUALITY_INDICATORS.filter(def=>(profile.evidenceCounts[def.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
   const best=ranked[0],weak=ranked[ranked.length-1];
@@ -1420,7 +1438,7 @@ document.getElementById("analyzeBtn").addEventListener("click",()=>{
     :"Ainda não há decisões suficientes para atualizar o Poker DNA. Complete spots para formar a amostra.";
   openSheet("POKER DNA SINCRONIZADO",summary);
 });
-document.getElementById("dnaInfo").addEventListener("click",()=>openSheet("COMO O DNA FUNCIONA","O HEROES combina decisões, contexto, posição, stack, street, pressão e evolução histórica para formar um perfil dinâmico do jogador."));
+document.getElementById("dnaInfo").addEventListener("click",()=>{trackUsage("analysis_view",{source:"dna_info"});openSheet("COMO O DNA FUNCIONA","O HEROES combina decisões, contexto, posição, stack, street, pressão e evolução histórica para formar um perfil dinâmico do jogador.");});
 document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet();showScreen("dna")});
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
 
@@ -1446,6 +1464,105 @@ function getSpotDecisionHistory(){
     return [];
   }catch{return []}
 }
+
+const PROFILE_ACCUMULATOR_KEY="heroes.profileAccumulator.v4";
+const USAGE_KEY="heroes.usage.v1";
+const RECENT_DECISION_LIMIT=500;
+const SESSION_IDLE_MS=30*60*1000;
+
+function readJsonKey(key,fallback){
+  try{const raw=store.get(key);if(raw==null)return fallback;return typeof raw==="string"?JSON.parse(raw):raw}catch{return fallback}
+}
+function writeJsonKey(key,value){store.set(key,JSON.stringify(value));return value}
+function indicatorAccumulatorTemplate(){
+  return Object.fromEntries(PLAYER_INDICATORS.map(def=>[def.key,{count:0,sum:0,sumSq:0,last:null,lastAt:null}]));
+}
+function emptyProfileAccumulator(){
+  return {version:"4",migratedAt:null,totalDecisions:0,indicators:indicatorAccumulatorTemplate(),quality:{count:0,sum:0,sumSq:0},solverValidated:0,aggression:{efficient:0,excessive:0,other:0},actions:{},contexts:{position:{},stack:{},street:{},phase:{},pressure:{},opponent:{}},firstDecisionAt:null,lastDecisionAt:null};
+}
+function addDecisionToAccumulator(acc,decision){
+  if(!decision||!decision.profile_signals)return acc;
+  acc.totalDecisions=(Number(acc.totalDecisions)||0)+1;
+  const at=decision.timestamp||new Date().toISOString();
+  acc.firstDecisionAt=acc.firstDecisionAt||at;acc.lastDecisionAt=at;
+  if(!acc.indicators)acc.indicators=indicatorAccumulatorTemplate();
+  PLAYER_INDICATORS.forEach(def=>{
+    const raw=decision.profile_signals?.[def.key];
+    if(!Number.isFinite(Number(raw)))return;
+    const v=clamp100(raw);
+    const slot=acc.indicators[def.key]||(acc.indicators[def.key]={count:0,sum:0,sumSq:0,last:null,lastAt:null});
+    slot.count++;slot.sum+=v;slot.sumSq+=v*v;slot.last=v;slot.lastAt=at;
+  });
+  const q=Number(decision?.decision_quality?.metrics?.decisionQuality);
+  if(Number.isFinite(q)){acc.quality.count++;acc.quality.sum+=q;acc.quality.sumSq+=q*q;}
+  if(decision?.decision_quality?.solver?.validated)acc.solverValidated++;
+  const cls=String(decision?.decision_quality?.aggressionClass||"");
+  if(/EFICIENTE|COERENTE/.test(cls))acc.aggression.efficient++;
+  else if(/EXCESSIVA/.test(cls))acc.aggression.excessive++;
+  else acc.aggression.other++;
+  const action=String(decision.action||"unknown").toLowerCase();acc.actions[action]=(acc.actions[action]||0)+1;
+  for(const key of Object.keys(acc.contexts||{})){
+    const bucket=scenarioBucket(decision,key);
+    if(!bucket||bucket==="—")continue;
+    const group=acc.contexts[key]||(acc.contexts[key]={});
+    const item=group[bucket]||(group[bucket]={count:0,qualitySum:0,solverValidated:0});
+    item.count++;if(Number.isFinite(q))item.qualitySum+=q;if(decision?.decision_quality?.solver?.validated)item.solverValidated++;
+  }
+  return acc;
+}
+function ensureProfileAccumulator(){
+  let acc=readJsonKey(PROFILE_ACCUMULATOR_KEY,null);
+  if(acc&&acc.version==="4"&&acc.indicators)return acc;
+  acc=emptyProfileAccumulator();
+  getSpotDecisionHistory().slice().reverse().forEach(decision=>addDecisionToAccumulator(acc,decision));
+  acc.migratedAt=new Date().toISOString();
+  return writeJsonKey(PROFILE_ACCUMULATOR_KEY,acc);
+}
+function updateProfileAccumulator(decision){
+  const acc=ensureProfileAccumulator();addDecisionToAccumulator(acc,decision);return writeJsonKey(PROFILE_ACCUMULATOR_KEY,acc);
+}
+function recentIndicatorTrend(key,windowSize=25){
+  const values=getSpotDecisionHistory().map(d=>d?.profile_signals?.[key]).filter(v=>Number.isFinite(Number(v))).map(Number);
+  if(values.length<4)return null;
+  const n=Math.min(windowSize,Math.floor(values.length/2)),recent=values.slice(0,n),prior=values.slice(n,n*2);
+  if(!prior.length)return null;
+  const avg=a=>a.reduce((s,v)=>s+v,0)/a.length;
+  return Math.round(avg(recent)-avg(prior));
+}
+
+function emptyUsageState(){
+  return {version:"1",current:null,sessions:[],totals:{events:0,pageViews:0,spotsViewed:0,decisions:0,analysisViews:0,filtersUsed:0},recentEvents:[]};
+}
+function readUsage(){return readJsonKey(USAGE_KEY,emptyUsageState())}
+function usageSessionId(){return "hs-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8)}
+function ensureUsageSession(state=readUsage()){
+  const now=Date.now(),current=state.current,last=current?Date.parse(current.lastAt||current.startedAt||0):0;
+  if(!current||!last||now-last>SESSION_IDLE_MS){
+    if(current)state.sessions=[{...current,endedAt:current.lastAt||new Date().toISOString()},...(state.sessions||[])].slice(0,100);
+    const at=new Date().toISOString();
+    state.current={id:usageSessionId(),startedAt:at,lastAt:at,events:0,pageViews:0,spotsViewed:0,decisions:0,analysisViews:0,filtersUsed:0,pages:{},filters:{}};
+  }
+  return state;
+}
+function trackUsage(type,details={}){
+  const state=ensureUsageSession(),at=new Date().toISOString(),cur=state.current;
+  cur.lastAt=at;cur.events++;state.totals.events=(state.totals.events||0)+1;
+  if(type==="page_view"){cur.pageViews++;state.totals.pageViews++;const page=String(details.page||"unknown");cur.pages[page]=(cur.pages[page]||0)+1;}
+  else if(type==="spot_viewed"){cur.spotsViewed++;state.totals.spotsViewed++;}
+  else if(type==="decision"){cur.decisions++;state.totals.decisions++;}
+  else if(type==="analysis_view"){cur.analysisViews++;state.totals.analysisViews++;}
+  else if(type==="filter_use"){cur.filtersUsed++;state.totals.filtersUsed++;const key=String(details.group||"filter")+":"+String(details.value||"");cur.filters[key]=(cur.filters[key]||0)+1;}
+  state.recentEvents=[{type,at,details},...(state.recentEvents||[])].slice(0,200);
+  writeJsonKey(USAGE_KEY,state);
+  try{window.dispatchEvent(new CustomEvent("heroes:usage-updated",{detail:state}))}catch(_){}
+  return state;
+}
+function usageSnapshot(){
+  const state=ensureUsageSession();writeJsonKey(USAGE_KEY,state);
+  const runtime=window.HeroesSolvedSpots?.progress?.()||{viewed:0,total:14000,remaining:14000};
+  return {state,current:state.current,sessions:(state.sessions||[]).length+(state.current?1:0),runtime};
+}
+
 
 const ACTION_PROFILE_META=PLAYER_INDICATORS.map(x=>[x.key,x.label]);
 const ACTION_PROFILE_LABELS=Object.fromEntries(ACTION_PROFILE_META);
@@ -1703,39 +1820,42 @@ function renderActionProfile(profile,label){
   }).join("");
 }
 function getUnifiedPlayerProfile(filterFn=null){
-  const all=getSpotDecisionHistory().filter(x=>x&&x.profile_signals);
-  const history=filterFn?all.filter(filterFn):all;
-  const scores={},evidenceCounts={};
+  if(filterFn){
+    const history=getSpotDecisionHistory().filter(x=>x&&x.profile_signals).filter(filterFn),scores={},evidenceCounts={};
+    PLAYER_INDICATORS.forEach(def=>{
+      const values=history.map(d=>d.profile_signals?.[def.key]).filter(v=>Number.isFinite(Number(v))).map(Number);
+      evidenceCounts[def.key]=values.length;
+      if(!values.length){scores[def.key]=def.baseline;return;}
+      const avg=values.reduce((s,v)=>s+v,0)/values.length,weight=Math.min(.82,(values.length/40)*.82);
+      scores[def.key]=clamp100(def.baseline*(1-weight)+avg*weight);
+    });
+    const qValues=history.map(d=>d?.decision_quality?.metrics?.decisionQuality).filter(v=>Number.isFinite(Number(v))).map(Number);
+    const decisionQualityAverage=qValues.length?clamp100(qValues.reduce((s,v)=>s+v,0)/qValues.length):null;
+    const solverValidated=history.filter(d=>d?.decision_quality?.solver?.validated).length;
+    const evidenceTotal=Object.values(evidenceCounts).reduce((s,v)=>s+v,0),possible=Math.max(1,history.length*PLAYER_INDICATORS.length);
+    const coverage=Math.round(Math.min(100,evidenceTotal/possible*100));
+    const confidence=clamp100(8+55*Math.min(1,history.length/35)+22*(coverage/100)+15*(history.length?solverValidated/history.length:0));
+    const updatedAt=history.map(d=>d.timestamp).filter(Boolean).sort().at(-1)||null;
+    return {version:"heroes-player-profile-v4",scope:"recent-filter",sampleSize:history.length,scores,evidenceCounts,decisionQualityAverage,solverValidated,coverage,confidence,updatedAt};
+  }
+  const acc=ensureProfileAccumulator(),scores={},evidenceCounts={};
   PLAYER_INDICATORS.forEach(def=>{
-    const values=history.map(d=>d.profile_signals?.[def.key]).filter(v=>Number.isFinite(Number(v))).map(Number);
-    evidenceCounts[def.key]=values.length;
-    if(!values.length){scores[def.key]=def.baseline;return;}
-    const avg=values.reduce((s,v)=>s+v,0)/values.length;
-    const weight=Math.min(.82,(values.length/40)*.82);
+    const slot=acc.indicators?.[def.key]||{count:0,sum:0},count=Number(slot.count)||0;evidenceCounts[def.key]=count;
+    if(!count){scores[def.key]=def.baseline;return;}
+    const avg=slot.sum/count,weight=Math.min(.88,(count/80)*.88);
     scores[def.key]=clamp100(def.baseline*(1-weight)+avg*weight);
   });
-
-  const qValues=history.map(d=>d?.decision_quality?.metrics?.decisionQuality).filter(v=>Number.isFinite(Number(v))).map(Number);
-  const decisionQualityAverage=qValues.length?clamp100(qValues.reduce((s,v)=>s+v,0)/qValues.length):null;
-  if(qValues.length>=2){
-    const mean=qValues.reduce((s,v)=>s+v,0)/qValues.length;
-    const variance=qValues.reduce((s,v)=>s+(v-mean)*(v-mean),0)/qValues.length;
-    const consistency=clamp100(100-Math.sqrt(variance)*2.2);
-    const def=PLAYER_INDICATOR_BY_KEY.decisionConsistency;
-    const weight=Math.min(.82,(qValues.length/40)*.82);
-    scores.decisionConsistency=clamp100(def.baseline*(1-weight)+consistency*weight);
-    evidenceCounts.decisionConsistency=qValues.length;
+  const qc=Number(acc.quality?.count)||0,qAvg=qc?acc.quality.sum/qc:null;
+  const decisionQualityAverage=qAvg===null?null:clamp100(qAvg);
+  if(qc>=2){
+    const variance=Math.max(0,acc.quality.sumSq/qc-(acc.quality.sum/qc)**2),consistency=clamp100(100-Math.sqrt(variance)*2.2),def=PLAYER_INDICATOR_BY_KEY.decisionConsistency,weight=Math.min(.88,(qc/80)*.88);
+    scores.decisionConsistency=clamp100(def.baseline*(1-weight)+consistency*weight);evidenceCounts.decisionConsistency=qc;
   }
-
-  const solverValidated=history.filter(d=>d?.decision_quality?.solver?.validated).length;
-  const evidenceTotal=Object.values(evidenceCounts).reduce((s,v)=>s+v,0);
-  const possible=Math.max(1,history.length*PLAYER_INDICATORS.length);
-  const coverage=Math.round(Math.min(100,evidenceTotal/possible*100));
-  const sampleFactor=Math.min(1,history.length/60);
-  const solverFactor=history.length?solverValidated/history.length:0;
-  const confidence=clamp100(10+65*sampleFactor+15*(coverage/100)+10*solverFactor);
-  const updatedAt=history.map(d=>d.timestamp).filter(Boolean).sort().at(-1)||null;
-  return {version:"heroes-player-profile-v3",sampleSize:history.length,scores,evidenceCounts,decisionQualityAverage,solverValidated,coverage,confidence,updatedAt};
+  const sampleSize=Number(acc.totalDecisions)||0,solverValidated=Number(acc.solverValidated)||0;
+  const evidenceTotal=Object.values(evidenceCounts).reduce((s,v)=>s+v,0),possible=Math.max(1,sampleSize*PLAYER_INDICATORS.length);
+  const coverage=Math.round(Math.min(100,evidenceTotal/possible*100)),sampleFactor=Math.min(1,sampleSize/120),solverFactor=sampleSize?solverValidated/sampleSize:0;
+  const confidence=clamp100(8+62*sampleFactor+18*(coverage/100)+12*solverFactor);
+  return {version:"heroes-player-profile-v4",scope:"lifetime",sampleSize,scores,evidenceCounts,decisionQualityAverage,solverValidated,coverage,confidence,updatedAt:acc.lastDecisionAt,firstDecisionAt:acc.firstDecisionAt};
 }
 function persistUnifiedPlayerProfile(){
   const profile=getUnifiedPlayerProfile();
@@ -1760,6 +1880,7 @@ window.addEventListener("storage",e=>{
 window.addEventListener("heroes:profile-updated",()=>{
   renderDNA();renderUnifiedProfileViews();renderLeaks(document.querySelector("#leakFilters .filter.active")?.dataset.filter||"all");renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");renderPatterns();renderSwot();
 });
+window.addEventListener("heroes:usage-updated",()=>{renderUnifiedProfileViews();});
 function getAggregatedActionProfile(){
   const profile=getUnifiedPlayerProfile();
   return {sampleSize:profile.sampleSize,averages:profile.scores,evidenceCounts:profile.evidenceCounts};
@@ -1770,9 +1891,9 @@ function buildActionProfileSummary(){
   const qualityRanked=QUALITY_INDICATORS.filter(def=>(profile.evidenceCounts[def.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
   const strengths=qualityRanked.slice(0,4);
   const leaks=qualityRanked.slice(-4).reverse();
-  const decisions=getSpotDecisionHistory().filter(x=>x&&x.decision_quality);
-  const aggressionEfficient=decisions.filter(x=>/EFICIENTE|COERENTE/.test(String(x.decision_quality?.aggressionClass||""))).length;
-  const aggressionExcessive=decisions.filter(x=>/EXCESSIVA/.test(String(x.decision_quality?.aggressionClass||""))).length;
+  const acc=ensureProfileAccumulator();
+  const aggressionEfficient=Number(acc.aggression?.efficient)||0;
+  const aggressionExcessive=Number(acc.aggression?.excessive)||0;
   return {
     sample_size:profile.sampleSize,
     averages:profile.scores,
@@ -1785,7 +1906,7 @@ function buildActionProfileSummary(){
     confidence:profile.confidence,
     coverage:profile.coverage,
     updated_at:profile.updatedAt,
-    version:"heroes-player-profile-v3"
+    version:"heroes-player-profile-v4"
   };
 }
 function persistActionProfileSummary(){
@@ -2011,6 +2132,7 @@ async function loadNextSolvedSpot(){
   try{
     const item=await window.HeroesSolvedSpots.next();
     renderSolvedSpot(item);
+    trackUsage("spot_viewed",{spot_id:item.id,solve_id:item.spot?.solveId||null,street:item.street,family:item.family});
   }catch(err){
     console.error(err);
     if(spotDecisionText)spotDecisionText.textContent="Falha ao carregar spot.";
@@ -2060,9 +2182,11 @@ function recordSpotDecision(action,amount,button){
       chosen_ev_bb:null,best_ev_bb:null,ev_loss_bb:null,alignment:null
     }
   };
+  updateProfileAccumulator(decision);
   const history=getSpotDecisionHistory();
   history.unshift(decision);
-  store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,500)));
+  store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,RECENT_DECISION_LIMIT)));
+  trackUsage("decision",{spot_id:decision.spot_id,action:decision.action,quality:decision.decision_quality?.metrics?.decisionQuality??null,solver_validated:!!decision.decision_quality?.solver?.validated});
   persistActionProfileSummary();
   renderActionProfile(profile,`${label} · PERFIL DA AÇÃO`);
   renderDecisionQuality(evaluation);
@@ -2100,6 +2224,8 @@ window.StackUpHeroesDecisionEngine=Object.freeze({
     actions:[{key:"fold",ev_bb:0,frequency:.1},{key:"call",ev_bb:.2,frequency:.5},{key:"raise:12",ev_bb:.3,frequency:.4}]
   }
 });
+ensureProfileAccumulator();
+trackUsage("app_open",{page:location.hash.replace("#","")||"home"});
 renderDNA();renderUnifiedProfileViews();renderLeaks();renderScenarios();renderPatterns();renderSwot();
 loadNextSolvedSpot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
