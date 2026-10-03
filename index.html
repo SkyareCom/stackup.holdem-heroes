@@ -44,11 +44,11 @@ linear-gradient(180deg,var(--bg-1),var(--bg-0) 62%,#0b0708)}
 .screen{display:none}
 .screen.active{display:block}
 .screen.page-dragging{transition:none!important;will-change:transform}
-.screen.page-returning{transition:transform .2s ease,opacity .2s ease;will-change:transform}
-.screen.page-enter-right{animation:pageEnterRight .24s cubic-bezier(.22,.8,.25,1)}
-.screen.page-enter-left{animation:pageEnterLeft .24s cubic-bezier(.22,.8,.25,1)}
-@keyframes pageEnterRight{from{opacity:.55;transform:translate3d(22%,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
-@keyframes pageEnterLeft{from{opacity:.55;transform:translate3d(-22%,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+.screen.page-returning{transition:transform .14s ease-out;will-change:transform}
+.screen.page-enter-right{animation:pageEnterRight .18s ease-out}
+.screen.page-enter-left{animation:pageEnterLeft .18s ease-out}
+@keyframes pageEnterRight{from{transform:translate3d(12%,0,0)}to{transform:translate3d(0,0,0)}}
+@keyframes pageEnterLeft{from{transform:translate3d(-12%,0,0)}to{transform:translate3d(0,0,0)}}
 @media (prefers-reduced-motion:reduce){
   .screen.page-enter-right,.screen.page-enter-left{animation:none}
   .screen.page-returning{transition:none}
@@ -886,71 +886,82 @@ let navStartY=0;
 let navDx=0;
 let navHorizontal=false;
 let navMouseDown=false;
+let navActiveScreen=null;
+let navRaf=0;
+let navPendingX=0;
 
+function applyPageDrag(){
+  navRaf=0;
+  if(!navActiveScreen)return;
+  navActiveScreen.style.transform=`translate3d(${navPendingX}px,0,0)`;
+}
+function schedulePageDrag(x){
+  navPendingX=x;
+  if(!navRaf)navRaf=requestAnimationFrame(applyPageDrag);
+}
 function beginPageSwipe(x,y){
   if(pageTransitioning)return;
+  navActiveScreen=document.querySelector(".screen[data-screen].active");
+  if(!navActiveScreen)return;
   navTouchActive=true;
   navStartX=x;
   navStartY=y;
   navDx=0;
   navHorizontal=false;
+  navPendingX=0;
 }
 function movePageSwipe(x,y,event){
-  if(!navTouchActive||pageTransitioning)return;
+  if(!navTouchActive||pageTransitioning||!navActiveScreen)return;
   const dx=x-navStartX;
   const dy=y-navStartY;
   if(!navHorizontal){
-    if(Math.abs(dx)<12)return;
-    if(Math.abs(dx)<=Math.abs(dy)*1.15)return;
+    if(Math.abs(dx)<14)return;
+    if(Math.abs(dx)<=Math.abs(dy)*1.2)return;
     navHorizontal=true;
+    navActiveScreen.classList.add("page-dragging");
   }
   navDx=dx;
   if(event?.cancelable)event.preventDefault();
 
-  const active=document.querySelector(".screen[data-screen].active");
-  if(!active)return;
-  const index=FOOTER_PAGES.indexOf(active.dataset.screen);
+  const index=FOOTER_PAGES.indexOf(navActiveScreen.dataset.screen);
   const blocked=(index===0&&dx>0)||(index===FOOTER_PAGES.length-1&&dx<0);
-  const visualDx=blocked?dx*.2:dx;
-  active.classList.add("page-dragging");
-  active.style.transform=`translate3d(${visualDx}px,0,0)`;
-  active.style.opacity=String(Math.max(.72,1-Math.abs(visualDx)/(window.innerWidth*1.5)));
+  schedulePageDrag(blocked?dx*.18:dx);
 }
 function endPageSwipe(){
   if(!navTouchActive)return;
-  const active=document.querySelector(".screen[data-screen].active");
+  navTouchActive=false;
+  if(navRaf){cancelAnimationFrame(navRaf);navRaf=0}
+
+  const active=navActiveScreen;
   const currentName=active?.dataset.screen||"home";
   const index=FOOTER_PAGES.indexOf(currentName);
-  const threshold=Math.min(72,window.innerWidth*.18);
+  const threshold=Math.min(64,window.innerWidth*.16);
   let targetIndex=index;
 
   if(navHorizontal&&navDx<=-threshold&&index<FOOTER_PAGES.length-1)targetIndex=index+1;
   if(navHorizontal&&navDx>=threshold&&index>0)targetIndex=index-1;
 
-  navTouchActive=false;
   const direction=Math.sign(targetIndex-index);
-
   if(active){
     active.classList.remove("page-dragging");
     if(direction===0){
       active.classList.add("page-returning");
       active.style.transform="translate3d(0,0,0)";
-      active.style.opacity="1";
       setTimeout(()=>{
         active.classList.remove("page-returning");
         active.style.removeProperty("transform");
-        active.style.removeProperty("opacity");
-      },220);
+      },150);
     }else{
+      active.style.removeProperty("transform");
       pageTransitioning=true;
-      active.classList.add("page-returning");
-      active.style.transform=`translate3d(${direction>0?"-28%":"28%"},0,0)`;
-      active.style.opacity=".6";
-      setTimeout(()=>showScreen(FOOTER_PAGES[targetIndex],direction),170);
+      showScreen(FOOTER_PAGES[targetIndex],direction);
     }
   }
+
+  navActiveScreen=null;
   navDx=0;
   navHorizontal=false;
+  navPendingX=0;
 }
 
 if(mainView){
