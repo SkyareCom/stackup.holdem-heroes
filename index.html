@@ -41,9 +41,9 @@ linear-gradient(180deg,var(--bg-1),var(--bg-0) 62%,#0b0708)}
 .brandline{display:flex;align-items:flex-end;justify-content:space-between;gap:18px}
 .brand-cluster{display:flex;align-items:center;gap:12px;min-width:0}
 .stackup-emblem{display:block;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.28))}
-.stackup-emblem.splash-emblem{width:76px;height:76px;margin:0 auto 12px}
-.stackup-emblem.topbar-emblem{width:40px;height:40px;flex:0 0 auto}
-.stackup-emblem.stackid-emblem{width:24px;height:24px}
+.stackup-emblem.splash-emblem{width:108px;height:108px;margin:0 auto 12px;clip-path:circle(45% at 50% 50%);transform:scale(1.08)}
+.stackup-emblem.topbar-emblem{width:44px;height:44px;flex:0 0 auto;clip-path:circle(45% at 50% 50%);transform:scale(1.06)}
+.stackup-emblem.stackid-emblem{width:26px;height:26px;clip-path:circle(45% at 50% 50%);transform:scale(1.06)}
 .brand-kicker{font-size:10px;letter-spacing:.22em;color:var(--muted-1);text-transform:uppercase}
 .brand-title{font-family:var(--display);font-size:30px;line-height:.95;letter-spacing:.02em;color:var(--cream-2)}
 .brand-sub{font-size:9px;letter-spacing:.26em;color:var(--champ-1);text-transform:uppercase;margin-top:6px}
@@ -200,11 +200,11 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
   display:flex;flex-direction:column;
   justify-content:flex-start;
   text-align:center;
-  padding:clamp(28px,5vh,52px) 0 18px
+  padding:clamp(22px,3.5vh,38px) 0 18px
 }
 .splash-identity{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  margin-bottom:24px
+  margin-bottom:8px
 }
 .splash-kicker{
   margin:0 0 10px;
@@ -237,7 +237,7 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
 .splash-controls{
   display:flex;flex-direction:column;
   gap:12px;
-  margin-top:auto
+  margin-top:22px
 }
 .splash-lang-row{
   display:grid;grid-template-columns:repeat(3,1fr);
@@ -317,7 +317,7 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
 
 @media (max-height:760px){
   .splash-inner{padding-top:20px}
-  .splash-identity{margin-bottom:18px}
+  .splash-identity{margin-bottom:6px}
   .splash-brand{font-size:72px}
   .splash-controls{gap:9px}
   .splash-auth{min-height:56px}
