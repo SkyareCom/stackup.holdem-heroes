@@ -2165,7 +2165,10 @@ const STATIC_SPOT_CONTEXT=Object.freeze({
   icm_pressure:18,
   opponent_profile:"unknown",
   range_context:{hero:"BTN continuing range",villain:"HJ betting range",confidence:35},
-  solver_reference:null
+  solver_reference:null,
+  display_format:"MTT",
+  display_currency:null,
+  display_bb_value:null
 });
 
 function getCurrentSpotContext(){
@@ -2656,8 +2659,8 @@ function configureSolvedActions(entry){
   setActionButton("fold",fold,"FOLD",fold?`${Number(fold.frequency||0).toFixed(0)}% solver`:"indisponível");
   const r0=raises[0]||null,r1=raises[1]||null,r2=raises[2]||null;
   setActionButton("raise",r0,"RAISE",r0?`${displayActionValue(solverActionAmount(r0))} · mínimo`:"indisponível");
-  setActionButton("raise1",r1,r1?`RAISE ${displayActionValue(solverActionAmount(r1))}`:"RAISE —",r1?"sugerido pelo solve":"indisponível");
-  setActionButton("raise2",r2,r2?`RAISE ${displayActionValue(solverActionAmount(r2))}`:"RAISE —",r2?"sugerido pelo solve":"indisponível");
+  setActionButton("raise1",r1,r1?"RAISE 1":"RAISE —",r1?`${displayActionValue(solverActionAmount(r1))} · sugerido`:"indisponível");
+  setActionButton("raise2",r2,r2?"RAISE 2":"RAISE —",r2?`${displayActionValue(solverActionAmount(r2))} · sugerido`:"indisponível");
   setActionButton("allin",jam,"ALL IN",jam?`${displayActionValue(solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||0)} · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
 }
 function renderSolvedSeats(item){
@@ -2727,7 +2730,10 @@ function renderSolvedSpot(item){
     solver:item.spot?.solver||null,
     family:item.family,
     game:"NLH",
-    format:prefs.format,
+    format:String(scenario.gameType||"MTT").includes("TOURNAMENT")?"MTT":String(scenario.gameType||"MTT"),
+    display_format:prefs.format,
+    display_currency:prefs.format==="CASH"?prefs.currency:null,
+    display_bb_value:prefs.format==="CASH"?prefs.bbValue:null,
     table_size:Number(view.tableSize||scenario.tableSize||9),
     street:String(view.street||scenario.street||"").toLowerCase(),
     hero_position:view.heroPosition||scenario.heroPosition,
@@ -2746,7 +2752,7 @@ function renderSolvedSpot(item){
   currentSpotSequence=item.progress.viewed;
   if(spotDecisionText)spotDecisionText.textContent="Escolha sua ação.";
   if(spotDecisionMeta)spotDecisionMeta.textContent=prefs.format==="CASH"
-    ?"Modo Cash · valores convertidos pela stake selecionada; estratégia mantém referência técnica do solve em bb."
+    ?"Visualização Cash · moeda + bb pela stake selecionada. O solve carregado mantém seu formato técnico original."
     :"Spot solver-resolvido · decisão será incorporada ao DNA Player.";
   if(nextSpotBtn)nextSpotBtn.hidden=true;
   resetActionAnalysis();
@@ -2782,6 +2788,9 @@ function recordSpotDecision(action,amount,button){
     timestamp:new Date().toISOString(),
     game:context.game||"NLH",
     format:context.format||"MTT",
+    display_format:context.display_format||readGamePreferences().format,
+    display_currency:context.display_currency||null,
+    display_bb_value:context.display_bb_value||null,
     table_size:Number(context.table_size||9),
     street:context.street,
     hero_position:context.hero_position,
@@ -2796,7 +2805,7 @@ function recordSpotDecision(action,amount,button){
     profile_signals:profile.scores,
     action_analysis:profile.comment,
     analysis_version:"action-profile-v2-solved-spots",
-    context_snapshot:evaluation.context_snapshot,
+    context_snapshot:{...evaluation.context_snapshot,solver_format:context.format||"MTT",display_format:context.display_format||readGamePreferences().format},
     decision_quality:evaluation,
     ev_analysis:evaluation.solver?{
       status:evaluation.solver.has_ev?"validated":"strategy_validated_ev_unavailable",
@@ -2830,9 +2839,12 @@ function recordSpotDecision(action,amount,button){
   renderTrainingRecommendations();
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.classList.toggle("selected",btn===button);btn.disabled=true});
   if(spotDecisionText)spotDecisionText.textContent=`${label} registrado`;
-  if(spotDecisionMeta)spotDecisionMeta.textContent=evaluation.solver?.has_ev
-    ?`Solve ${context.solve_id||"validado"} · estratégia e EV incorporados ao DNA Player.`
-    :`Solve ${context.solve_id||"validado"} · estratégia validada incorporada; EV numérico indisponível.`;
+  if(spotDecisionMeta){
+    const displayNote=context.display_format==="CASH"&&context.format!=="CASH"?" · visualização Cash; solve original "+context.format:"";
+    spotDecisionMeta.textContent=evaluation.solver?.has_ev
+      ?`Solve ${context.solve_id||"validado"} · estratégia e EV incorporados ao DNA Player${displayNote}.`
+      :`Solve ${context.solve_id||"validado"} · estratégia validada incorporada; EV numérico indisponível${displayNote}.`;
+  }
   if(nextSpotBtn)nextSpotBtn.hidden=false;
 }
 document.querySelectorAll("[data-game-format]").forEach(btn=>btn.addEventListener("click",()=>{
