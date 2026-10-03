@@ -40,10 +40,19 @@ linear-gradient(180deg,var(--bg-1),var(--bg-0) 62%,#0b0708)}
 .brand-title{font-family:var(--display);font-size:30px;line-height:.95;letter-spacing:.02em;color:var(--cream-2)}
 .brand-sub{font-size:9px;letter-spacing:.26em;color:var(--champ-1);text-transform:uppercase;margin-top:6px}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 5px rgba(114,137,110,.08)}
-.view{padding:4px 18px 28px}
-.screen{display:none;animation:fadeIn .22s ease}
+.view{padding:4px 18px 28px;overflow-x:hidden;touch-action:pan-y}
+.screen{display:none}
 .screen.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.screen.page-dragging{transition:none!important;will-change:transform}
+.screen.page-returning{transition:transform .2s ease,opacity .2s ease;will-change:transform}
+.screen.page-enter-right{animation:pageEnterRight .24s cubic-bezier(.22,.8,.25,1)}
+.screen.page-enter-left{animation:pageEnterLeft .24s cubic-bezier(.22,.8,.25,1)}
+@keyframes pageEnterRight{from{opacity:.55;transform:translate3d(22%,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes pageEnterLeft{from{opacity:.55;transform:translate3d(-22%,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@media (prefers-reduced-motion:reduce){
+  .screen.page-enter-right,.screen.page-enter-left{animation:none}
+  .screen.page-returning{transition:none}
+}
 
 .hero{position:relative;overflow:hidden;border:1px solid var(--line-1);border-radius:var(--r-xl);padding:28px 24px 26px;min-height:390px;background:
 linear-gradient(155deg,rgba(64,25,30,.92),rgba(22,11,13,.94) 58%,rgba(15,9,9,.98)),
@@ -813,14 +822,50 @@ function renderPatterns(){
     <div class="feature-line"><div><div class="feature-title">${t}</div><div class="feature-note">${n}</div></div></div>`).join("");
 }
 
-function showScreen(name){
-  document.querySelectorAll(".screen[data-screen]").forEach(s=>s.classList.toggle("active",s.dataset.screen===name));
-  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
-  window.scrollTo({top:0,behavior:"smooth"});
-  history.replaceState({screen:name},"","#"+name);
+const FOOTER_PAGES=["home","dna","spots","analysis","profile"];
+let pageTransitioning=false;
+
+function currentScreenName(){
+  return document.querySelector(".screen[data-screen].active")?.dataset.screen||"home";
 }
-document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>showScreen(btn.dataset.tab)));
-document.querySelectorAll("[data-go]").forEach(btn=>btn.addEventListener("click",()=>showScreen(btn.dataset.go)));
+function showScreen(name,direction=0){
+  if(!FOOTER_PAGES.includes(name))return;
+  const currentName=currentScreenName();
+  const current=document.querySelector(`.screen[data-screen="${currentName}"]`);
+  const target=document.querySelector(`.screen[data-screen="${name}"]`);
+  if(!target)return;
+
+  if(currentName===name){
+    current?.style.removeProperty("transform");
+    current?.style.removeProperty("opacity");
+  }else{
+    document.querySelectorAll(".screen[data-screen]").forEach(s=>{
+      s.classList.remove("active","page-dragging","page-returning","page-enter-left","page-enter-right");
+      s.style.removeProperty("transform");
+      s.style.removeProperty("opacity");
+    });
+    target.classList.add("active");
+    const inferredDirection=direction||Math.sign(FOOTER_PAGES.indexOf(name)-FOOTER_PAGES.indexOf(currentName));
+    if(inferredDirection>0)target.classList.add("page-enter-right");
+    if(inferredDirection<0)target.classList.add("page-enter-left");
+    setTimeout(()=>target.classList.remove("page-enter-left","page-enter-right"),280);
+  }
+
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
+  window.scrollTo({top:0,behavior:"auto"});
+  history.replaceState({screen:name},"","#"+name);
+  pageTransitioning=false;
+}
+document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{
+  const from=FOOTER_PAGES.indexOf(currentScreenName());
+  const to=FOOTER_PAGES.indexOf(btn.dataset.tab);
+  showScreen(btn.dataset.tab,Math.sign(to-from));
+}));
+document.querySelectorAll("[data-go]").forEach(btn=>btn.addEventListener("click",()=>{
+  const from=FOOTER_PAGES.indexOf(currentScreenName());
+  const to=FOOTER_PAGES.indexOf(btn.dataset.go);
+  showScreen(btn.dataset.go,Math.sign(to-from));
+}));
 
 document.getElementById("leakFilters")?.addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
@@ -833,6 +878,108 @@ document.getElementById("analysisFilters").addEventListener("click",e=>{
   btn.classList.add("active");
   renderScenarios(btn.dataset.scenarioFilter||"all");
 });
+
+const mainView=document.getElementById("view");
+let navTouchActive=false;
+let navStartX=0;
+let navStartY=0;
+let navDx=0;
+let navHorizontal=false;
+let navMouseDown=false;
+
+function beginPageSwipe(x,y){
+  if(pageTransitioning)return;
+  navTouchActive=true;
+  navStartX=x;
+  navStartY=y;
+  navDx=0;
+  navHorizontal=false;
+}
+function movePageSwipe(x,y,event){
+  if(!navTouchActive||pageTransitioning)return;
+  const dx=x-navStartX;
+  const dy=y-navStartY;
+  if(!navHorizontal){
+    if(Math.abs(dx)<12)return;
+    if(Math.abs(dx)<=Math.abs(dy)*1.15)return;
+    navHorizontal=true;
+  }
+  navDx=dx;
+  if(event?.cancelable)event.preventDefault();
+
+  const active=document.querySelector(".screen[data-screen].active");
+  if(!active)return;
+  const index=FOOTER_PAGES.indexOf(active.dataset.screen);
+  const blocked=(index===0&&dx>0)||(index===FOOTER_PAGES.length-1&&dx<0);
+  const visualDx=blocked?dx*.2:dx;
+  active.classList.add("page-dragging");
+  active.style.transform=`translate3d(${visualDx}px,0,0)`;
+  active.style.opacity=String(Math.max(.72,1-Math.abs(visualDx)/(window.innerWidth*1.5)));
+}
+function endPageSwipe(){
+  if(!navTouchActive)return;
+  const active=document.querySelector(".screen[data-screen].active");
+  const currentName=active?.dataset.screen||"home";
+  const index=FOOTER_PAGES.indexOf(currentName);
+  const threshold=Math.min(72,window.innerWidth*.18);
+  let targetIndex=index;
+
+  if(navHorizontal&&navDx<=-threshold&&index<FOOTER_PAGES.length-1)targetIndex=index+1;
+  if(navHorizontal&&navDx>=threshold&&index>0)targetIndex=index-1;
+
+  navTouchActive=false;
+  const direction=Math.sign(targetIndex-index);
+
+  if(active){
+    active.classList.remove("page-dragging");
+    if(direction===0){
+      active.classList.add("page-returning");
+      active.style.transform="translate3d(0,0,0)";
+      active.style.opacity="1";
+      setTimeout(()=>{
+        active.classList.remove("page-returning");
+        active.style.removeProperty("transform");
+        active.style.removeProperty("opacity");
+      },220);
+    }else{
+      pageTransitioning=true;
+      active.classList.add("page-returning");
+      active.style.transform=`translate3d(${direction>0?"-28%":"28%"},0,0)`;
+      active.style.opacity=".6";
+      setTimeout(()=>showScreen(FOOTER_PAGES[targetIndex],direction),170);
+    }
+  }
+  navDx=0;
+  navHorizontal=false;
+}
+
+if(mainView){
+  mainView.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1||e.target.closest("button,input,select,textarea,a"))return;
+    beginPageSwipe(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:true});
+  mainView.addEventListener("touchmove",e=>{
+    if(e.touches.length!==1)return;
+    movePageSwipe(e.touches[0].clientX,e.touches[0].clientY,e);
+  },{passive:false});
+  mainView.addEventListener("touchend",endPageSwipe,{passive:true});
+  mainView.addEventListener("touchcancel",endPageSwipe,{passive:true});
+
+  mainView.addEventListener("mousedown",e=>{
+    if(e.button!==0||e.target.closest("button,input,select,textarea,a"))return;
+    navMouseDown=true;
+    beginPageSwipe(e.clientX,e.clientY);
+  });
+  window.addEventListener("mousemove",e=>{
+    if(!navMouseDown)return;
+    movePageSwipe(e.clientX,e.clientY,e);
+  });
+  window.addEventListener("mouseup",()=>{
+    if(!navMouseDown)return;
+    navMouseDown=false;
+    endPageSwipe();
+  });
+}
 
 const sheet=document.getElementById("sheetBackdrop");
 function openSheet(title,copy){
@@ -847,7 +994,6 @@ document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet()
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
 
 
-const spotsScreen=document.querySelector('[data-screen="spots"]');
 const spotPager=document.getElementById("spotPager");
 const spotTrack=document.getElementById("spotTrack");
 const spotPages=[...document.querySelectorAll(".spot-page")];
@@ -856,12 +1002,6 @@ const spotCounter=document.getElementById("spotCounter");
 const spotPrev=document.getElementById("spotPrev");
 const spotNext=document.getElementById("spotNext");
 let spotIndex=0;
-let gestureStartX=0;
-let gestureStartY=0;
-let gestureDx=0;
-let gestureActive=false;
-let horizontalIntent=false;
-let mouseDragging=false;
 
 function syncSpotPager(){
   if(!spotPages.length)return;
@@ -870,83 +1010,15 @@ function syncSpotPager(){
   if(spotPrev)spotPrev.disabled=spotIndex===0;
   if(spotNext)spotNext.disabled=spotIndex===spotPages.length-1;
 }
-function setSpotTransform(dx=0,dragging=false){
+function setSpotTransform(){
   if(!spotTrack)return;
-  spotTrack.classList.toggle("dragging",dragging);
-  spotTrack.style.transform=`translate3d(calc(${-spotIndex*100}% + ${dx}px),0,0)`;
+  spotTrack.style.transform=`translate3d(${-spotIndex*100}%,0,0)`;
 }
 function goToSpot(index){
   spotIndex=Math.max(0,Math.min(spotPages.length-1,index));
-  setSpotTransform(0,false);
+  setSpotTransform();
   syncSpotPager();
 }
-function beginSpotGesture(x,y){
-  gestureStartX=x;
-  gestureStartY=y;
-  gestureDx=0;
-  gestureActive=true;
-  horizontalIntent=false;
-}
-function moveSpotGesture(x,y,event){
-  if(!gestureActive)return;
-  const dx=x-gestureStartX;
-  const dy=y-gestureStartY;
-  if(!horizontalIntent){
-    if(Math.abs(dx)<10)return;
-    if(Math.abs(dx)<=Math.abs(dy))return;
-    horizontalIntent=true;
-  }
-  gestureDx=dx;
-  if(horizontalIntent){
-    if(event?.cancelable)event.preventDefault();
-    const atFirst=spotIndex===0&&dx>0;
-    const atLast=spotIndex===spotPages.length-1&&dx<0;
-    const visualDx=(atFirst||atLast)?dx*.25:dx;
-    setSpotTransform(visualDx,true);
-  }
-}
-function endSpotGesture(){
-  if(!gestureActive)return;
-  const threshold=Math.min(52,(spotPager?.clientWidth||320)*.14);
-  if(horizontalIntent&&gestureDx<=-threshold)spotIndex=Math.min(spotPages.length-1,spotIndex+1);
-  else if(horizontalIntent&&gestureDx>=threshold)spotIndex=Math.max(0,spotIndex-1);
-  gestureActive=false;
-  horizontalIntent=false;
-  gestureDx=0;
-  setSpotTransform(0,false);
-  syncSpotPager();
-}
-
-if(spotsScreen){
-  spotsScreen.addEventListener("touchstart",e=>{
-    if(e.touches.length!==1||e.target.closest("button,input,select,textarea,a"))return;
-    beginSpotGesture(e.touches[0].clientX,e.touches[0].clientY);
-  },{passive:true});
-
-  spotsScreen.addEventListener("touchmove",e=>{
-    if(e.touches.length!==1)return;
-    moveSpotGesture(e.touches[0].clientX,e.touches[0].clientY,e);
-  },{passive:false});
-
-  spotsScreen.addEventListener("touchend",endSpotGesture,{passive:true});
-  spotsScreen.addEventListener("touchcancel",endSpotGesture,{passive:true});
-
-  spotsScreen.addEventListener("mousedown",e=>{
-    if(e.button!==0||e.target.closest("button,input,select,textarea,a"))return;
-    mouseDragging=true;
-    beginSpotGesture(e.clientX,e.clientY);
-  });
-  window.addEventListener("mousemove",e=>{
-    if(!mouseDragging)return;
-    moveSpotGesture(e.clientX,e.clientY,e);
-  });
-  window.addEventListener("mouseup",()=>{
-    if(!mouseDragging)return;
-    mouseDragging=false;
-    endSpotGesture();
-  });
-}
-
 spotPrev?.addEventListener("click",()=>goToSpot(spotIndex-1));
 spotNext?.addEventListener("click",()=>goToSpot(spotIndex+1));
 spotDots.forEach(dot=>dot.addEventListener("click",()=>goToSpot(Number(dot.dataset.spotIndex))));
