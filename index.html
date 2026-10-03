@@ -43,15 +43,12 @@ linear-gradient(180deg,var(--bg-1),var(--bg-0) 62%,#0b0708)}
 .view{padding:4px 18px 28px;overflow-x:hidden;touch-action:pan-y}
 .screen{display:none}
 .screen.active{display:block}
-.screen.page-dragging{transition:none!important;will-change:transform}
-.screen.page-returning{transition:transform .14s ease-out;will-change:transform}
-.screen.page-enter-right{animation:pageEnterRight .18s ease-out}
-.screen.page-enter-left{animation:pageEnterLeft .18s ease-out}
-@keyframes pageEnterRight{from{transform:translate3d(12%,0,0)}to{transform:translate3d(0,0,0)}}
-@keyframes pageEnterLeft{from{transform:translate3d(-12%,0,0)}to{transform:translate3d(0,0,0)}}
+.screen.page-enter-right{animation:pageEnterRight .16s ease-out}
+.screen.page-enter-left{animation:pageEnterLeft .16s ease-out}
+@keyframes pageEnterRight{from{transform:translate3d(8%,0,0)}to{transform:translate3d(0,0,0)}}
+@keyframes pageEnterLeft{from{transform:translate3d(-8%,0,0)}to{transform:translate3d(0,0,0)}}
 @media (prefers-reduced-motion:reduce){
   .screen.page-enter-right,.screen.page-enter-left{animation:none}
-  .screen.page-returning{transition:none}
 }
 
 .hero{position:relative;overflow:hidden;border:1px solid var(--line-1);border-radius:var(--r-xl);padding:28px 24px 26px;min-height:390px;background:
@@ -884,84 +881,45 @@ let navTouchActive=false;
 let navStartX=0;
 let navStartY=0;
 let navDx=0;
+let navDy=0;
 let navHorizontal=false;
 let navMouseDown=false;
-let navActiveScreen=null;
-let navRaf=0;
-let navPendingX=0;
 
-function applyPageDrag(){
-  navRaf=0;
-  if(!navActiveScreen)return;
-  navActiveScreen.style.transform=`translate3d(${navPendingX}px,0,0)`;
-}
-function schedulePageDrag(x){
-  navPendingX=x;
-  if(!navRaf)navRaf=requestAnimationFrame(applyPageDrag);
-}
 function beginPageSwipe(x,y){
   if(pageTransitioning)return;
-  navActiveScreen=document.querySelector(".screen[data-screen].active");
-  if(!navActiveScreen)return;
   navTouchActive=true;
   navStartX=x;
   navStartY=y;
   navDx=0;
+  navDy=0;
   navHorizontal=false;
-  navPendingX=0;
 }
 function movePageSwipe(x,y,event){
-  if(!navTouchActive||pageTransitioning||!navActiveScreen)return;
-  const dx=x-navStartX;
-  const dy=y-navStartY;
-  if(!navHorizontal){
-    if(Math.abs(dx)<14)return;
-    if(Math.abs(dx)<=Math.abs(dy)*1.2)return;
+  if(!navTouchActive||pageTransitioning)return;
+  navDx=x-navStartX;
+  navDy=y-navStartY;
+  if(!navHorizontal && Math.abs(navDx)>=18 && Math.abs(navDx)>Math.abs(navDy)*1.25){
     navHorizontal=true;
-    navActiveScreen.classList.add("page-dragging");
   }
-  navDx=dx;
-  if(event?.cancelable)event.preventDefault();
-
-  const index=FOOTER_PAGES.indexOf(navActiveScreen.dataset.screen);
-  const blocked=(index===0&&dx>0)||(index===FOOTER_PAGES.length-1&&dx<0);
-  schedulePageDrag(blocked?dx*.18:dx);
+  if(navHorizontal && event?.cancelable)event.preventDefault();
 }
 function endPageSwipe(){
   if(!navTouchActive)return;
   navTouchActive=false;
-  if(navRaf){cancelAnimationFrame(navRaf);navRaf=0}
 
-  const active=navActiveScreen;
-  const currentName=active?.dataset.screen||"home";
+  const currentName=currentScreenName();
   const index=FOOTER_PAGES.indexOf(currentName);
-  const threshold=Math.min(64,window.innerWidth*.16);
-  let targetIndex=index;
+  const threshold=Math.min(70,window.innerWidth*.17);
 
-  if(navHorizontal&&navDx<=-threshold&&index<FOOTER_PAGES.length-1)targetIndex=index+1;
-  if(navHorizontal&&navDx>=threshold&&index>0)targetIndex=index-1;
-
-  const direction=Math.sign(targetIndex-index);
-  if(active){
-    active.classList.remove("page-dragging");
-    if(direction===0){
-      active.classList.add("page-returning");
-      active.style.transform="translate3d(0,0,0)";
-      setTimeout(()=>{
-        active.classList.remove("page-returning");
-        active.style.removeProperty("transform");
-      },150);
-    }else{
-      active.style.removeProperty("transform");
-      pageTransitioning=true;
-      showScreen(FOOTER_PAGES[targetIndex],direction);
-    }
+  if(navHorizontal && navDx<=-threshold && index<FOOTER_PAGES.length-1){
+    showScreen(FOOTER_PAGES[index+1],1);
+  }else if(navHorizontal && navDx>=threshold && index>0){
+    showScreen(FOOTER_PAGES[index-1],-1);
   }
 
-  navActiveScreen=null;
   navDx=0;
+  navDy=0;
   navHorizontal=false;
-  navPendingX=0;
 }
 
 if(mainView){
@@ -969,10 +927,12 @@ if(mainView){
     if(e.touches.length!==1||e.target.closest("button,input,select,textarea,a"))return;
     beginPageSwipe(e.touches[0].clientX,e.touches[0].clientY);
   },{passive:true});
+
   mainView.addEventListener("touchmove",e=>{
     if(e.touches.length!==1)return;
     movePageSwipe(e.touches[0].clientX,e.touches[0].clientY,e);
   },{passive:false});
+
   mainView.addEventListener("touchend",endPageSwipe,{passive:true});
   mainView.addEventListener("touchcancel",endPageSwipe,{passive:true});
 
@@ -981,10 +941,12 @@ if(mainView){
     navMouseDown=true;
     beginPageSwipe(e.clientX,e.clientY);
   });
+
   window.addEventListener("mousemove",e=>{
     if(!navMouseDown)return;
     movePageSwipe(e.clientX,e.clientY,e);
   });
+
   window.addEventListener("mouseup",()=>{
     if(!navMouseDown)return;
     navMouseDown=false;
