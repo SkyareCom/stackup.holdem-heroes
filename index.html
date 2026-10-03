@@ -498,21 +498,54 @@ strong,b,em,i{
         </div>
       </section>
 
-      <section class="screen" data-screen="leaks">
-        <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1518133120397-258d5eb470c6?auto=format&fit=crop&w=1600&q=82');--pos:center">
-          <div class="screen-visual-content"><div class="section-kicker">DIAGNÓSTICO DE POKER</div><div class="screen-visual-title">Onde seu jogo perde valor.</div><div class="screen-visual-copy">Leaks organizados por impacto, frequência e contexto — sem ruído visual.</div></div>
+      <section class="screen" data-screen="spots">
+        <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=1600&q=82');--pos:center">
+          <div class="screen-visual-content">
+            <div class="section-kicker">SPOTS DO JOGADOR</div>
+            <div class="screen-visual-title">Decisões que revelam seu perfil.</div>
+            <div class="screen-visual-copy">Revise situações representativas do seu jogo e veja onde suas decisões reforçam ou alteram seu Poker DNA.</div>
+          </div>
         </div>
+
         <div class="section-head">
-          <div><div class="section-kicker">SEUS LEAKS</div><h1 class="section-title">O QUE ESTÁ CUSTANDO EV?</h1></div>
+          <div><div class="section-kicker">SPOTS RECENTES</div><h1 class="section-title">SPOTS</h1></div>
         </div>
-        <div class="body-copy" style="margin-bottom:14px">Priorize padrões com maior frequência e impacto. O objetivo é revelar onde sua tomada de decisão se torna previsível ou perde qualidade.</div>
-        <div class="filterbar" id="leakFilters">
-          <button class="filter active" data-filter="all">TODOS</button>
-          <button class="filter" data-filter="critical">CRÍTICO</button>
-          <button class="filter" data-filter="high">ALTO</button>
-          <button class="filter" data-filter="moderate">MODERADO</button>
+        <div class="body-copy" style="margin-bottom:18px">Cada spot representa uma decisão analisável do seu histórico. Use esta área para revisar contexto, ação e leitura do seu padrão.</div>
+
+        <div class="scenario-stack">
+          <section class="scenario-section">
+            <div class="scenario-head">
+              <div class="scenario-name">BOLHA · BTN vs BB</div>
+              <div class="scenario-desc">22bb · MTT · decisão sob pressão</div>
+            </div>
+            <div class="scenario-grid">
+              <div class="scenario-cell"><span>DECISÃO</span><strong>Raise</strong><em>agressividade acima da baseline</em></div>
+              <div class="scenario-cell"><span>PRESSÃO</span><strong>82</strong><em>zona de maior variação</em></div>
+            </div>
+          </section>
+
+          <section class="scenario-section">
+            <div class="scenario-head">
+              <div class="scenario-name">CO vs BTN · 40bb</div>
+              <div class="scenario-desc">pot 3-bet · adaptação posicional</div>
+            </div>
+            <div class="scenario-grid">
+              <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>linha dentro do padrão</em></div>
+              <div class="scenario-cell"><span>DISCIPLINA</span><strong>74</strong><em>boa manutenção de range</em></div>
+            </div>
+          </section>
+
+          <section class="scenario-section">
+            <div class="scenario-head">
+              <div class="scenario-name">BB · River</div>
+              <div class="scenario-desc">pote grande · decisão de showdown</div>
+            </div>
+            <div class="scenario-grid">
+              <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>hero call acima do padrão</em></div>
+              <div class="scenario-cell"><span>IMPACTO</span><strong>-7 EV</strong><em>spot ligado a leak recorrente</em></div>
+            </div>
+          </section>
         </div>
-        <div id="leakList"></div>
       </section>
 
       <section class="screen" data-screen="analysis">
@@ -533,6 +566,20 @@ strong,b,em,i{
         </div>
 
         <div id="scenarioStack" class="scenario-stack"></div>
+        <div class="section" id="analysisLeaks">
+          <div class="section-head">
+            <div><div class="section-kicker">LEAKS</div><h2 class="section-title">O QUE ESTÁ CUSTANDO EV?</h2></div>
+          </div>
+          <div class="body-copy" style="margin-bottom:14px">Priorize padrões com maior frequência e impacto. Aqui os leaks aparecem dentro da análise geral do seu jogo.</div>
+          <div class="filterbar" id="leakFilters">
+            <button class="filter active" data-filter="all">TODOS</button>
+            <button class="filter" data-filter="critical">CRÍTICO</button>
+            <button class="filter" data-filter="high">ALTO</button>
+            <button class="filter" data-filter="moderate">MODERADO</button>
+          </div>
+          <div id="leakList"></div>
+        </div>
+
 
         <div class="section">
           <div class="pressure">
@@ -583,13 +630,13 @@ strong,b,em,i{
 
   <nav id="tabbar" class="tabbar" aria-label="Navegação principal">
     <button class="tab active" data-tab="home" aria-label="Home">
-      <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9 20v-6h6v6"/></svg><span>INÍCIO</span>
+      <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9 20v-6h6v6"/></svg><span>HOME</span>
     </button>
     <button class="tab" data-tab="dna" aria-label="DNA">
       <svg viewBox="0 0 24 24"><path d="M8 3c0 5 8 5 8 10s-8 5-8 8"/><path d="M16 3c0 5-8 5-8 10s8 5 8 8"/><path d="M9 7h6M9 17h6"/></svg><span>DNA</span>
     </button>
-    <button class="tab" data-tab="leaks" aria-label="Leaks">
-      <svg viewBox="0 0 24 24"><path d="M12 3 3.8 19h16.4z"/><path d="M12 8v5M12 16.5v.5"/></svg><span>LEAKS</span>
+    <button class="tab" data-tab="spots" aria-label="Spots">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>SPOTS</span>
     </button>
     <button class="tab" data-tab="analysis" aria-label="Analysis">
       <svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg><span>ANÁLISE</span>
@@ -711,7 +758,7 @@ function showScreen(name){
 document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>showScreen(btn.dataset.tab)));
 document.querySelectorAll("[data-go]").forEach(btn=>btn.addEventListener("click",()=>showScreen(btn.dataset.go)));
 
-document.getElementById("leakFilters").addEventListener("click",e=>{
+document.getElementById("leakFilters")?.addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
   document.querySelectorAll("#leakFilters .filter").forEach(x=>x.classList.remove("active"));
   btn.classList.add("active");renderLeaks(btn.dataset.filter);
@@ -736,7 +783,7 @@ document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet()
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
 
 renderDNA();renderLeaks();renderScenarios();renderPatterns();
-const initial=location.hash.replace("#","");if(["home","dna","leaks","analysis","profile"].includes(initial))showScreen(initial);
+const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
 </script>
 </body>
