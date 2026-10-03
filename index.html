@@ -552,6 +552,17 @@ strong,b,em,i{
 .action-analysis-title{font-family:var(--display);font-size:18px;color:var(--cream-2);font-weight:400}
 .action-analysis-scale{font-size:8px;letter-spacing:.14em;color:var(--muted-1);white-space:nowrap}
 .action-comment{font-size:10px;line-height:1.55;color:var(--muted-1);padding:10px 0 13px;border-bottom:1px solid var(--line-1)}
+
+.action-quality{margin:12px 0 14px;padding:12px;border:1px solid rgba(216,178,142,.18);border-radius:13px;background:rgba(255,255,255,.018)}
+.action-quality-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.action-quality-grade{font-family:var(--display);font-size:20px;color:var(--cream-2);line-height:1.05}
+.action-quality-mode{font-size:8px;line-height:1.3;letter-spacing:.1em;color:var(--muted-1);text-align:right}
+.action-quality-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.action-quality-item{padding:9px 10px;border-radius:11px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}
+.action-quality-item span{display:block;font-size:8px;line-height:1.25;color:var(--muted-1);letter-spacing:.06em}
+.action-quality-item b{display:block;margin-top:4px;font-family:var(--display);font-size:15px;color:var(--champ-1);font-weight:400}
+.action-aggression-read{margin-top:10px;padding-top:10px;border-top:1px solid var(--line-1);font-size:9px;line-height:1.45;color:var(--cream-1)}
+.action-profile-kicker{margin-top:4px;font-size:8px;letter-spacing:.14em;color:var(--muted-1)}
 .profile-indicators{display:grid;gap:9px;margin-top:13px}
 .profile-indicator{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:9px;align-items:center}
 .profile-indicator-main{display:grid;gap:5px}
@@ -822,6 +833,18 @@ strong,b,em,i{
               <div class="action-analysis-scale">INDICADORES · 0–100</div>
             </div>
             <div class="action-comment" id="actionAnalysisComment">Escolha uma ação para gerar a leitura comportamental.</div>
+            <div class="action-quality" id="actionQuality">
+              <div class="action-quality-top">
+                <div>
+                  <div class="section-kicker">QUALIDADE DA DECISÃO</div>
+                  <div class="action-quality-grade" id="actionQualityGrade">—</div>
+                </div>
+                <div class="action-quality-mode" id="actionQualityMode">AGUARDANDO AÇÃO</div>
+              </div>
+              <div class="action-quality-grid" id="actionQualityMetrics"></div>
+              <div class="action-aggression-read" id="actionAggressionRead"></div>
+            </div>
+            <div class="action-profile-kicker">PERFIL COMPORTAMENTAL DA AÇÃO · 0–100</div>
             <div class="profile-indicators" id="actionProfileIndicators"></div>
           </div>
 
@@ -1239,7 +1262,152 @@ const ACTION_PROFILE_META=[
 const ACTION_PROFILE_LABELS=Object.fromEntries(ACTION_PROFILE_META);
 const clamp100=v=>Math.max(0,Math.min(100,Math.round(Number(v)||0)));
 
-function buildActionProfile(action,amount=0){
+const DECISION_QUALITY_META=[
+  ["decisionQuality","QUALIDADE GLOBAL"],
+  ["rangeDiscipline","DISCIPLINA DE RANGE"],
+  ["sizingQuality","QUALIDADE DO SIZING"],
+  ["stackAwareness","GESTÃO DE STACK"],
+  ["positionFit","AJUSTE POSICIONAL"],
+  ["pressureControl","CONTROLE SOB PRESSÃO"],
+  ["mathAwareness","QUALIDADE MATEMÁTICA"],
+  ["evAlignment","ALINHAMENTO DE EV"]
+];
+
+const STATIC_SPOT_CONTEXT=Object.freeze({
+  spot_id:"heroes_spot_static_turn_btn_hj",
+  game:"NLH",
+  format:"MTT",
+  table_size:9,
+  street:"turn",
+  hero_position:"BTN",
+  villain_position:"HJ",
+  effective_stack_bb:44,
+  pot_bb:10.5,
+  facing_bet_bb:6,
+  board:["Qs","8h","3c","Jd"],
+  hero_hand:["As","Kh"],
+  tournament_phase:"middle",
+  icm_pressure:18,
+  opponent_profile:"unknown",
+  range_context:{hero:"BTN continuing range",villain:"HJ betting range",confidence:35},
+  solver_reference:null
+});
+
+function getCurrentSpotContext(){
+  const external=window.StackUpHeroesCurrentSpot;
+  if(external&&typeof external==="object")return JSON.parse(JSON.stringify({...STATIC_SPOT_CONTEXT,...external}));
+  return JSON.parse(JSON.stringify(STATIC_SPOT_CONTEXT));
+}
+function normalizeActionKey(action,amount=0){
+  if(action==="raise")return `raise:${Number(amount)||0}`;
+  return String(action||"").toLowerCase();
+}
+function potOddsRequired(context){
+  const call=Math.max(0,Number(context?.facing_bet_bb)||0);
+  const pot=Math.max(0,Number(context?.pot_bb)||0);
+  if(!call)return 0;
+  return (call/(pot+call+call))*100;
+}
+function resolveSolverAction(context,action,amount=0){
+  const ref=context?.solver_reference;
+  if(!ref||!ref.validated||!Array.isArray(ref.actions))return null;
+  const key=normalizeActionKey(action,amount);
+  let chosen=ref.actions.find(x=>String(x.key)===key);
+  if(!chosen&&action==="raise"){
+    const raises=ref.actions.filter(x=>String(x.key||"").startsWith("raise:"));
+    if(raises.length)chosen=raises.sort((a,b)=>Math.abs(Number(String(a.key).split(":")[1])-amount)-Math.abs(Number(String(b.key).split(":")[1])-amount))[0];
+  }
+  const evs=ref.actions.map(x=>Number(x.ev_bb)).filter(Number.isFinite);
+  if(!chosen||!evs.length||!Number.isFinite(Number(chosen.ev_bb)))return null;
+  const best=Math.max(...evs);
+  const chosenEv=Number(chosen.ev_bb);
+  const loss=Math.max(0,best-chosenEv);
+  return {source:String(ref.source||"solver"),validated:true,chosen_ev_bb:chosenEv,best_ev_bb:best,ev_loss_bb:loss,frequency:Number.isFinite(Number(chosen.frequency))?Number(chosen.frequency):null,ev_alignment:clamp100(100-loss*35)};
+}
+function evaluateDecisionContext(action,amount=0,context=getCurrentSpotContext()){
+  const stack=Math.max(1,Number(context.effective_stack_bb)||1);
+  const facing=Math.max(0,Number(context.facing_bet_bb)||0);
+  const pot=Math.max(0,Number(context.pot_bb)||0);
+  const invest=action==="allin"?stack:action==="raise"?Math.max(0,Number(amount)||0):action==="call"?facing:0;
+  const investPct=invest/stack*100;
+  const potOdds=potOddsRequired(context);
+  const ip=["BTN","CO","HJ"].includes(String(context.hero_position||"").toUpperCase());
+  const pressure=clamp100(context.icm_pressure||0);
+  const solver=resolveSolverAction(context,action,amount);
+
+  let sizingQuality=72;
+  if(action==="raise"){
+    const minRaise=Math.max(facing*2,1);
+    const ratio=invest/Math.max(1,pot+facing);
+    sizingQuality=clamp100((invest>=minRaise?76:35)+(ratio>=.55&&ratio<=1.25?12:0)-(investPct>55?18:investPct>40?8:0));
+  }else if(action==="allin")sizingQuality=clamp100(stack<=18?82:stack<=25?68:32);
+  else if(action==="call")sizingQuality=clamp100(78-(potOdds>35?12:0));
+  else if(action==="fold")sizingQuality=82;
+
+  const stackAwareness=clamp100(action==="allin"?(stack<=18?88:stack<=25?72:38):action==="raise"?82-Math.max(0,investPct-35)*1.35:action==="call"?78-Math.max(0,(facing/stack*100)-18):88);
+  const positionFit=clamp100(ip?(["raise","call"].includes(action)?86:action==="fold"?72:78):(["fold","call"].includes(action)?78:70));
+  const pressureControl=clamp100(pressure<35?(action==="allin"?55:action==="raise"?78:82):action==="allin"?35:action==="raise"?62:84);
+  const rangeDiscipline=clamp100(action==="fold"?84:action==="call"?74:action==="raise"?(amount<=Math.max(12,facing*2.5)?78:58):action==="allin"?(stack<=20?74:38):65);
+  const mathAwareness=clamp100(action==="call"?(potOdds<=28?72:potOdds<=34?62:50):action==="raise"?(sizingQuality*.55+stackAwareness*.45):action==="allin"?stackAwareness:80);
+  const evAlignment=solver?solver.ev_alignment:null;
+  const contextualBase=(rangeDiscipline+sizingQuality+stackAwareness+positionFit+pressureControl+mathAwareness)/6;
+  const decisionQuality=clamp100(solver?contextualBase*.55+evAlignment*.45:Math.min(78,contextualBase));
+  const confidence=solver?clamp100(context?.solver_reference?.confidence||95):clamp100(38+(context?.range_context?.confidence||0)*.35);
+
+  const aggressionIntensity=action==="allin"?100:action==="raise"?clamp100(72+investPct*.55):action==="call"?42:12;
+  let aggressionClass="AGRESSIVIDADE BAIXA / CONTROLE";
+  if(aggressionIntensity>=70){
+    if(solver&&evAlignment>=78)aggressionClass="AGRESSIVIDADE EFICIENTE";
+    else if(solver&&evAlignment<55)aggressionClass="AGRESSIVIDADE EXCESSIVA";
+    else if(decisionQuality>=72&&sizingQuality>=70&&stackAwareness>=65)aggressionClass="AGRESSIVIDADE CONTEXTUALMENTE COERENTE";
+    else if(decisionQuality<55||sizingQuality<50||stackAwareness<50)aggressionClass="AGRESSIVIDADE POTENCIALMENTE EXCESSIVA";
+    else aggressionClass="AGRESSIVIDADE ALTA · A VALIDAR";
+  }else if(action==="call")aggressionClass="CONTROLE / CONTINUIDADE";
+  else if(action==="fold")aggressionClass="DISCIPLINA / PRESERVAÇÃO";
+
+  return {
+    metrics:{decisionQuality,rangeDiscipline,sizingQuality,stackAwareness,positionFit,pressureControl,mathAwareness,evAlignment},
+    confidence,aggressionIntensity,aggressionClass,solver,
+    math:{pot_odds_required_pct:Number(potOdds.toFixed(1)),investment_pct_stack:Number(investPct.toFixed(1)),pot_before_action_bb:pot,facing_bet_bb:facing},
+    context_mode:solver?"solver-validated":"contextual-model",
+    context_snapshot:{street:context.street,hero_position:context.hero_position,villain_position:context.villain_position,effective_stack_bb:context.effective_stack_bb,tournament_phase:context.tournament_phase,icm_pressure:context.icm_pressure,opponent_profile:context.opponent_profile}
+  };
+}
+function enrichProfileWithDecisionQuality(base,evaluation){
+  const scores={...base.scores};
+  const q=evaluation?.metrics?.decisionQuality??50;
+  const aggressive=evaluation?.aggressionIntensity>=70;
+  if(aggressive&&q>=72){
+    scores.discipline=clamp100(scores.discipline+12);
+    scores.riskControl=clamp100(scores.riskControl+10);
+    scores.adaptability=clamp100(scores.adaptability+6);
+  }else if(aggressive&&q<55){
+    scores.discipline=clamp100(scores.discipline-16);
+    scores.riskControl=clamp100(scores.riskControl-18);
+    scores.bluffTendency=clamp100(scores.bluffTendency+7);
+  }
+  if((evaluation?.metrics?.pressureControl??50)>=78)scores.pressure=clamp100(Math.min(scores.pressure,70));
+  const mode=evaluation?.solver?"referência de solver validada":"modelo contextual sem solve validado";
+  return {scores,comment:`${base.comment} Leitura de qualidade: ${evaluation.aggressionClass.toLowerCase()}. Qualidade ${q}/100, confiança ${evaluation.confidence}/100, usando ${mode}.`};
+}
+function renderDecisionQuality(evaluation){
+  const grade=document.getElementById("actionQualityGrade");
+  const mode=document.getElementById("actionQualityMode");
+  const list=document.getElementById("actionQualityMetrics");
+  const read=document.getElementById("actionAggressionRead");
+  if(!evaluation)return;
+  const q=evaluation.metrics.decisionQuality;
+  if(grade)grade.textContent=q>=80?"MUITO FORTE":q>=68?"FORTE":q>=55?"NEUTRA":q>=42?"FRÁGIL":"MUITO FRÁGIL";
+  if(mode)mode.textContent=evaluation.solver?`SOLVER VALIDADO · CONFIANÇA ${evaluation.confidence}%`:`MODELO CONTEXTUAL · CONFIANÇA ${evaluation.confidence}% · EV PENDENTE`;
+  if(list)list.innerHTML=DECISION_QUALITY_META.map(([key,label])=>{
+    const value=evaluation.metrics[key];
+    const shown=value===null||value===undefined?"—":clamp100(value);
+    return `<div class="action-quality-item"><span>${label}</span><b>${shown}</b></div>`;
+  }).join("")+`<div class="action-quality-item"><span>POT ODDS NECESSÁRIA</span><b>${evaluation.math.pot_odds_required_pct}%</b></div><div class="action-quality-item"><span>STACK INVESTIDO</span><b>${evaluation.math.investment_pct_stack}%</b></div>`;
+  if(read)read.textContent=`${evaluation.aggressionClass}. ${evaluation.solver?`EV escolhido ${evaluation.solver.chosen_ev_bb.toFixed(2)}bb · melhor EV ${evaluation.solver.best_ev_bb.toFixed(2)}bb · perda ${evaluation.solver.ev_loss_bb.toFixed(2)}bb.`:"O EV não é afirmado sem referência de solver validada; posição, stack, sizing, pressão e matemática objetiva entram na leitura contextual."}`;
+}
+
+function buildActionProfile(action,amount=0,evaluation=null){
   let scores,comment;
   if(action==="fold"){
     scores={aggression:18,discipline:88,riskControl:92,patience:90,pressure:76,adaptability:68,positionalAwareness:72,bluffTendency:8};
@@ -1272,7 +1440,8 @@ function buildActionProfile(action,amount=0){
     scores={aggression:50,discipline:50,riskControl:50,patience:50,pressure:50,adaptability:50,positionalAwareness:50,bluffTendency:50};
     comment="Ação registrada. O HEROES incorporará este sinal à amostra comportamental.";
   }
-  return {scores:Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,clamp100(v)])),comment};
+  const base={scores:Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,clamp100(v)])),comment};
+  return evaluation?enrichProfileWithDecisionQuality(base,evaluation):base;
 }
 function renderActionProfile(profile,label){
   const box=document.getElementById("actionAnalysis");
@@ -1317,13 +1486,22 @@ function buildActionProfileSummary(){
   if(a.bluffTendency>82)leaks.push("bluffTendency");
   if(!leaks.length)leaks.push(...positiveKeys.sort((x,y)=>a[x]-a[y]).slice(0,2));
   const uniqLeaks=[...new Set(leaks)].slice(0,3);
+  const decisions=getSpotDecisionHistory().filter(x=>x&&x.decision_quality);
+  const qualities=decisions.map(x=>Number(x.decision_quality?.metrics?.decisionQuality)).filter(Number.isFinite);
+  const qualityAverage=qualities.length?clamp100(qualities.reduce((s,v)=>s+v,0)/qualities.length):null;
+  const aggressionEfficient=decisions.filter(x=>/EFICIENTE|COERENTE/.test(String(x.decision_quality?.aggressionClass||""))).length;
+  const aggressionExcessive=decisions.filter(x=>/EXCESSIVA/.test(String(x.decision_quality?.aggressionClass||""))).length;
+  const solverValidated=decisions.filter(x=>x.decision_quality?.solver?.validated).length;
   const summary={
     sample_size:profile.sampleSize,
     averages:a,
     strengths:strengths.map(key=>({key,label:ACTION_PROFILE_LABELS[key],score:a[key]})),
     leaks:uniqLeaks.map(key=>({key,label:ACTION_PROFILE_LABELS[key],score:a[key]})),
+    decision_quality_average:qualityAverage,
+    aggression_quality:{efficient:aggressionEfficient,excessive:aggressionExcessive},
+    solver_validated_decisions:solverValidated,
     updated_at:new Date().toISOString(),
-    version:"action-profile-v1"
+    version:"action-profile-v2"
   };
   return summary;
 }
@@ -1341,14 +1519,20 @@ function renderSwot(){
     if(x.key==="bluffTendency"&&x.score>82)return `TENDÊNCIA AO BLEFE ${x.score}/100 — frequência elevada`;
     return `${x.label} ${x.score}/100`;
   });
+  if(summary.decision_quality_average!==null&&summary.decision_quality_average>=75)strong.push(`QUALIDADE DE DECISÃO ${summary.decision_quality_average}/100`);
+  if(summary.aggression_quality.efficient>=3&&summary.aggression_quality.efficient>summary.aggression_quality.excessive)strong.push(`Agressividade eficiente em ${summary.aggression_quality.efficient} decisões`);
+  if(summary.aggression_quality.excessive>=2)weak.push(`Agressividade potencialmente excessiva em ${summary.aggression_quality.excessive} decisões`);
+  if(summary.decision_quality_average!==null&&summary.decision_quality_average<55)weak.push(`Qualidade média das decisões ${summary.decision_quality_average}/100`);
   const opportunities=[];
   if(a.discipline<70)opportunities.push("Treinar disciplina em potes grandes e decisões de alta pressão.");
   if(a.riskControl<70)opportunities.push("Refinar seleção de sizings para preservar EV e stack.");
   if(a.positionalAwareness<80)opportunities.push("Aumentar consciência de ranges por posição.");
+  if(summary.solver_validated_decisions<summary.sample_size)opportunities.push("Ampliar a cobertura de spots com referência de solver para transformar sinais contextuais em leitura objetiva de EV.");
   if(!opportunities.length)opportunities.push("Aprofundar adaptação contra perfis de oponentes e texturas diferentes.");
   const threats=[];
   if(a.aggression>85&&a.discipline<65)threats.push("Agressividade alta combinada com disciplina baixa pode ampliar decisões de baixa qualidade.");
   if(a.bluffTendency>78&&a.riskControl<60)threats.push("Blefes frequentes com baixo controle de risco podem aumentar variância e leaks.");
+  if(summary.aggression_quality.excessive>summary.aggression_quality.efficient&&summary.aggression_quality.excessive>=2)threats.push("Agressividade excessiva está aparecendo mais vezes que agressividade eficiente na amostra atual.");
   if(summary.sample_size<20)threats.push("Amostra ainda pequena: padrões podem mudar conforme novas decisões forem registradas.");
   if(!threats.length)threats.push("Mudanças de comportamento sob pressão podem alterar rapidamente o perfil atual.");
   const cards=[
@@ -1366,7 +1550,9 @@ function renderSwot(){
 }
 function recordSpotDecision(action,amount,button){
   const label=action==="raise"&&amount?`RAISE ${amount}bb`:action==="allin"?"ALL IN":action.toUpperCase();
-  const profile=buildActionProfile(action,amount);
+  const context=getCurrentSpotContext();
+  const evaluation=evaluateDecisionContext(action,amount,context);
+  const profile=buildActionProfile(action,amount,evaluation);
   const decision={
     spot_id:`heroes_spot_${currentSpotSequence}`,
     timestamp:new Date().toISOString(),
@@ -1384,13 +1570,31 @@ function recordSpotDecision(action,amount,button){
     amount_bb:amount||0,
     profile_signals:profile.scores,
     action_analysis:profile.comment,
-    analysis_version:"action-profile-v1"
+    analysis_version:"action-profile-v2",
+    context_snapshot:evaluation.context_snapshot,
+    decision_quality:evaluation,
+    ev_analysis:evaluation.solver?{
+      status:"validated",
+      source:evaluation.solver.source,
+      chosen_ev_bb:evaluation.solver.chosen_ev_bb,
+      best_ev_bb:evaluation.solver.best_ev_bb,
+      ev_loss_bb:evaluation.solver.ev_loss_bb,
+      alignment:evaluation.solver.ev_alignment
+    }:{
+      status:"pending_solver_reference",
+      source:"contextual-model",
+      chosen_ev_bb:null,
+      best_ev_bb:null,
+      ev_loss_bb:null,
+      alignment:null
+    }
   };
   const history=getSpotDecisionHistory();
   history.unshift(decision);
   store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,500)));
   persistActionProfileSummary();
   renderActionProfile(profile,`${label} · PERFIL DA AÇÃO`);
+  renderDecisionQuality(evaluation);
   renderDNA();
   renderSwot();
 
@@ -1422,9 +1626,28 @@ nextSpotBtn?.addEventListener("click",()=>{
   if(actionAnalysis)actionAnalysis.hidden=true;
   const indicators=document.getElementById("actionProfileIndicators");
   if(indicators)indicators.innerHTML="";
+  const qualityMetrics=document.getElementById("actionQualityMetrics");
+  if(qualityMetrics)qualityMetrics.innerHTML="";
+  const qualityGrade=document.getElementById("actionQualityGrade");
+  if(qualityGrade)qualityGrade.textContent="—";
+  const qualityMode=document.getElementById("actionQualityMode");
+  if(qualityMode)qualityMode.textContent="AGUARDANDO AÇÃO";
+  const aggressionRead=document.getElementById("actionAggressionRead");
+  if(aggressionRead)aggressionRead.textContent="";
   nextSpotBtn.hidden=true;
 });
 
+window.StackUpHeroesDecisionEngine=Object.freeze({
+  evaluate:evaluateDecisionContext,
+  currentContext:getCurrentSpotContext,
+  potOddsRequired,
+  expectedSolverReferenceShape:{
+    validated:true,
+    source:"solver-name/version",
+    confidence:95,
+    actions:[{key:"fold",ev_bb:0,frequency:.1},{key:"call",ev_bb:.2,frequency:.5},{key:"raise:12",ev_bb:.3,frequency:.4}]
+  }
+});
 renderDNA();renderLeaks();renderScenarios();renderPatterns();renderSwot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
