@@ -5888,6 +5888,90 @@ linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;
   .view{padding-left:var(--content-x);padding-right:var(--content-x)}
   .hero{padding:32px 28px}
 }
+
+/* Mobile scale correction */
+html,body,#app,.app{width:100%;max-width:none;min-width:0}
+.shell{width:100%;max-width:none;margin:0;min-height:100dvh}
+.topbar{width:100%;padding-left:20px;padding-right:20px}
+.view{width:100%;max-width:none;padding-left:20px;padding-right:20px}
+.tabbar{left:0;right:0;transform:none;width:100%;max-width:none}
+
+.brand-kicker{font-size:11px;line-height:1.2}
+.brand-title{font-size:36px;line-height:1}
+.brand-sub{font-size:11px;line-height:1.3;letter-spacing:.2em}
+.status-dot{width:10px;height:10px}
+
+.hero{width:100%;min-height:410px;padding:30px 24px 28px}
+.eyebrow{font-size:11px;line-height:1.2}
+.display-xl{font-size:clamp(40px,11vw,50px);line-height:.98;margin:14px 0 12px}
+.hero-copy{max-width:none;font-size:14px;line-height:1.6}
+.dna-label{font-size:10px}
+.dna-value{font-size:36px}
+.dna-grid{gap:18px}
+
+.section-kicker{font-size:10px;line-height:1.25}
+.section-title{font-size:30px;line-height:1.1}
+.section-link{font-size:11px}
+.archetype{font-size:32px;line-height:1.08}
+.body-copy{font-size:14px;line-height:1.65}
+.pill{font-size:10px}
+.feature-title{font-size:21px}
+.feature-meta{font-size:10px}
+.feature-note{font-size:13px}
+.feature-score{font-size:32px}
+.btn{font-size:11px;min-height:52px}
+
+.dna-row-name{font-size:11px}
+.dna-row-score{font-size:34px}
+.dna-row-copy{font-size:13px}
+.baseline{font-size:10px}
+
+.filter{font-size:10px;min-height:40px}
+.leak-title{font-size:23px}
+.severity{font-size:10px}
+.mini-label{font-size:9px}
+.mini-value{font-size:19px}
+.recommend{font-size:13px}
+
+.screen-visual{width:100%;min-height:210px}
+.screen-visual-title{font-size:34px}
+.screen-visual-copy{font-size:12px}
+
+.scenario-name{font-size:24px}
+.scenario-desc{font-size:10px}
+.scenario-cell{min-height:128px}
+.scenario-cell span{font-size:11px}
+.scenario-cell strong{font-size:30px}
+.scenario-cell em{font-size:13px}
+
+.pressure-stat span{font-size:9px}
+.pressure-stat b{font-size:29px}
+.insight{font-size:21px}
+
+.profile-name{font-size:40px}
+.profile-id{font-size:11px}
+.setting strong{font-size:13px}
+.setting span{font-size:11px}
+.tab{font-size:9px;min-height:60px}
+.tab svg{width:20px;height:20px}
+
+@media (max-width:430px){
+  .topbar{padding-left:18px;padding-right:18px}
+  .view{padding-left:18px;padding-right:18px}
+  .hero{padding:28px 22px 26px}
+  .scenario-section{padding:20px 16px}
+  .scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .scenario-cell{min-height:124px;padding:15px 13px 17px}
+}
+@media (max-width:360px){
+  .topbar{padding-left:16px;padding-right:16px}
+  .view{padding-left:16px;padding-right:16px}
+  .brand-title{font-size:34px}
+  .display-xl{font-size:40px}
+  .section-title{font-size:28px}
+  .scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .scenario-cell{min-height:120px}
+}
 </style>
 </head>
 <body>
