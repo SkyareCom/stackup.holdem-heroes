@@ -2,6 +2,16 @@ import fs from 'node:fs';
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const failures=[];
 const expect=(c,m)=>{if(!c)failures.push(m)};
+
+const style = html.slice(html.indexOf('<style>'), html.indexOf('</style>'));
+expect(!style.includes('sólido'),'CSS must not contain translated solid keyword');
+expect(!/\.scenario-cell\s+forte\{/.test(style),'scenario score selector must target strong');
+expect(!/\.setting\s+forte\{/.test(style),'setting label selector must target strong');
+expect(style.includes('--section-gap:32px'),'global section spacing token must be defined');
+expect(style.includes('.scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}'),'scenario cards must use the normalized two-column grid');
+expect(style.includes('.scenario-cell{min-width:0;min-height:124px'),'scenario cards must have normalized breathing room');
+expect(style.includes('@media (max-width:330px)'),'small-screen fallback must exist');
+
 for(const token of ['#0F0909','#160B0D','#2A1114','#8D5B46','#D8B28E','#EEE1D1']) expect(html.includes(token),`missing HEROES palette token ${token}`);
 expect(html.includes('@font-face{font-family:"Roboto Slab"'),'Roboto Slab must be embedded');
 expect(html.includes('data:font/ttf;base64,'),'Roboto Slab must be self-contained');
