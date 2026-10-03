@@ -460,19 +460,20 @@ strong,b,em,i{
 .seat-stack,.hero-stack{margin-top:3px;font-size:9px;line-height:1;color:var(--cream-1);white-space:nowrap}
 .active-bettor .seat-avatar{border-color:var(--champ-1);box-shadow:0 0 0 2px rgba(216,178,142,.12),0 6px 14px rgba(0,0,0,.35)}
 .bet-chip{
-  position:absolute;left:-7px;top:48px;padding:3px 6px;border-radius:999px;
+  position:absolute;left:-12px;top:46px;padding:3px 6px;border-radius:999px;
   background:#160b0d;border:1px solid rgba(216,178,142,.35);
   font-size:8px;color:var(--champ-1);white-space:nowrap
 }
 
-.seat-utg{left:31%;top:5%}
-.seat-utg1{left:51%;top:-1%}
-.seat-utg2{left:72%;top:6%}
-.seat-lj{left:91%;top:33%}
-.seat-hj{left:90%;top:68%}
-.seat-co{left:72%;top:91%}
-.seat-sb{left:27%;top:91%}
-.seat-bb{left:9%;top:63%}
+/* 9-max seats: symmetric arc around the table, HERO fixed at bottom */
+.seat-sb{left:22%;top:85%}
+.seat-bb{left:8%;top:58%}
+.seat-utg{left:13%;top:27%}
+.seat-utg1{left:35%;top:7%}
+.seat-utg2{left:65%;top:7%}
+.seat-lj{left:87%;top:27%}
+.seat-hj{left:92%;top:58%}
+.seat-co{left:78%;top:85%}
 
 .table-center{
   position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
@@ -505,7 +506,7 @@ strong,b,em,i{
 .poker-card.back span{font-family:var(--display);font-weight:400}
 .hero-turn{margin-top:9px;font-size:9px;letter-spacing:.18em;color:var(--champ-1)}
 
-.hero-seat{left:50%;top:99%;width:82px}
+.hero-seat{left:50%;top:100%;width:86px}
 .hero-cards{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);gap:2px}
 .hero-card{width:32px;height:45px;transform:rotate(-4deg)}
 .hero-card+ .hero-card{transform:rotate(4deg)}
