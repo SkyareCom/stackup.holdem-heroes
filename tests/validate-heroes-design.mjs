@@ -44,8 +44,10 @@ expect(html.includes('id="spotPrev"') && html.includes('id="spotNext"'),'Spots p
 expect(html.includes('id="spotViewport"'),'Spots native swipe viewport must exist');
 expect(style.includes('scroll-snap-type:x mandatory'),'Spots pager must use native horizontal scroll snap');
 expect(style.includes('scroll-snap-align:start'),'Each spot page must snap horizontally');
-expect(style.includes('touch-action:pan-x pan-y'),'Spots pager must support native touch panning');
+expect(style.includes('touch-action:pan-y'),'Spots pager must preserve vertical page scrolling while JS handles horizontal drag');
 expect(html.includes('spotViewport.addEventListener("scroll"'),'Spots pager UI must sync with native scrolling');
+expect(html.includes('addEventListener("pointerdown"') && html.includes('addEventListener("pointermove"') && html.includes('addEventListener("pointerup"'),'Spots pager must support pointer-drag fallback');
+expect(html.includes('setPointerCapture'),'Spots pointer drag must capture the active pointer');
 expect(html.includes('data-photo-slot="home"'),'Premium background/photo slot missing');
 expect((html.match(/images\.unsplash\.com\/photo-/g)||[]).length >= 5,'expected at least 5 real photographic poker backgrounds');
 for(const scenario of ['POR POSIÇÃO','POR STACK','POR STREET','POR FASE DO TORNEIO','POR PRESSÃO','POR TIPO DE OPONENTE']) expect(html.includes(scenario),`missing scenario division: ${scenario}`);
