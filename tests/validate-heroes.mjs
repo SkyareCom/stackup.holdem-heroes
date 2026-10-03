@@ -25,6 +25,28 @@ for (const phrase of [
   expect(!html.includes(phrase), `inherited PLO copy still present: ${phrase}`);
 }
 
+
+// Unified Poker DNA / usage data architecture.
+expect((html.match(/\{key:"/g)||[]).length>=30, 'Poker DNA must expose at least 30 indicator definitions');
+for (const token of [
+  'heroes.profileAccumulator.v4',
+  'heroes.usage.v1',
+  'RECENT_DECISION_LIMIT=500',
+  'function updateProfileAccumulator',
+  'function getUnifiedPlayerProfile',
+  'indicatorConfidence',
+  'function buildTrainingRecommendations',
+  'data-training-focus',
+  'heroes-player-profile-v4'
+]) {
+  expect(html.includes(token), `missing synchronized HEROES data capability: ${token}`);
+}
+expect(!html.includes('mode:"mock"'), 'mock session mode must not be used in the published HEROES app');
+expect(html.includes('updateProfileAccumulator(decision)'), 'every spot decision must update lifetime DNA accumulator');
+expect(html.includes('trackUsage("spot_viewed"'), 'viewing a solved spot must update usage history');
+expect(html.includes('trackUsage("decision"'), 'taking an action must update usage history');
+expect(html.includes('shouldPublishProfileToBridge'), 'cross-app profile sync must be throttled instead of publishing every interaction');
+
 if (failures.length) {
   console.error('Heroes validation failed:');
   for (const failure of failures) console.error(`- ${failure}`);
