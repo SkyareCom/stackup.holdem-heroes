@@ -832,20 +832,17 @@ function showScreen(name,direction=0){
   const target=document.querySelector(`.screen[data-screen="${name}"]`);
   if(!target)return;
 
-  if(currentName===name){
-    current?.style.removeProperty("transform");
-    current?.style.removeProperty("opacity");
-  }else{
-    document.querySelectorAll(".screen[data-screen]").forEach(s=>{
-      s.classList.remove("active","page-dragging","page-returning","page-enter-left","page-enter-right");
-      s.style.removeProperty("transform");
-      s.style.removeProperty("opacity");
-    });
+  if(currentName!==name){
+    current?.classList.remove("active","page-enter-left","page-enter-right");
+    target.classList.remove("page-enter-left","page-enter-right");
     target.classList.add("active");
+
     const inferredDirection=direction||Math.sign(FOOTER_PAGES.indexOf(name)-FOOTER_PAGES.indexOf(currentName));
-    if(inferredDirection>0)target.classList.add("page-enter-right");
-    if(inferredDirection<0)target.classList.add("page-enter-left");
-    setTimeout(()=>target.classList.remove("page-enter-left","page-enter-right"),280);
+    const animationClass=inferredDirection>0?"page-enter-right":inferredDirection<0?"page-enter-left":"";
+    if(animationClass){
+      target.classList.add(animationClass);
+      target.addEventListener("animationend",()=>target.classList.remove(animationClass),{once:true});
+    }
   }
 
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
