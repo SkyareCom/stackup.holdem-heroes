@@ -30,7 +30,9 @@ expect(!html.includes('font-style:italic'),'italic typography must be removed');
 expect(!html.includes('fonts.googleapis.com'),'external font loading must be removed');
 expect(html.includes('Force exact Google Fonts Antic Slab everywhere'),'global Antic Slab force rule must be present');
 expect(!/data:font\/ttf;base64,[^"]*\s/.test(html),'embedded Antic Slab base64 must not contain whitespace');
-for(const label of ['DESCUBRA SEU POKER DNA','SEU POKER DNA','O AGRESSOR CONTROLADO','O QUE ESTÁ CUSTANDO EV?','DNA SOB PRESSÃO','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
+for(const label of ['DESCUBRA SEU POKER DNA','SEU POKER DNA','O QUE ESTÁ CUSTANDO EV?','DNA SOB PRESSÃO','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
+expect(html.includes('id="homeArchetype"'),'Home must expose the dynamic player archetype');
+expect(html.includes('AGRESSOR CONTROLADO') && html.includes('PERFIL HÍBRIDO'),'dynamic archetype engine must include premium player archetypes');
 for(const tab of ['HOME','DNA','SPOTS','ANÁLISE','PERFIL']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
 expect((html.match(/data-tab=/g)||[]).length===5,'bottom navigation must contain exactly 5 tabs');
 expect(html.includes('data-screen="spots"'),'Spots screen must exist');
@@ -67,6 +69,7 @@ for(const scenario of ['POR POSIÇÃO','POR STACK','POR STREET','POR FASE DO TOR
 expect(html.includes('data-scenario-filter="position"'),'scenario filters must be data-driven');
 expect(html.includes('renderScenarios'),'scenario rendering function missing');
 expect(!/neon/i.test(html),'neon styling/reference should not be present');
-expect(!/\bXP\b|\bcoins\b|\bstars\b/i.test(html),'childlike gamification terms should not be present');
+const visibleHtml=html.replace(/data:font\/ttf;base64,[A-Za-z0-9+/=]+/g,'');
+expect(!/\bXP\b|\bcoins\b|\bstars\b/i.test(visibleHtml),'childlike gamification terms should not be present in visible/app source text');
 if(failures.length){console.error('Heroes product-design validation failed:');failures.forEach(f=>console.error('- '+f));process.exit(1)}
 console.log('Heroes product-design validation passed.');
