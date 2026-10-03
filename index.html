@@ -770,7 +770,7 @@ strong,b,em,i{
 .poker-action.loading{opacity:.35;pointer-events:none}
 </style>
 </head>
-<body data-build="heroes-entry-20261003-0444">
+<body data-build="heroes-emblem-97de056">
 <div id="splash" class="splash">
   <div class="splash-inner">
     <div class="splash-identity">
@@ -1177,6 +1177,13 @@ strong,b,em,i{
 <script src="core/heroes-solved-spots-runtime.js"></script>
 <script src="stackup-app-bridge.js"></script>
 <script>
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.getRegistrations().then(list=>list.forEach(r=>r.unregister())).catch(()=>{});
+}
+if("caches" in window){
+  caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).catch(()=>{});
+}
+
 const store={
   get(k){try{return localStorage.getItem(k)}catch{return null}},
   set(k,v){try{localStorage.setItem(k,v)}catch{}},
