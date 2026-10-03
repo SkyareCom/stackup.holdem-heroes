@@ -163,14 +163,32 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
 .tab.active{color:var(--champ-1)}
 
 .splash{position:fixed;inset:0;z-index:100;background:
-radial-gradient(circle at 50% 30%,rgba(188,128,98,.12),transparent 34%),
-linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:center;justify-content:center;padding:28px;transition:opacity .45s ease,visibility .45s ease}
-.splash.hidden{opacity:0;visibility:hidden}
-.splash-inner{text-align:center}
-.splash-brand{font-family:var(--display);font-size:48px;color:var(--cream-2)}
-.splash-kicker{font-size:9px;letter-spacing:.32em;text-transform:uppercase;color:var(--champ-1);margin-top:8px}
-.splash-line{width:56px;height:1px;background:var(--copper-2);margin:22px auto}
-.splash-copy{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted-2)}
+radial-gradient(circle at 50% 18%,rgba(188,128,98,.14),transparent 32%),
+radial-gradient(circle at 50% 76%,rgba(64,25,30,.28),transparent 42%),
+linear-gradient(180deg,var(--bg-2),var(--bg-0));display:flex;align-items:flex-start;justify-content:center;padding:calc(8vh + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));transition:opacity .45s ease,visibility .45s ease;overflow:auto}
+.splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-inner{text-align:center;width:min(420px,100%);display:flex;flex-direction:column;align-items:stretch}
+.splash-brand{font-family:var(--display);font-size:96px;line-height:.82;letter-spacing:.015em;color:var(--cream-2);text-shadow:0 18px 54px rgba(0,0,0,.35)}
+.splash-kicker{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--champ-1);margin-top:14px}
+.splash-line{width:66px;height:1px;background:var(--copper-2);margin:20px auto 16px}
+.splash-copy{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-1)}
+.splash-controls{display:grid;gap:12px;margin-top:34px}
+.splash-lang-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.splash-lang{min-height:42px;border:1px solid var(--line-1);border-radius:13px;background:rgba(42,17,20,.54);color:var(--muted-1);font-size:11px;letter-spacing:.18em}
+.splash-lang.active{background:var(--champ-1);border-color:var(--champ-1);color:#231113}
+.splash-auth{min-height:56px;border:1px solid var(--line-2);border-radius:16px;background:linear-gradient(180deg,rgba(50,20,25,.82),rgba(29,13,16,.88));color:var(--cream-2);display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:0 16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-align:left}
+.splash-auth:active{transform:translateY(1px)}
+.splash-auth-icon{width:28px;height:28px;border-radius:9px;border:1px solid var(--line-1);display:grid;place-items:center;color:var(--champ-1);flex:0 0 auto;font-size:13px}
+.splash-auth svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6}
+.splash-auth-text{display:grid;gap:2px}
+.splash-auth-text small{font-size:8px;letter-spacing:.08em;text-transform:none;color:var(--muted-2)}
+.splash-status{min-height:18px;margin-top:4px;font-size:10px;line-height:1.45;color:var(--muted-1)}
+@media (max-width:360px){
+  .splash{padding-top:calc(6vh + env(safe-area-inset-top))}
+  .splash-brand{font-size:78px}
+  .splash-controls{margin-top:26px}
+  .splash-auth{min-height:52px}
+}
 
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:60;display:none}
 .sheet-backdrop.open{display:block}
@@ -619,7 +637,34 @@ strong,b,em,i{
     <div class="splash-brand">HEROES</div>
     <div class="splash-kicker">StackUp Hold'em</div>
     <div class="splash-line"></div>
-    <div class="splash-copy">Descubra seu Poker DNA</div>
+    <div class="splash-copy" id="splashCopy">Descubra seu Poker DNA</div>
+
+    <div class="splash-controls" aria-label="Acesso ao HEROES">
+      <div class="splash-lang-row" id="splashLanguages" aria-label="Idioma">
+        <button class="splash-lang" type="button" data-splash-lang="pt">PT</button>
+        <button class="splash-lang" type="button" data-splash-lang="en">EN</button>
+        <button class="splash-lang" type="button" data-splash-lang="es">ES</button>
+      </div>
+
+      <button class="splash-auth" type="button" id="splashBiometric">
+        <span class="splash-auth-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6"/><path d="M18 9a6 6 0 0 0-6-6"/><path d="M5 12c0 4 1.6 7 4.4 9"/><path d="M19 12c0 4-1.6 7-4.4 9"/><path d="M8 10a4 4 0 0 1 8 0v3"/><path d="M12 8a2 2 0 0 0-2 2v4c0 2 .5 4 1.5 6"/><path d="M14 12v3c0 1.4-.2 2.7-.7 4"/></svg>
+        </span>
+        <span class="splash-auth-text"><span id="splashBiometricLabel">Entrar com biometria</span><small id="splashBiometricSub">Acesso local neste dispositivo</small></span>
+      </button>
+
+      <button class="splash-auth" type="button" id="splashGoogle">
+        <span class="splash-auth-icon" aria-hidden="true">G</span>
+        <span class="splash-auth-text"><span id="splashGoogleLabel">Entrar com Google</span><small id="splashGoogleSub">Conta Google</small></span>
+      </button>
+
+      <button class="splash-auth" type="button" id="splashStackId">
+        <span class="splash-auth-icon" aria-hidden="true">S</span>
+        <span class="splash-auth-text"><span id="splashStackIdLabel">Entrar com StackUp ID</span><small id="splashStackIdSub">Identidade do ecossistema StackUp</small></span>
+      </button>
+
+      <div class="splash-status" id="splashStatus" aria-live="polite"></div>
+    </div>
   </div>
 </div>
 
@@ -2340,12 +2385,114 @@ window.StackUpHeroesDecisionEngine=Object.freeze({
     actions:[{key:"fold",ev_bb:0,frequency:.1},{key:"call",ev_bb:.2,frequency:.5},{key:"raise:12",ev_bb:.3,frequency:.4}]
   }
 });
+const SPLASH_COPY=Object.freeze({
+  pt:{copy:"Descubra seu Poker DNA",bio:"Entrar com biometria",bioSub:"Acesso local neste dispositivo",google:"Entrar com Google",googleSub:"Conta Google",stack:"Entrar com StackUp ID",stackSub:"Identidade do ecossistema StackUp"},
+  en:{copy:"Discover your Poker DNA",bio:"Sign in with biometrics",bioSub:"Local access on this device",google:"Sign in with Google",googleSub:"Google account",stack:"Sign in with StackUp ID",stackSub:"StackUp ecosystem identity"},
+  es:{copy:"Descubre tu Poker DNA",bio:"Entrar con biometría",bioSub:"Acceso local en este dispositivo",google:"Entrar con Google",googleSub:"Cuenta de Google",stack:"Entrar con StackUp ID",stackSub:"Identidad del ecosistema StackUp"}
+});
+function splashLanguage(){
+  const raw=store.get("heroes.lang");
+  return ["pt","en","es"].includes(String(raw||"").replace(/"/g,""))?String(raw).replace(/"/g,""):"pt";
+}
+function setSplashLanguage(lang){
+  if(!SPLASH_COPY[lang])return;
+  store.set("heroes.lang",lang);
+  document.documentElement.lang=lang==="pt"?"pt-BR":lang;
+  document.querySelectorAll("[data-splash-lang]").forEach(btn=>btn.classList.toggle("active",btn.dataset.splashLang===lang));
+  const copy=SPLASH_COPY[lang];
+  document.getElementById("splashCopy").textContent=copy.copy;
+  document.getElementById("splashBiometricLabel").textContent=copy.bio;
+  document.getElementById("splashBiometricSub").textContent=copy.bioSub;
+  document.getElementById("splashGoogleLabel").textContent=copy.google;
+  document.getElementById("splashGoogleSub").textContent=copy.googleSub;
+  document.getElementById("splashStackIdLabel").textContent=copy.stack;
+  document.getElementById("splashStackIdSub").textContent=copy.stackSub;
+}
+function setSplashStatus(message,error=false){
+  const el=document.getElementById("splashStatus");if(!el)return;
+  el.textContent=message||"";el.style.color=error?"#d8a0a5":"var(--muted-1)";
+}
+function bytesToBase64url(bytes){
+  let s="";new Uint8Array(bytes).forEach(b=>s+=String.fromCharCode(b));
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function base64urlToBytes(value){
+  const s=String(value||"").replace(/-/g,"+").replace(/_/g,"/");const padded=s+"=".repeat((4-s.length%4)%4);
+  return Uint8Array.from(atob(padded),x=>x.charCodeAt(0));
+}
+function secureRandom(length=32){const a=new Uint8Array(length);crypto.getRandomValues(a);return a}
+function completeSplashAccess(mode,meta={}){
+  const now=new Date().toISOString();
+  const previous=readJsonKey("heroes.session",{});
+  writeJsonKey("heroes.session",{...previous,mode,authenticated:true,authenticatedAt:now,...meta});
+  trackUsage("access",{mode});
+  document.getElementById("splash")?.classList.add("hidden");
+}
+async function accessWithBiometric(){
+  const btn=document.getElementById("splashBiometric");if(btn)btn.disabled=true;
+  try{
+    if(!window.PublicKeyCredential||!navigator.credentials)throw new Error("Biometria não disponível neste navegador.");
+    if(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
+      const available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if(!available)throw new Error("Biometria do dispositivo não está disponível.");
+    }
+    const stored=readJsonKey("heroes.biometricCredential.v1",null);
+    if(stored?.id){
+      setSplashStatus("Confirme sua biometria no dispositivo…");
+      await navigator.credentials.get({publicKey:{
+        challenge:secureRandom(32),
+        allowCredentials:[{type:"public-key",id:base64urlToBytes(stored.id)}],
+        userVerification:"required",
+        timeout:60000
+      }});
+      completeSplashAccess("biometric",{credentialId:stored.id});
+      return;
+    }
+    setSplashStatus("Cadastre a biometria deste dispositivo para acessar o HEROES…");
+    const userId=secureRandom(16);
+    const credential=await navigator.credentials.create({publicKey:{
+      challenge:secureRandom(32),
+      rp:{name:"StackUp Hold'em HEROES"},
+      user:{id:userId,name:"heroes-local",displayName:"HEROES Player"},
+      pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"preferred"},
+      timeout:60000,
+      attestation:"none"
+    }});
+    if(!credential?.rawId)throw new Error("Não foi possível registrar a biometria.");
+    const id=bytesToBase64url(credential.rawId);
+    writeJsonKey("heroes.biometricCredential.v1",{id,createdAt:new Date().toISOString()});
+    completeSplashAccess("biometric",{credentialId:id});
+  }catch(err){
+    setSplashStatus(String(err?.message||err),true);
+  }finally{if(btn)btn.disabled=false;}
+}
+function accessWithGoogle(){
+  setSplashStatus("Google OAuth ainda não está configurado neste app. Nenhum login foi simulado.",true);
+}
+function accessWithStackId(){
+  const identity=heroesBridge?.identity?.()||{};
+  if(!identity.stackupUserId){
+    setSplashStatus("Nenhum StackUp ID conectado neste dispositivo.",true);
+    return;
+  }
+  completeSplashAccess("stackup-id",{stackupUserId:identity.stackupUserId});
+}
+document.getElementById("splashLanguages")?.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-splash-lang]");if(btn)setSplashLanguage(btn.dataset.splashLang);
+});
+document.getElementById("splashBiometric")?.addEventListener("click",accessWithBiometric);
+document.getElementById("splashGoogle")?.addEventListener("click",accessWithGoogle);
+document.getElementById("splashStackId")?.addEventListener("click",accessWithStackId);
+setSplashLanguage(splashLanguage());
+
 ensureProfileAccumulator();
 trackUsage("app_open",{page:location.hash.replace("#","")||"home"});
 renderDNA();renderUnifiedProfileViews();renderLeaks();renderScenarios();renderPatterns();renderSwot();renderTrainingRecommendations();
 loadNextSolvedSpot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
-setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
+const existingSession=readJsonKey("heroes.session",{});
+if(existingSession?.authenticated===true)document.getElementById("splash")?.classList.add("hidden");
 </script>
 </body>
 </html>
