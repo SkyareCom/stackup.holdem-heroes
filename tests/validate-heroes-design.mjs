@@ -31,8 +31,12 @@ expect(!html.includes('fonts.googleapis.com'),'external font loading must be rem
 expect(html.includes('Force exact Google Fonts Antic Slab everywhere'),'global Antic Slab force rule must be present');
 expect(!/data:font\/ttf;base64,[^"]*\s/.test(html),'embedded Antic Slab base64 must not contain whitespace');
 for(const label of ['DESCUBRA SEU POKER DNA','SEU POKER DNA','O AGRESSOR CONTROLADO','O QUE ESTÁ CUSTANDO EV?','DNA SOB PRESSÃO','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
-for(const tab of ['INÍCIO','DNA','LEAKS','ANÁLISE','PERFIL']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
+for(const tab of ['HOME','DNA','SPOTS','ANÁLISE','PERFIL']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
 expect((html.match(/data-tab=/g)||[]).length===5,'bottom navigation must contain exactly 5 tabs');
+expect(html.includes('data-screen="spots"'),'Spots screen must exist');
+expect(!html.includes('data-screen="leaks"'),'standalone leaks screen must be removed');
+expect(html.includes('id="analysisLeaks"'),'Leaks must live inside Analysis');
+expect(html.includes('data-tab="spots"'),'Spots must be present in bottom navigation');
 expect(html.includes('data-photo-slot="home"'),'Premium background/photo slot missing');
 expect((html.match(/images\.unsplash\.com\/photo-/g)||[]).length >= 5,'expected at least 5 real photographic poker backgrounds');
 for(const scenario of ['POR POSIÇÃO','POR STACK','POR STREET','POR FASE DO TORNEIO','POR PRESSÃO','POR TIPO DE OPONENTE']) expect(html.includes(scenario),`missing scenario division: ${scenario}`);
