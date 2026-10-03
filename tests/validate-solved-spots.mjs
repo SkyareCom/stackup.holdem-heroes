@@ -59,7 +59,7 @@ for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-eng
 }
 expect(html.includes('await window.HeroesSolvedSpots.next()'),'SPOTS table must request real solved decisions');
 expect(html.includes('solver_reference:ref'),'DNA decision context must receive the solver reference');
-expect((html.match(/data-action-slot="/g)||[]).length===7,'SPOTS must expose exactly seven solver-bound action slots');
+expect((html.match(/<button[^>]*data-action-slot="/g)||[]).length===7,'SPOTS must expose exactly seven solver-bound action slots');
 
 if(failures.length){
   console.error('Solved spot engine validation failed:');
