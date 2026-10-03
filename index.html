@@ -400,11 +400,29 @@ strong,b,em,i{
   font-style:normal !important;
 }
 
-/* Spots horizontal swipe pager */
-.spot-pager{width:100%;overflow:hidden;position:relative;touch-action:pan-y}
-.spot-track{display:flex;width:100%;will-change:transform;transform:translate3d(0,0,0);transition:transform .32s cubic-bezier(.22,.8,.25,1)}
-.spot-track.dragging{transition:none}
-.spot-page{flex:0 0 100%;width:100%;min-width:0;padding:0 1px}
+/* Spots horizontal swipe pager — native scroll snap */
+.spot-pager{width:100%;position:relative}
+.spot-viewport{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x pan-y;
+  scrollbar-width:none;
+}
+.spot-viewport::-webkit-scrollbar{display:none}
+.spot-track{display:flex;width:100%}
+.spot-page{
+  flex:0 0 100%;
+  width:100%;
+  min-width:100%;
+  padding:0 2px;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+}
 .spot-page .scenario-section{height:100%;margin:0}
 .spot-pager-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px}
 .spot-counter{font-size:11px;letter-spacing:.12em;color:var(--muted-1)}
@@ -414,7 +432,8 @@ strong,b,em,i{
 .spot-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .spot-actions .btn:disabled{opacity:.32;cursor:default}
 @media (prefers-reduced-motion:reduce){
-  .spot-track,.spot-dot{transition:none}
+  .spot-viewport{scroll-behavior:auto}
+  .spot-dot{transition:none}
 }
 </style>
 </head>
@@ -536,7 +555,8 @@ strong,b,em,i{
         <div class="body-copy" style="margin-bottom:18px">Revise situações representativas do seu jogo e observe como posição, stack, street e pressão moldam seu perfil.</div>
 
         <div class="spot-pager" id="spotPager" aria-label="Navegação entre spots">
-          <div class="spot-track" id="spotTrack">
+          <div class="spot-viewport" id="spotViewport">
+            <div class="spot-track" id="spotTrack">
             <article class="spot-page" data-spot-page="0">
               <section class="scenario-section">
                 <div class="scenario-head">
@@ -575,6 +595,7 @@ strong,b,em,i{
                 </div>
               </section>
             </article>
+            </div>
           </div>
 
           <div class="spot-pager-meta">
@@ -829,64 +850,42 @@ sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
 
 
 const spotPager=document.getElementById("spotPager");
-const spotTrack=document.getElementById("spotTrack");
+const spotViewport=document.getElementById("spotViewport");
 const spotPages=[...document.querySelectorAll(".spot-page")];
 const spotDots=[...document.querySelectorAll(".spot-dot")];
 const spotCounter=document.getElementById("spotCounter");
 const spotPrev=document.getElementById("spotPrev");
 const spotNext=document.getElementById("spotNext");
 let spotIndex=0;
-let spotStartX=0;
-let spotDeltaX=0;
-let spotDragging=false;
+let spotScrollTimer=null;
 
-function renderSpotPager(animate=true){
-  if(!spotTrack||!spotPages.length)return;
-  spotTrack.classList.toggle("dragging",!animate);
-  spotTrack.style.transform=`translate3d(${-spotIndex*100}%,0,0)`;
+function syncSpotPager(index){
+  spotIndex=Math.max(0,Math.min(spotPages.length-1,index));
   if(spotCounter)spotCounter.textContent=`${spotIndex+1} / ${spotPages.length}`;
   spotDots.forEach((dot,i)=>dot.classList.toggle("active",i===spotIndex));
   if(spotPrev)spotPrev.disabled=spotIndex===0;
   if(spotNext)spotNext.disabled=spotIndex===spotPages.length-1;
 }
-function goToSpot(index){
-  spotIndex=Math.max(0,Math.min(spotPages.length-1,index));
-  renderSpotPager(true);
+function goToSpot(index,behavior="smooth"){
+  if(!spotViewport||!spotPages.length)return;
+  const target=Math.max(0,Math.min(spotPages.length-1,index));
+  spotViewport.scrollTo({left:target*spotViewport.clientWidth,behavior});
+  syncSpotPager(target);
 }
-if(spotPager&&spotTrack){
-  spotPager.addEventListener("touchstart",e=>{
-    if(e.touches.length!==1)return;
-    spotDragging=true;
-    spotStartX=e.touches[0].clientX;
-    spotDeltaX=0;
-    spotTrack.classList.add("dragging");
-  },{passive:true});
-  spotPager.addEventListener("touchmove",e=>{
-    if(!spotDragging||e.touches.length!==1)return;
-    spotDeltaX=e.touches[0].clientX-spotStartX;
-    const width=spotPager.clientWidth||1;
-    const base=-spotIndex*width;
-    const edgeResistance=(spotIndex===0&&spotDeltaX>0)||(spotIndex===spotPages.length-1&&spotDeltaX<0);
-    const drag=edgeResistance?spotDeltaX*.28:spotDeltaX;
-    spotTrack.style.transform=`translate3d(${base+drag}px,0,0)`;
-  },{passive:true});
-  spotPager.addEventListener("touchend",()=>{
-    if(!spotDragging)return;
-    spotDragging=false;
-    const threshold=Math.min(70,(spotPager.clientWidth||1)*.18);
-    if(spotDeltaX<=-threshold)goToSpot(spotIndex+1);
-    else if(spotDeltaX>=threshold)goToSpot(spotIndex-1);
-    else renderSpotPager(true);
-    spotDeltaX=0;
-  },{passive:true});
-  spotPager.addEventListener("touchcancel",()=>{
-    spotDragging=false;spotDeltaX=0;renderSpotPager(true);
+if(spotViewport){
+  spotViewport.addEventListener("scroll",()=>{
+    clearTimeout(spotScrollTimer);
+    spotScrollTimer=setTimeout(()=>{
+      const width=spotViewport.clientWidth||1;
+      syncSpotPager(Math.round(spotViewport.scrollLeft/width));
+    },60);
   },{passive:true});
 }
 spotPrev?.addEventListener("click",()=>goToSpot(spotIndex-1));
 spotNext?.addEventListener("click",()=>goToSpot(spotIndex+1));
 spotDots.forEach(dot=>dot.addEventListener("click",()=>goToSpot(Number(dot.dataset.spotIndex))));
-renderSpotPager(false);
+window.addEventListener("resize",()=>goToSpot(spotIndex,"auto"));
+syncSpotPager(0);
 
 renderDNA();renderLeaks();renderScenarios();renderPatterns();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
