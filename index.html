@@ -918,7 +918,7 @@ strong,b,em,i{
           <div class="profile-id" id="profileConfidenceLine">heroes / profile confidence —</div>
           <div class="profile-grid">
             <div class="profile-item"><div class="mini-label">PLANO</div><div class="mini-value">GRÁTIS</div></div>
-            <div class="profile-item"><div class="mini-label">SESSÕES</div><div class="mini-value">24</div></div>
+            <div class="profile-item"><div class="mini-label">DECISÕES ANALISADAS</div><div class="mini-value" id="profileDecisionCount">0</div></div>
             <div class="profile-item"><div class="mini-label">CONFIANÇA DO DNA</div><div class="mini-value" id="profileConfidenceValue">—</div></div>
             <div class="profile-item"><div class="mini-label">ÚLTIMA ATUALIZAÇÃO</div><div class="mini-value" id="profileUpdatedAt">—</div></div>
           </div>
@@ -932,7 +932,7 @@ strong,b,em,i{
 
         <div class="section">
           <div class="section-head"><div><div class="section-kicker">PERFIL</div><h2 class="section-title">Conta & histórico</h2></div></div>
-          <div class="setting"><strong>Histórico de sessões</strong><span>24 analisadas</span></div>
+          <div class="setting"><strong>Histórico de decisões</strong><span id="profileHistoryCount">0 analisadas</span></div>
           <div class="setting"><strong>Preferências de análise</strong><span>MTT · NLH</span></div>
           <div class="setting"><strong>Privacidade</strong><span>Gerenciar</span></div>
           <div class="setting"><strong>Plano HEROES</strong><span>GRÁTIS</span></div>
@@ -1027,14 +1027,6 @@ const PLAYER_INDICATOR_BY_KEY=Object.freeze(Object.fromEntries(PLAYER_INDICATORS
 const QUALITY_INDICATORS=Object.freeze(PLAYER_INDICATORS.filter(x=>x.kind==="quality"));
 
 
-const leaks=[
-  {level:"critical",area:"PRESSÃO",title:"Agressividade excessiva perto da bolha",freq:"38%",impact:"-12 EV",context:"Bubble",rec:"Reduza a frequência de 3-bet shove marginal quando o field comprime e o stack efetivo fica abaixo de 24bb."},
-  {level:"high",area:"PRE-FLOP",title:"Calls excessivos no BB",freq:"31%",impact:"-9 EV",context:"BB 20–35bb",rec:"Aumente seletividade contra opens de posições iniciais e ranges mais fortes."},
-  {level:"high",area:"POST-FLOP",title:"Passividade excessiva no turn",freq:"27%",impact:"-7 EV",context:"Single-raised pots",rec:"Preserve agressão em turns que favorecem seu range percebido e bloqueadores."},
-  {level:"moderate",area:"STACK DEPTH",title:"Queda de performance abaixo de 20bb",freq:"22%",impact:"-5 EV",context:"Short stack",rec:"Simplifique árvores de decisão e reduza linhas de baixa frequência."},
-  {level:"moderate",area:"POSITION",title:"EV do BTN abaixo da baseline",freq:"18%",impact:"-4 EV",context:"BTN",rec:"Amplie pressão contra blinds passivos e refine defesa versus 3-bet."}
-];
-
 const SCENARIO_META=Object.freeze({
   position:{title:"POR POSIÇÃO",desc:"qualidade por posição do herói"},
   stack:{title:"POR STACK",desc:"qualidade por profundidade efetiva"},
@@ -1122,6 +1114,8 @@ function renderUnifiedProfileViews(){
     ?`Mesmos 30 indicadores, filtrados para ${pressureProfile.sampleSize} decisões sob pressão. Confiança contextual: ${pressureProfile.confidence}%.`
     :"Ainda não há decisões suficientes classificadas como pressão/ICM; nenhum valor contextual é inventado.";
 
+  const countEl=document.getElementById("profileDecisionCount");if(countEl)countEl.textContent=String(profile.sampleSize);
+  const historyEl=document.getElementById("profileHistoryCount");if(historyEl)historyEl.textContent=`${profile.sampleSize} analisada${profile.sampleSize===1?"":"s"}`;
   const confLine=document.getElementById("profileConfidenceLine");if(confLine)confLine.textContent=`heroes / profile confidence ${profile.confidence}%`;
   const confValue=document.getElementById("profileConfidenceValue");if(confValue)confValue.textContent=`${profile.confidence}%`;
   const updated=document.getElementById("profileUpdatedAt");if(updated)updated.textContent=profile.updatedAt?new Date(profile.updatedAt).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"—";
@@ -1351,7 +1345,15 @@ function openSheet(title,copy){
   sheet.classList.add("open");
 }
 function closeSheet(){sheet.classList.remove("open")}
-document.getElementById("analyzeBtn").addEventListener("click",()=>openSheet("DNA ATUALIZADO","Nova sessão simulada: Agressividade +3 · Disciplina -2 · Pressão +1. O perfil foi atualizado com dados mockados realistas."));
+document.getElementById("analyzeBtn").addEventListener("click",()=>{
+  const profile=getUnifiedPlayerProfile();
+  const ranked=QUALITY_INDICATORS.filter(def=>(profile.evidenceCounts[def.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
+  const best=ranked[0],weak=ranked[ranked.length-1];
+  const summary=profile.sampleSize
+    ?`${profile.sampleSize} decisões analisadas · confiança ${profile.confidence}% · cobertura ${profile.coverage}%. ${best?`Força atual: ${best.label} ${profile.scores[best.key]}/100.`:""} ${weak?`Ponto de atenção: ${weak.label} ${profile.scores[weak.key]}/100.`:""}`
+    :"Ainda não há decisões suficientes para atualizar o Poker DNA. Complete spots para formar a amostra.";
+  openSheet("POKER DNA SINCRONIZADO",summary);
+});
 document.getElementById("dnaInfo").addEventListener("click",()=>openSheet("COMO O DNA FUNCIONA","O HEROES combina decisões, contexto, posição, stack, street, pressão e evolução histórica para formar um perfil dinâmico do jogador."));
 document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet();showScreen("dna")});
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
@@ -1673,8 +1675,17 @@ function persistUnifiedPlayerProfile(){
   const profile=getUnifiedPlayerProfile();
   store.set("heroes.playerProfile",JSON.stringify(profile));
   store.set("heroes.actionProfile",JSON.stringify(profile));
+  try{window.dispatchEvent(new CustomEvent("heroes:profile-updated",{detail:profile}))}catch(_){}
   return profile;
 }
+window.addEventListener("storage",e=>{
+  if(["heroes.spotDecisions","heroes.playerProfile","heroes.actionProfile"].includes(e.key)){
+    renderDNA();renderUnifiedProfileViews();renderLeaks(document.querySelector("#leakFilters .filter.active")?.dataset.filter||"all");renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");renderPatterns();renderSwot();
+  }
+});
+window.addEventListener("heroes:profile-updated",()=>{
+  renderDNA();renderUnifiedProfileViews();renderLeaks(document.querySelector("#leakFilters .filter.active")?.dataset.filter||"all");renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");renderPatterns();renderSwot();
+});
 function getAggregatedActionProfile(){
   const profile=getUnifiedPlayerProfile();
   return {sampleSize:profile.sampleSize,averages:profile.scores,evidenceCounts:profile.evidenceCounts};
