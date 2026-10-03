@@ -773,6 +773,25 @@ strong,b,em,i{
 .player-seat.hero-position-seat{opacity:.08}
 .poker-action.loading{opacity:.35;pointer-events:none}
 
+/* HEROES CARD SHAPE SYSTEM — structural cards use one rounded rectangle */
+.hero,.screen-visual,.scenario-section,.scenario-cell,.matrix-cell,.pressure,
+.profile-item,.spot-progress-card,.action-analysis,.action-quality,
+.action-quality-item,.swot-card,.splash-auth{
+  border-radius:18px !important;
+}
+
+/* Capsules are controls/tags only, never structural cards. */
+.pill,.filter,.severity,.splash-lang,.bet-chip,.pot-label,
+.profile-indicator-track,.sheet-handle{
+  border-radius:999px !important;
+}
+
+/* Special shapes remain semantic, not cards. */
+.poker-table{border-radius:48%/42% !important}
+.hero-avatar,.dna-feed-dot{border-radius:50% !important}
+.poker-card{border-radius:5px !important}
+.sheet{border-radius:28px 28px 0 0 !important}
+
 /* HEROES TYPOGRAPHY SYSTEM 10/12/14/16/20 · 400/600
    Brand identity (logo / STACKUP HOLD'EM / HEROES / POKER DNA) is intentionally excluded. */
 html,body,#app,.app,button,input,select,textarea{font-weight:400}
