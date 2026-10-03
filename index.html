@@ -1664,7 +1664,7 @@ function renderSolvedSeats(item){
     seat.classList.toggle("inactive-seat",!isActive);
     seat.classList.toggle("hero-position-seat",isHero);
     const stack=seat.querySelector(".seat-stack");
-    if(stack)stack.textContent=isActive?`${Number(view.stackForPosition?.[pos]??scenario.effectiveStack||0)}bb`:"—";
+    if(stack)stack.textContent=isActive?`${Number((view.stackForPosition?.[pos]??scenario.effectiveStack) || 0)}bb`:"—";
     seat.querySelector(".bet-chip")?.remove();
   });
   const last=[...(scenario.actionHistory||[])].reverse().find(a=>a?.position&&a.position!==view.heroPosition);
@@ -1705,7 +1705,7 @@ function renderSolvedSpot(item){
     heroCardsBox.innerHTML=cards.slice(0,2).map(x=>cardHtml(x,"hero-card")).join("");
   }
   if(heroPositionLabel)heroPositionLabel.textContent=view.heroPosition||scenario.heroPosition||"HERO";
-  const hs=document.getElementById("heroStack");if(hs)hs.textContent=`${Number(view.stackForPosition?.[view.heroPosition]??scenario.heroStack??scenario.effectiveStack||0)}bb`;
+  const hs=document.getElementById("heroStack");if(hs)hs.textContent=`${Number((view.stackForPosition?.[view.heroPosition]??scenario.heroStack??scenario.effectiveStack) || 0)}bb`;
   renderSolvedSeats({...item,view});
   configureSolvedActions(item.entry);
   const ref=buildSolverReference(item);
