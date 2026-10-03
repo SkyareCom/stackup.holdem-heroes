@@ -4,6 +4,12 @@ const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const failures = [];
 const expect = (condition, message) => { if (!condition) failures.push(message); };
 
+expect(/^<!doctype html>/i.test(html.trimStart()), 'document must start with <!doctype html>');
+expect(/<html\s+lang=["']pt-BR["']/i.test(html), 'html lang must be pt-BR');
+expect(/<head>/i.test(html) && /<\/head>/i.test(html), 'document head is missing');
+expect(/<meta\s+name=["']viewport["'][^>]*width=device-width/i.test(html), 'mobile viewport meta is missing');
+
+
 const ids = [...html.matchAll(/\sid=["']([^"']+)["']/g)].map(m => m[1]);
 const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
 
