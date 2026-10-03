@@ -28,6 +28,8 @@ expect(!html.includes('font-family:Dosis'),'legacy Dosis typography must be remo
 expect(!html.includes('font-style:oblique'),'oblique typography must be removed');
 expect(!html.includes('font-style:italic'),'italic typography must be removed');
 expect(!html.includes('fonts.googleapis.com'),'external font loading must be removed');
+expect(html.includes('Force exact Google Fonts Antic Slab everywhere'),'global Antic Slab force rule must be present');
+expect(!/data:font\/ttf;base64,[^"]*\s/.test(html),'embedded Antic Slab base64 must not contain whitespace');
 for(const label of ['DESCUBRA SEU POKER DNA','SEU POKER DNA','O AGRESSOR CONTROLADO','O QUE ESTÁ CUSTANDO EV?','DNA SOB PRESSÃO','STACKUP ID']) expect(html.includes(label),`missing required Heroes concept: ${label}`);
 for(const tab of ['INÍCIO','DNA','LEAKS','ANÁLISE','PERFIL']) expect(html.includes(`<span>${tab}</span>`),`missing bottom navigation item: ${tab}`);
 expect((html.match(/data-tab=/g)||[]).length===5,'bottom navigation must contain exactly 5 tabs');
