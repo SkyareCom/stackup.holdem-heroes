@@ -878,6 +878,12 @@ strong,b,em,i{
           <div class="body-copy" style="margin-bottom:14px">A matriz cruza o histórico das decisões com os indicadores comportamentais registrados nos Spots.</div>
           <div class="swot-grid" id="swotGrid"></div>
         </div>
+        <div class="section" id="analysisTraining">
+          <div class="section-head"><div><div class="section-kicker">INTEGRAÇÃO HEROES → GRINDER</div><h2 class="section-title">TREINO DIRECIONADO</h2></div></div>
+          <div class="body-copy" style="margin-bottom:14px">Só aparecem recomendações quando um indicador tem amostra e confiança suficientes. O treino usa o mesmo leak identificado pelo Poker DNA.</div>
+          <div id="trainingRecommendations"></div>
+        </div>
+
         <div class="section" id="analysisLeaks">
           <div class="section-head">
             <div><div class="section-kicker">LEAKS</div><h2 class="section-title">O QUE ESTÁ CUSTANDO EV?</h2></div>
@@ -996,7 +1002,7 @@ function migrateLegacyKey(currentKey,legacyKey){
 migrateLegacyKey("heroes.lang","wraps.lang");
 migrateLegacyKey("heroes.session","wraps.session");
 if(!store.get("heroes.lang"))store.set("heroes.lang","pt");
-if(!store.get("heroes.session"))store.set("heroes.session",JSON.stringify({mode:"mock",createdAt:new Date().toISOString()}));
+if(!store.get("heroes.session"))store.set("heroes.session",JSON.stringify({mode:"local",createdAt:new Date().toISOString()}));
 
 
 const heroesBridge=window.StackUpAppBridge?.create?.('heroes')||null;
@@ -1338,6 +1344,15 @@ document.getElementById("leakFilters")?.addEventListener("click",e=>{
   document.querySelectorAll("#leakFilters .filter").forEach(x=>x.classList.remove("active"));
   btn.classList.add("active");trackUsage("filter_use",{group:"leaks",value:btn.dataset.filter});renderLeaks(btn.dataset.filter);
 });
+const trainingHost=document.getElementById("trainingRecommendations");
+trainingHost?.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-training-focus]");if(!btn)return;
+  const focus=btn.dataset.trainingFocus,indicator=btn.dataset.trainingIndicator;
+  const profile=getUnifiedPlayerProfile(),def=PLAYER_INDICATOR_BY_KEY[indicator];
+  trackUsage("training_handoff",{focus,indicator,score:profile.scores[indicator],confidence:profile.indicatorConfidence?.[indicator]||0});
+  window.StackUpHeroesIntegration?.openGrinder?.({focus,title:HEROES_GRINDER_FOCUS[focus]?.title,reason:`${def?.label||indicator} ${profile.scores[indicator]}/100`,priority:profile.scores[indicator]<50?"critical":profile.scores[indicator]<60?"high":"medium",profileVersion:profile.version,sampleSize:250});
+});
+
 document.getElementById("analysisFilters").addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
   document.querySelectorAll("#analysisFilters .filter").forEach(x=>x.classList.remove("active"));
@@ -1862,24 +1877,55 @@ function getUnifiedPlayerProfile(filterFn=null){
   const indicatorConfidence=Object.fromEntries(PLAYER_INDICATORS.map(def=>[def.key,clamp100(5+78*Math.min(1,(evidenceCounts[def.key]||0)/60)+17*solverFactor)]));
   return {version:"heroes-player-profile-v4",scope:"lifetime",sampleSize,scores,evidenceCounts,indicatorConfidence,decisionQualityAverage,solverValidated,coverage,confidence,updatedAt:acc.lastDecisionAt,firstDecisionAt:acc.firstDecisionAt};
 }
+const PROFILE_PUBLISH_META_KEY="heroes.bridgeProfilePublished.v1";
+function profileMaxDelta(previous,current){
+  if(!previous||!current)return 100;
+  return Math.max(...PLAYER_INDICATORS.map(def=>Math.abs(Number(current[def.key]||0)-Number(previous[def.key]||0))));
+}
+function shouldPublishProfileToBridge(profile){
+  const last=readJsonKey(PROFILE_PUBLISH_META_KEY,null);
+  if(!last)return true;
+  if(profile.sampleSize<=1)return true;
+  if(profile.sampleSize-(Number(last.sampleSize)||0)>=5)return true;
+  if(Math.abs(profile.confidence-(Number(last.confidence)||0))>=4)return true;
+  if(profileMaxDelta(last.scores,profile.scores)>=4)return true;
+  return false;
+}
+function markProfilePublished(profile){
+  writeJsonKey(PROFILE_PUBLISH_META_KEY,{sampleSize:profile.sampleSize,confidence:profile.confidence,scores:profile.scores,at:new Date().toISOString(),version:profile.version});
+}
+function buildTrainingRecommendations(){
+  const summary=buildActionProfileSummary();
+  return summary.leaks.filter(x=>(summary.evidence_counts?.[x.key]||0)>=12&&(x.confidence||0)>=35).map(x=>{
+    const focus=HEROES_INDICATOR_TO_FOCUS[x.key]||null;
+    const target=focus?HEROES_GRINDER_FOCUS[focus]:null;
+    return {indicatorKey:x.key,label:x.label,score:x.score,confidence:x.confidence,focus,title:target?.title||"TREINO DIRECIONADO",priority:x.score<50?"critical":x.score<60?"high":"medium",reason:`${x.label} ${x.score}/100 · confiança ${x.confidence}%`};
+  }).filter(x=>x.focus).slice(0,4);
+}
+function renderTrainingRecommendations(){
+  const host=document.getElementById("trainingRecommendations");if(!host)return;
+  const rows=buildTrainingRecommendations();
+  writeJsonKey("heroes.trainingRecommendations.v1",rows);
+  host.innerHTML=rows.length?rows.map(x=>`<div class="feature-line"><div><div class="feature-meta">${x.priority.toUpperCase()} · CONFIANÇA ${x.confidence}%</div><div class="feature-title">${x.label} · ${x.score}/100</div><div class="feature-note">Recomendação: ${x.title}</div></div><button class="section-link" data-training-focus="${x.focus}" data-training-indicator="${x.indicatorKey}">TREINAR</button></div>`).join(""):'<div class="body-copy">Nenhuma recomendação liberada ainda. O HEROES aguarda amostra suficiente antes de direcionar treino.</div>';
+}
+
 function persistUnifiedPlayerProfile(){
   const profile=getUnifiedPlayerProfile();
   store.set("heroes.playerProfile",JSON.stringify(profile));
   store.set("heroes.actionProfile",JSON.stringify(profile));
   try{
-    const ranked=QUALITY_INDICATORS.filter(def=>(profile.evidenceCounts[def.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
-    heroesPublishProfile(profile,{
-      profileVersion:profile.version,
-      strengths:ranked.slice(0,4).map(def=>({id:def.key,label:def.label,score:profile.scores[def.key]})),
-      weaknesses:ranked.slice(-4).reverse().map(def=>({id:def.key,label:def.label,score:100-profile.scores[def.key],rawScore:profile.scores[def.key]}))
-    });
+    if(shouldPublishProfileToBridge(profile)){
+      const summary=buildActionProfileSummary();
+      const env=heroesPublishProfile(profile,{profileVersion:profile.version,strengths:summary.strengths,weaknesses:summary.leaks});
+      if(env)markProfilePublished(profile);
+    }
   }catch(_){}
   try{window.dispatchEvent(new CustomEvent("heroes:profile-updated",{detail:profile}))}catch(_){}
   return profile;
 }
 window.addEventListener("storage",e=>{
   if(["heroes.spotDecisions","heroes.playerProfile","heroes.actionProfile","heroes.profileAccumulator.v4"].includes(e.key)){
-    renderDNA();renderUnifiedProfileViews();renderLeaks(document.querySelector("#leakFilters .filter.active")?.dataset.filter||"all");renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");renderPatterns();renderSwot();
+    renderDNA();renderUnifiedProfileViews();renderLeaks(document.querySelector("#leakFilters .filter.active")?.dataset.filter||"all");renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");renderPatterns();renderSwot();renderTrainingRecommendations();
   }
   if(e.key==="heroes.usage.v1")renderUnifiedProfileViews();
 });
@@ -2196,6 +2242,7 @@ function recordSpotDecision(action,amount,button){
   renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");
   renderPatterns();
   renderSwot();
+  renderTrainingRecommendations();
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.classList.toggle("selected",btn===button);btn.disabled=true});
   if(spotDecisionText)spotDecisionText.textContent=`${label} registrado`;
   if(spotDecisionMeta)spotDecisionMeta.textContent=`Solve ${context.solve_id||"validado"} · decisão adicionada ao DNA Player.`;
@@ -2226,7 +2273,7 @@ window.StackUpHeroesDecisionEngine=Object.freeze({
 });
 ensureProfileAccumulator();
 trackUsage("app_open",{page:location.hash.replace("#","")||"home"});
-renderDNA();renderUnifiedProfileViews();renderLeaks();renderScenarios();renderPatterns();renderSwot();
+renderDNA();renderUnifiedProfileViews();renderLeaks();renderScenarios();renderPatterns();renderSwot();renderTrainingRecommendations();
 loadNextSolvedSpot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
