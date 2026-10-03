@@ -541,6 +541,35 @@ strong,b,em,i{
 .poker-action.selected{outline:2px solid var(--champ-1);outline-offset:1px}
 .poker-action:active:not(:disabled){transform:translateY(1px)}
 
+
+.action-analysis{
+  margin-top:14px;padding:15px;border:1px solid var(--line-1);border-radius:16px;
+  background:linear-gradient(160deg,rgba(50,22,25,.82),rgba(24,12,14,.94));
+  box-shadow:0 10px 22px rgba(0,0,0,.18)
+}
+.action-analysis[hidden]{display:none!important}
+.action-analysis-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}
+.action-analysis-title{font-family:var(--display);font-size:18px;color:var(--cream-2);font-weight:400}
+.action-analysis-scale{font-size:8px;letter-spacing:.14em;color:var(--muted-1);white-space:nowrap}
+.action-comment{font-size:10px;line-height:1.55;color:var(--muted-1);padding:10px 0 13px;border-bottom:1px solid var(--line-1)}
+.profile-indicators{display:grid;gap:9px;margin-top:13px}
+.profile-indicator{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:9px;align-items:center}
+.profile-indicator-main{display:grid;gap:5px}
+.profile-indicator-name{font-size:9px;letter-spacing:.08em;color:var(--cream-2)}
+.profile-indicator-track{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.profile-indicator-track span{display:block;height:100%;width:var(--score);border-radius:inherit;background:linear-gradient(90deg,var(--champ-1),var(--cream-2))}
+.profile-indicator-score{font-family:var(--display);font-size:15px;text-align:right;color:var(--champ-1)}
+
+.swot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.swot-card{min-height:150px;padding:14px;border:1px solid var(--line-1);border-radius:15px;background:rgba(37,17,20,.72)}
+.swot-card h3{font-family:var(--display);font-size:16px;font-weight:400;color:var(--cream-2);margin:5px 0 9px}
+.swot-card p{font-size:9px;line-height:1.5;color:var(--muted-1);margin:0}
+.swot-card ul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+.swot-card li{font-size:9px;line-height:1.35;color:var(--cream-1);padding-left:11px;position:relative}
+.swot-card li:before{content:"";position:absolute;left:0;top:.55em;width:4px;height:4px;border-radius:50%;background:var(--champ-1)}
+.swot-sample{font-size:8px;letter-spacing:.12em;color:var(--muted-1);margin-top:5px}
+@media (max-width:360px){.swot-grid{grid-template-columns:1fr}}
+
 .spot-decision{
   margin-top:12px;padding:14px 0 0;border-top:1px solid var(--line-1);
   display:flex;align-items:center;justify-content:space-between;gap:14px
@@ -784,6 +813,18 @@ strong,b,em,i{
             </button>
           </div>
 
+          <div class="action-analysis" id="actionAnalysis" hidden aria-live="polite">
+            <div class="action-analysis-head">
+              <div>
+                <span class="section-kicker">ANÁLISE DA AÇÃO</span>
+                <div class="action-analysis-title" id="actionAnalysisTitle">Perfil da decisão</div>
+              </div>
+              <div class="action-analysis-scale">INDICADORES · 0–100</div>
+            </div>
+            <div class="action-comment" id="actionAnalysisComment">Escolha uma ação para gerar a leitura comportamental.</div>
+            <div class="profile-indicators" id="actionProfileIndicators"></div>
+          </div>
+
           <div class="spot-decision" id="spotDecision" aria-live="polite">
             <div>
               <span class="section-kicker">DECISÃO</span>
@@ -813,6 +854,17 @@ strong,b,em,i{
         </div>
 
         <div id="scenarioStack" class="scenario-stack"></div>
+        <div class="section" id="analysisSwot">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">SWOT DO JOGADOR</div>
+              <h2 class="section-title">FORÇAS, LEAKS E OPORTUNIDADES</h2>
+              <div class="swot-sample" id="swotSample">BASE DINÂMICA DO DNA PLAYER</div>
+            </div>
+          </div>
+          <div class="body-copy" style="margin-bottom:14px">A matriz cruza o histórico das decisões com os indicadores comportamentais registrados nos Spots.</div>
+          <div class="swot-grid" id="swotGrid"></div>
+        </div>
         <div class="section" id="analysisLeaks">
           <div class="section-head">
             <div><div class="section-kicker">LEAKS</div><h2 class="section-title">O QUE ESTÁ CUSTANDO EV?</h2></div>
@@ -1151,8 +1203,148 @@ let currentSpotSequence=12;
 function getSpotDecisionHistory(){
   try{return JSON.parse(store.get("heroes.spotDecisions")||"[]")}catch{return []}
 }
+
+const ACTION_PROFILE_META=[
+  ["aggression","AGRESSIVIDADE"],
+  ["discipline","DISCIPLINA"],
+  ["riskControl","CONTROLE DE RISCO"],
+  ["patience","PACIÊNCIA"],
+  ["pressure","PRESSÃO"],
+  ["adaptability","ADAPTABILIDADE"],
+  ["positionalAwareness","CONSCIÊNCIA POSICIONAL"],
+  ["bluffTendency","TENDÊNCIA AO BLEFE"]
+];
+const ACTION_PROFILE_LABELS=Object.fromEntries(ACTION_PROFILE_META);
+const clamp100=v=>Math.max(0,Math.min(100,Math.round(Number(v)||0)));
+
+function buildActionProfile(action,amount=0){
+  let scores,comment;
+  if(action==="fold"){
+    scores={aggression:18,discipline:88,riskControl:92,patience:90,pressure:76,adaptability:68,positionalAwareness:72,bluffTendency:8};
+    comment="O fold reduz variância e preserva stack. Nesta leitura, a decisão sinaliza disciplina, paciência e controle de risco elevados; o valor estratégico depende da força real dos ranges envolvidos.";
+  }else if(action==="call"){
+    scores={aggression:46,discipline:72,riskControl:64,patience:66,pressure:62,adaptability:78,positionalAwareness:76,bluffTendency:26};
+    comment="O call mantém o range mais amplo e controla o tamanho do pote. A decisão sugere adaptabilidade e disciplina moderadas, sem transformar pressão em agressão desnecessária.";
+  }else if(action==="raise"){
+    const size=Number(amount)||12;
+    const intensity=Math.max(0,Math.min(1,(size-12)/8));
+    scores={
+      aggression:clamp100(82+12*intensity),
+      discipline:clamp100(67-19*intensity),
+      riskControl:clamp100(56-22*intensity),
+      patience:clamp100(42-18*intensity),
+      pressure:clamp100(74+12*intensity),
+      adaptability:clamp100(80-6*intensity),
+      positionalAwareness:clamp100(84-3*intensity),
+      bluffTendency:clamp100(63+19*intensity)
+    };
+    comment=size<=12
+      ?"O raise mínimo aplica pressão preservando espaço para decisões futuras. O perfil da ação combina agressividade alta com risco ainda controlável."
+      :size<=15
+        ?"O raise intermediário aumenta pressão e polarização. A ação eleva agressividade e frequência potencial de blefe, exigindo boa disciplina de range."
+        :"O raise grande concentra pressão e risco. O perfil aponta agressividade muito alta e menor margem de controle, especialmente se a frequência se repetir.";
+  }else if(action==="allin"){
+    scores={aggression:100,discipline:28,riskControl:8,patience:10,pressure:97,adaptability:52,positionalAwareness:65,bluffTendency:88};
+    comment="O all-in maximiza pressão e exposição ao risco. Uma ocorrência isolada pode ser correta; repetição fora dos contextos adequados tende a formar um sinal de agressividade excessiva e baixa preservação de stack.";
+  }else{
+    scores={aggression:50,discipline:50,riskControl:50,patience:50,pressure:50,adaptability:50,positionalAwareness:50,bluffTendency:50};
+    comment="Ação registrada. O HEROES incorporará este sinal à amostra comportamental.";
+  }
+  return {scores:Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,clamp100(v)])),comment};
+}
+function renderActionProfile(profile,label){
+  const box=document.getElementById("actionAnalysis");
+  const title=document.getElementById("actionAnalysisTitle");
+  const comment=document.getElementById("actionAnalysisComment");
+  const list=document.getElementById("actionProfileIndicators");
+  if(!box||!profile)return;
+  box.hidden=false;
+  if(title)title.textContent=label||"Perfil da decisão";
+  if(comment)comment.textContent=profile.comment;
+  if(list)list.innerHTML=ACTION_PROFILE_META.map(([key,name])=>{
+    const score=clamp100(profile.scores?.[key]);
+    return `<div class="profile-indicator">
+      <div class="profile-indicator-main">
+        <div class="profile-indicator-name">${name}</div>
+        <div class="profile-indicator-track"><span style="--score:${score}%"></span></div>
+      </div>
+      <div class="profile-indicator-score">${score}</div>
+    </div>`;
+  }).join("");
+}
+function getAggregatedActionProfile(){
+  const history=getSpotDecisionHistory().filter(x=>x&&x.profile_signals);
+  const totals=Object.fromEntries(ACTION_PROFILE_META.map(([key])=>[key,0]));
+  history.forEach(d=>ACTION_PROFILE_META.forEach(([key])=>{totals[key]+=clamp100(d.profile_signals?.[key])}));
+  const averages={};
+  ACTION_PROFILE_META.forEach(([key])=>{
+    averages[key]=history.length?clamp100(totals[key]/history.length):({aggression:78,discipline:62,riskControl:68,patience:73,pressure:57,adaptability:84,positionalAwareness:81,bluffTendency:71}[key]||50);
+  });
+  return {sampleSize:history.length,averages};
+}
+function buildActionProfileSummary(){
+  const profile=getAggregatedActionProfile();
+  const a=profile.averages;
+  const positiveKeys=["discipline","riskControl","patience","adaptability","positionalAwareness"];
+  const strengths=[...positiveKeys].sort((x,y)=>a[y]-a[x]).slice(0,2);
+  const leaks=[];
+  if(a.discipline<55)leaks.push("discipline");
+  if(a.riskControl<50)leaks.push("riskControl");
+  if(a.patience<50)leaks.push("patience");
+  if(a.aggression>88)leaks.push("aggression");
+  if(a.bluffTendency>82)leaks.push("bluffTendency");
+  if(!leaks.length)leaks.push(...positiveKeys.sort((x,y)=>a[x]-a[y]).slice(0,2));
+  const uniqLeaks=[...new Set(leaks)].slice(0,3);
+  const summary={
+    sample_size:profile.sampleSize,
+    averages:a,
+    strengths:strengths.map(key=>({key,label:ACTION_PROFILE_LABELS[key],score:a[key]})),
+    leaks:uniqLeaks.map(key=>({key,label:ACTION_PROFILE_LABELS[key],score:a[key]})),
+    updated_at:new Date().toISOString(),
+    version:"action-profile-v1"
+  };
+  return summary;
+}
+function persistActionProfileSummary(){
+  const summary=buildActionProfileSummary();
+  store.set("heroes.actionProfile",JSON.stringify(summary));
+  return summary;
+}
+function renderSwot(){
+  const summary=buildActionProfileSummary();
+  const a=summary.averages;
+  const strong=summary.strengths.map(x=>`${x.label} ${x.score}/100`);
+  const weak=summary.leaks.map(x=>{
+    if(x.key==="aggression"&&x.score>88)return `AGRESSIVIDADE ${x.score}/100 — frequência elevada`;
+    if(x.key==="bluffTendency"&&x.score>82)return `TENDÊNCIA AO BLEFE ${x.score}/100 — frequência elevada`;
+    return `${x.label} ${x.score}/100`;
+  });
+  const opportunities=[];
+  if(a.discipline<70)opportunities.push("Treinar disciplina em potes grandes e decisões de alta pressão.");
+  if(a.riskControl<70)opportunities.push("Refinar seleção de sizings para preservar EV e stack.");
+  if(a.positionalAwareness<80)opportunities.push("Aumentar consciência de ranges por posição.");
+  if(!opportunities.length)opportunities.push("Aprofundar adaptação contra perfis de oponentes e texturas diferentes.");
+  const threats=[];
+  if(a.aggression>85&&a.discipline<65)threats.push("Agressividade alta combinada com disciplina baixa pode ampliar decisões de baixa qualidade.");
+  if(a.bluffTendency>78&&a.riskControl<60)threats.push("Blefes frequentes com baixo controle de risco podem aumentar variância e leaks.");
+  if(summary.sample_size<20)threats.push("Amostra ainda pequena: padrões podem mudar conforme novas decisões forem registradas.");
+  if(!threats.length)threats.push("Mudanças de comportamento sob pressão podem alterar rapidamente o perfil atual.");
+  const cards=[
+    ["FORÇAS","Sinais que hoje aparecem com melhor consistência.",strong],
+    ["FRAQUEZAS / LEAKS","Pontos que merecem investigação e treino direcionado.",weak],
+    ["OPORTUNIDADES","Caminhos de treino sugeridos pelos sinais atuais.",opportunities],
+    ["AMEAÇAS","Padrões que podem deteriorar decisões se forem recorrentes.",threats]
+  ];
+  const grid=document.getElementById("swotGrid");
+  if(grid)grid.innerHTML=cards.map(([title,copy,items])=>`<article class="swot-card"><div class="section-kicker">SWOT</div><h3>${title}</h3><p>${copy}</p><ul>${items.map(item=>`<li>${item}</li>`).join("")}</ul></article>`).join("");
+  const sample=document.getElementById("swotSample");
+  if(sample)sample.textContent=summary.sample_size
+    ?`BASE DINÂMICA · ${summary.sample_size} DECISÃO${summary.sample_size===1?"":"ÕES"} COM PERFIL`
+    :"BASE INICIAL DO DNA · AGUARDANDO DECISÕES EM SPOTS";
+}
 function recordSpotDecision(action,amount,button){
   const label=action==="raise"&&amount?`RAISE ${amount}bb`:action==="allin"?"ALL IN":action.toUpperCase();
+  const profile=buildActionProfile(action,amount);
   const decision={
     spot_id:`heroes_spot_${currentSpotSequence}`,
     timestamp:new Date().toISOString(),
@@ -1167,11 +1359,17 @@ function recordSpotDecision(action,amount,button){
     board:["Qs","8h","3c","Jd"],
     hero_hand:["As","Kh"],
     action,
-    amount_bb:amount||0
+    amount_bb:amount||0,
+    profile_signals:profile.scores,
+    action_analysis:profile.comment,
+    analysis_version:"action-profile-v1"
   };
   const history=getSpotDecisionHistory();
   history.unshift(decision);
   store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,500)));
+  persistActionProfileSummary();
+  renderActionProfile(profile,`${label} · PERFIL DA AÇÃO`);
+  renderSwot();
 
   document.querySelectorAll("[data-poker-action]").forEach(btn=>{
     btn.classList.toggle("selected",btn===button);
@@ -1197,10 +1395,14 @@ nextSpotBtn?.addEventListener("click",()=>{
   });
   if(spotDecisionText)spotDecisionText.textContent="Escolha sua ação.";
   if(spotDecisionMeta)spotDecisionMeta.textContent="A resposta será registrada no DNA Player.";
+  const actionAnalysis=document.getElementById("actionAnalysis");
+  if(actionAnalysis)actionAnalysis.hidden=true;
+  const indicators=document.getElementById("actionProfileIndicators");
+  if(indicators)indicators.innerHTML="";
   nextSpotBtn.hidden=true;
 });
 
-renderDNA();renderLeaks();renderScenarios();renderPatterns();
+renderDNA();renderLeaks();renderScenarios();renderPatterns();renderSwot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
 </script>
