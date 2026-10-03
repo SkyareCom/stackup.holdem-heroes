@@ -12,6 +12,12 @@ expect(style.includes('.scenario-grid{grid-template-columns:repeat(2,minmax(0,1f
 expect(style.includes('.scenario-cell{min-width:0;min-height:124px'),'scenario cards must have normalized breathing room');
 expect(style.includes('@media (max-width:330px)'),'small-screen fallback must exist');
 
+expect(style.includes('.shell{width:100%;max-width:none'),'mobile shell must use full viewport width');
+expect(style.includes('.tabbar{left:0;right:0;transform:none;width:100%;max-width:none'),'tab bar must span full mobile width');
+expect(style.includes('.brand-title{font-size:36px'),'mobile brand scale must remain readable');
+expect(style.includes('.scenario-cell strong{font-size:30px'),'scenario scores must remain readable on mobile');
+
+
 for(const token of ['#0F0909','#160B0D','#2A1114','#8D5B46','#D8B28E','#EEE1D1']) expect(html.includes(token),`missing HEROES palette token ${token}`);
 expect(html.includes('@font-face{font-family:"Roboto Slab"'),'Roboto Slab must be embedded');
 expect(html.includes('data:font/ttf;base64,'),'Roboto Slab must be self-contained');
