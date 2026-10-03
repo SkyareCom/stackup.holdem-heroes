@@ -1,0 +1,72 @@
+name: Validate Heroes
+
+on:
+  push:
+    branches:
+      - main
+      - work/heroes-playstore-foundation
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Validate
+        run: npm test
+      - name: Build web artifact
+        run: npm run build
+
+  android-scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Setup Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android 16 platform
+        run: |
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+      - name: Install pinned dependencies
+        run: npm install --ignore-scripts
+      - name: Generate Android shell
+        run: npm run android:init
+      - name: Verify Android 16 target
+        run: |
+          grep -Eq "compileSdkVersion\s*=\s*36" android/variables.gradle
+          grep -Eq "targetSdkVersion\s*=\s*36" android/variables.gradle
+          grep -R "applicationId \"com.stackupholdem.heroes\"" android/app/build.gradle
+
+      - name: Build debug AAB
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew bundleDebug
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+      - name: Upload debug AAB
+        uses: actions/upload-artifact@v7
+        with:
+          name: heroes-debug-aab
+          path: android/app/build/outputs/bundle/debug/app-debug.aab
+          if-no-files-found: error
+          retention-days: 7
