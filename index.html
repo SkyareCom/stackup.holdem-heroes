@@ -606,6 +606,11 @@ strong,b,em,i{
   .poker-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
   .poker-action.allin{grid-column:span 2}
 }
+
+/* Solved-spot runtime table states */
+.player-seat.inactive-seat{opacity:.2;filter:saturate(.25)}
+.player-seat.hero-position-seat{opacity:.08}
+.poker-action.loading{opacity:.35;pointer-events:none}
 </style>
 </head>
 <body>
@@ -723,12 +728,12 @@ strong,b,em,i{
         <div class="spot-session-head">
           <div>
             <div class="section-kicker">SPOT ATUAL</div>
-            <div class="spot-session-title">TURN · BTN vs HJ</div>
-            <div class="spot-session-copy">MTT 9-max · 44bb efetivos · pote single-raised</div>
+            <div class="spot-session-title" id="spotSessionTitle">TURN · BTN vs HJ</div>
+            <div class="spot-session-copy" id="spotSessionCopy">MTT 9-max · 44bb efetivos · pote single-raised</div>
           </div>
           <div class="spot-progress-card">
             <span id="spotNumber">12 / 50</span>
-            <b>MÉDIO</b>
+            <b id="spotDifficulty">SOLVED</b>
           </div>
         </div>
 
@@ -737,36 +742,36 @@ strong,b,em,i{
             <div class="poker-table" aria-label="Mesa de poker 9 jogadores">
               <div class="felt-mark">HEROES</div>
 
-              <div class="player-seat seat-utg">
+              <div class="player-seat seat-utg" data-seat-position="UTG">
                 <div class="seat-avatar"><span>UTG</span></div>
                 <div class="seat-stack">52bb</div>
               </div>
-              <div class="player-seat seat-utg1">
+              <div class="player-seat seat-utg1" data-seat-position="UTG+1">
                 <div class="seat-avatar"><span>UTG+1</span></div>
                 <div class="seat-stack">68bb</div>
               </div>
-              <div class="player-seat seat-utg2">
+              <div class="player-seat seat-utg2" data-seat-position="UTG+2">
                 <div class="seat-avatar"><span>UTG+2</span></div>
                 <div class="seat-stack">37bb</div>
               </div>
-              <div class="player-seat seat-lj">
+              <div class="player-seat seat-lj" data-seat-position="LJ">
                 <div class="seat-avatar"><span>LJ</span></div>
                 <div class="seat-stack">91bb</div>
               </div>
-              <div class="player-seat seat-hj active-bettor">
+              <div class="player-seat seat-hj" data-seat-position="HJ">
                 <div class="seat-avatar"><span>HJ</span></div>
                 <div class="seat-stack">44bb</div>
                 <div class="bet-chip">6bb</div>
               </div>
-              <div class="player-seat seat-co">
+              <div class="player-seat seat-co" data-seat-position="CO">
                 <div class="seat-avatar"><span>CO</span></div>
                 <div class="seat-stack">73bb</div>
               </div>
-              <div class="player-seat seat-sb">
+              <div class="player-seat seat-sb" data-seat-position="SB">
                 <div class="seat-avatar"><span>SB</span></div>
                 <div class="seat-stack">31bb</div>
               </div>
-              <div class="player-seat seat-bb">
+              <div class="player-seat seat-bb" data-seat-position="BB">
                 <div class="seat-avatar"><span>BB</span></div>
                 <div class="seat-stack">58bb</div>
               </div>
@@ -784,11 +789,11 @@ strong,b,em,i{
               </div>
 
               <div class="hero-seat">
-                <div class="hero-cards">
+                <div class="hero-cards" id="heroCards">
                   <div class="poker-card hero-card black"><span>A</span><b>♠</b></div>
                   <div class="poker-card hero-card red"><span>K</span><b>♥</b></div>
                 </div>
-                <div class="hero-avatar"><span>BTN</span></div>
+                <div class="hero-avatar"><span id="heroPositionLabel">BTN</span></div>
                 <div class="hero-label">HERO</div>
                 <div class="hero-stack" id="heroStack">44bb</div>
               </div>
@@ -801,25 +806,25 @@ strong,b,em,i{
           </div>
 
           <div class="poker-actions" id="pokerActions">
-            <button class="poker-action" type="button" data-poker-action="check" disabled>
+            <button class="poker-action" type="button" data-action-slot="check" data-poker-action="check" disabled>
               <span>CHECK</span><small>indisponível</small>
             </button>
-            <button class="poker-action call" type="button" data-poker-action="call" data-amount="6">
+            <button class="poker-action call" type="button" data-action-slot="call" data-poker-action="call" data-amount="6">
               <span>CALL</span><small>6bb</small>
             </button>
-            <button class="poker-action fold" type="button" data-poker-action="fold">
+            <button class="poker-action fold" type="button" data-action-slot="fold" data-poker-action="fold">
               <span>FOLD</span><small>encerrar mão</small>
             </button>
-            <button class="poker-action" type="button" data-poker-action="raise" data-amount="12">
+            <button class="poker-action" type="button" data-action-slot="raise" data-poker-action="raise" data-amount="12">
               <span>RAISE</span><small>12bb · mínimo</small>
             </button>
-            <button class="poker-action suggested" type="button" data-poker-action="raise" data-amount="15">
+            <button class="poker-action suggested" type="button" data-action-slot="raise1" data-poker-action="raise" data-amount="15">
               <span>RAISE 15bb</span><small>sugerido</small>
             </button>
-            <button class="poker-action suggested" type="button" data-poker-action="raise" data-amount="20">
+            <button class="poker-action suggested" type="button" data-action-slot="raise2" data-poker-action="raise" data-amount="20">
               <span>RAISE 20bb</span><small>sugerido</small>
             </button>
-            <button class="poker-action allin" type="button" data-poker-action="allin" data-amount="44">
+            <button class="poker-action allin" type="button" data-action-slot="allin" data-poker-action="allin" data-amount="44">
               <span>ALL IN</span><small>44bb</small>
             </button>
           </div>
@@ -978,6 +983,9 @@ strong,b,em,i{
   </div>
 </div>
 
+<script src="core/stackup-solved-spot-contract.js"></script>
+<script src="core/stackup-spots-engine.js"></script>
+<script src="core/heroes-solved-spots-runtime.js"></script>
 <script>
 const store={
   get(k){try{return localStorage.getItem(k)}catch{return null}},
@@ -1243,10 +1251,21 @@ const spotDecisionText=document.getElementById("spotDecisionText");
 const spotDecisionMeta=document.getElementById("spotDecisionMeta");
 const nextSpotBtn=document.getElementById("nextSpotBtn");
 const spotNumber=document.getElementById("spotNumber");
-let currentSpotSequence=12;
+const spotSessionTitle=document.getElementById("spotSessionTitle");
+const spotSessionCopy=document.getElementById("spotSessionCopy");
+const spotDifficulty=document.getElementById("spotDifficulty");
+const heroCardsBox=document.getElementById("heroCards");
+const heroPositionLabel=document.getElementById("heroPositionLabel");
+let currentSpotSequence=0;
+let currentSolvedSpot=null;
 
 function getSpotDecisionHistory(){
-  try{return JSON.parse(store.get("heroes.spotDecisions")||"[]")}catch{return []}
+  try{
+    const value=store.get("heroes.spotDecisions");
+    if(Array.isArray(value))return value;
+    if(typeof value==="string")return JSON.parse(value||"[]");
+    return [];
+  }catch{return []}
 }
 
 const ACTION_PROFILE_META=[
@@ -1548,29 +1567,221 @@ function renderSwot(){
     ?`BASE DINÂMICA · ${summary.sample_size} DECISÃO${summary.sample_size===1?"":"ÕES"} COM PERFIL`
     :"BASE INICIAL DO DNA · AGUARDANDO DECISÕES EM SPOTS";
 }
+
+
+const FAMILY_LABELS=Object.freeze({
+  RFI:"RFI",
+  VS_RFI:"VS RFI",
+  THREEBET_4BET:"3-BET / 4-BET",
+  BLIND_WAR_HU:"BLIND WAR / HU",
+  SQUEEZE_LIMP_ISO:"SQUEEZE / LIMP / ISO",
+  SHOVE_RESHOVE:"SHOVE / RESHOVE",
+  ICM_PKO:"ICM / PKO",
+  MULTIWAY_ALLIN:"ALL-IN MULTIWAY",
+  TEXTURE_SIZING:"TEXTURA / SIZING",
+  GENERAL_HU:"HEADS-UP",
+  MULTIWAY:"MULTIWAY"
+});
+const SUIT_SYMBOL=Object.freeze({s:"♠",h:"♥",d:"♦",c:"♣"});
+function fallbackPositions(size){
+  if(Number(size)>=9)return["UTG","UTG+1","UTG+2","LJ","HJ","CO","BTN","SB","BB"];
+  if(Number(size)>=6)return["UTG","HJ","CO","BTN","SB","BB"];
+  if(Number(size)===2)return["SB","BB"];
+  return["UTG","HJ","CO","BTN","SB","BB"];
+}
+function cardParts(card){
+  const text=String(card||"").trim();
+  if(!text)return null;
+  const suit=text.slice(-1).toLowerCase();
+  const rank=text.slice(0,-1).replace(/^T$/,"10");
+  if(!SUIT_SYMBOL[suit])return null;
+  return{rank,suit,symbol:SUIT_SYMBOL[suit],red:suit==="h"||suit==="d"};
+}
+function cardHtml(card,extraClass=""){
+  const p=cardParts(card);
+  if(!p)return'<div class="poker-card back"><span>?</span></div>';
+  return`<div class="poker-card ${extraClass} ${p.red?"red":"black"}"><span>${p.rank}</span><b>${p.symbol}</b></div>`;
+}
+function solverActionKind(action){
+  return window.StackUpSpotsEngine?.normalizeActionKind?.(action)||String(action?.kind||action?.action||"").toLowerCase();
+}
+function solverActionAmount(action){
+  const value=Number(action?.to??action?.amount??action?.size);
+  return Number.isFinite(value)?value:0;
+}
+function buildSolverReference(item){
+  const actions=(item?.entry?.actions||[]).map(a=>{
+    const kind=solverActionKind(a);
+    const amount=solverActionAmount(a);
+    const key=kind==="jam"?"allin":kind==="raise"?`raise:${amount}`:kind;
+    const ev=Number(a.ev??a.expectedValue??a.expected_value);
+    return{key,ev_bb:Number.isFinite(ev)?ev:null,frequency:Number.isFinite(Number(a.frequency))?Number(a.frequency):null};
+  });
+  return{
+    validated:true,
+    source:`${item?.spot?.solver||"solver"}/${item?.spot?.solveId||item?.spot?.id||"solve"}`,
+    confidence:95,
+    actions
+  };
+}
+function setActionButton(slot,action,label,sub){
+  const btn=document.querySelector(`[data-action-slot="${slot}"]`);
+  if(!btn)return;
+  btn.classList.remove("selected","loading");
+  const kind=action?solverActionKind(action):slot;
+  const amount=action?solverActionAmount(action):0;
+  btn.dataset.pokerAction=kind==="jam"?"allin":kind==="raise"?"raise":kind;
+  btn.dataset.amount=String(amount||0);
+  btn.disabled=!action;
+  const title=btn.querySelector("span"),small=btn.querySelector("small");
+  if(title)title.textContent=label;
+  if(small)small.textContent=sub;
+}
+function configureSolvedActions(entry){
+  const actions=entry?.actions||[];
+  const byKind=k=>actions.find(a=>solverActionKind(a)===k)||null;
+  const raises=actions.filter(a=>solverActionKind(a)==="raise").sort((a,b)=>solverActionAmount(a)-solverActionAmount(b));
+  const jam=actions.find(a=>solverActionKind(a)==="jam")||null;
+  const check=byKind("check"),call=byKind("call"),fold=byKind("fold");
+  setActionButton("check",check,"CHECK",check?`${Number(check.frequency||0).toFixed(0)}% solver`:"indisponível");
+  setActionButton("call",call,"CALL",call?`${solverActionAmount(call)||""}bb · ${Number(call.frequency||0).toFixed(0)}%`:"indisponível");
+  setActionButton("fold",fold,"FOLD",fold?`${Number(fold.frequency||0).toFixed(0)}% solver`:"indisponível");
+  const r0=raises[0]||null,r1=raises[1]||null,r2=raises[2]||null;
+  setActionButton("raise",r0,"RAISE",r0?`${solverActionAmount(r0)}bb · mínimo`:"indisponível");
+  setActionButton("raise1",r1,r1?`RAISE ${solverActionAmount(r1)}bb`:"RAISE —",r1?"sugerido pelo solve":"indisponível");
+  setActionButton("raise2",r2,r2?`RAISE ${solverActionAmount(r2)}bb`:"RAISE —",r2?"sugerido pelo solve":"indisponível");
+  setActionButton("allin",jam,"ALL IN",jam?`${solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||""}bb · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
+}
+function renderSolvedSeats(item){
+  const view=item.view||{};
+  const scenario=item.spot?.scenario||{};
+  const positions=(view.positions?.length?view.positions:fallbackPositions(view.tableSize||scenario.tableSize));
+  const active=new Set(positions);
+  document.querySelectorAll(".player-seat[data-seat-position]").forEach(seat=>{
+    const pos=seat.dataset.seatPosition;
+    const isHero=pos===view.heroPosition;
+    const isActive=active.has(pos)&&!isHero;
+    seat.classList.toggle("inactive-seat",!isActive);
+    seat.classList.toggle("hero-position-seat",isHero);
+    const stack=seat.querySelector(".seat-stack");
+    if(stack)stack.textContent=isActive?`${Number(view.stackForPosition?.[pos]??scenario.effectiveStack||0)}bb`:"—";
+    seat.querySelector(".bet-chip")?.remove();
+  });
+  const last=[...(scenario.actionHistory||[])].reverse().find(a=>a?.position&&a.position!==view.heroPosition);
+  if(last){
+    const actor=document.querySelector(`.player-seat[data-seat-position="${last.position}"]`);
+    const amount=Number(last.to??last.amount??scenario.currentBet);
+    if(actor&&Number.isFinite(amount)&&amount>0){
+      const chip=document.createElement("div");chip.className="bet-chip";chip.textContent=`${amount}bb`;actor.appendChild(chip);
+    }
+  }
+}
+function resetActionAnalysis(){
+  const actionAnalysis=document.getElementById("actionAnalysis");if(actionAnalysis)actionAnalysis.hidden=true;
+  const indicators=document.getElementById("actionProfileIndicators");if(indicators)indicators.innerHTML="";
+  const qualityMetrics=document.getElementById("actionQualityMetrics");if(qualityMetrics)qualityMetrics.innerHTML="";
+  const qualityGrade=document.getElementById("actionQualityGrade");if(qualityGrade)qualityGrade.textContent="—";
+  const qualityMode=document.getElementById("actionQualityMode");if(qualityMode)qualityMode.textContent="AGUARDANDO AÇÃO";
+  const aggressionRead=document.getElementById("actionAggressionRead");if(aggressionRead)aggressionRead.textContent="";
+}
+function renderSolvedSpot(item){
+  currentSolvedSpot=item;
+  const view=item.view||window.StackUpSpotsEngine?.toViewModel?.(item.spot,{positions:item.spot?.scenario?.positions||[]})||{};
+  const scenario=item.spot?.scenario||{};
+  const street=String(view.street||scenario.street||"").replace("PRE-FLOP","PRÉ-FLOP");
+  const villain=view.villainPosition||scenario.villainPosition||"FIELD";
+  if(spotSessionTitle)spotSessionTitle.textContent=`${street} · ${view.heroPosition||scenario.heroPosition||"HERO"} vs ${villain}`;
+  if(spotSessionCopy)spotSessionCopy.textContent=`${String(scenario.gameType||"MTT").replace("TOURNAMENT","MTT")} ${view.tableSize||scenario.tableSize||9}-max · ${Number(scenario.effectiveStack||0)}bb efetivos · ${FAMILY_LABELS[item.family]||item.family}`;
+  if(spotNumber)spotNumber.textContent=`${item.progress.viewed.toLocaleString("pt-BR")} / 14.000`;
+  if(spotDifficulty)spotDifficulty.textContent="SOLVED";
+  const pot=document.getElementById("spotPot");if(pot)pot.textContent=`${Number(view.pot||scenario.pot||0)}bb`;
+  const board=document.getElementById("boardCards");
+  if(board){
+    const cards=[...(view.board||scenario.board||[])];
+    board.innerHTML=cards.map(x=>cardHtml(x)).join("")+Array.from({length:Math.max(0,5-cards.length)},()=>'<div class="poker-card back"><span>?</span></div>').join("");
+  }
+  if(heroCardsBox){
+    const cards=view.heroCards||[];
+    heroCardsBox.innerHTML=cards.slice(0,2).map(x=>cardHtml(x,"hero-card")).join("");
+  }
+  if(heroPositionLabel)heroPositionLabel.textContent=view.heroPosition||scenario.heroPosition||"HERO";
+  const hs=document.getElementById("heroStack");if(hs)hs.textContent=`${Number(view.stackForPosition?.[view.heroPosition]??scenario.heroStack??scenario.effectiveStack||0)}bb`;
+  renderSolvedSeats({...item,view});
+  configureSolvedActions(item.entry);
+  const ref=buildSolverReference(item);
+  const facing=Number(scenario.currentBet??[...(scenario.actionHistory||[])].reverse().find(a=>a?.position!==view.heroPosition)?.to??0);
+  window.StackUpHeroesCurrentSpot={
+    spot_id:item.id,
+    solve_id:item.spot?.solveId||item.spot?.id||null,
+    solver:item.spot?.solver||null,
+    family:item.family,
+    game:"NLH",
+    format:String(scenario.gameType||"MTT").includes("TOURNAMENT")?"MTT":String(scenario.gameType||""),
+    table_size:Number(view.tableSize||scenario.tableSize||9),
+    street:String(view.street||scenario.street||"").toLowerCase(),
+    hero_position:view.heroPosition||scenario.heroPosition,
+    villain_position:view.villainPosition||scenario.villainPosition||null,
+    effective_stack_bb:Number(scenario.effectiveStack||0),
+    pot_bb:Number(view.pot||scenario.pot||0),
+    facing_bet_bb:Number.isFinite(facing)?facing:0,
+    board:[...(scenario.board||[])],
+    hero_hand:[...(view.heroCards||[])],
+    tournament_phase:scenario.phase||null,
+    icm_pressure:scenario.icm?70:20,
+    opponent_profile:scenario.opponentProfile||"unknown",
+    range_context:{hero:scenario.heroRange||null,villain:scenario.villainRange||null,confidence:95},
+    solver_reference:ref
+  };
+  currentSpotSequence=item.progress.viewed;
+  if(spotDecisionText)spotDecisionText.textContent="Escolha sua ação.";
+  if(spotDecisionMeta)spotDecisionMeta.textContent="Spot solver-resolvido · decisão será incorporada ao DNA Player.";
+  if(nextSpotBtn)nextSpotBtn.hidden=true;
+  resetActionAnalysis();
+}
+async function loadNextSolvedSpot(){
+  if(!window.HeroesSolvedSpots){
+    if(spotDecisionText)spotDecisionText.textContent="Motor de spots indisponível.";
+    return;
+  }
+  document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.disabled=true;btn.classList.add("loading")});
+  if(spotDecisionText)spotDecisionText.textContent="Carregando spot inédito…";
+  try{
+    const item=await window.HeroesSolvedSpots.next();
+    renderSolvedSpot(item);
+  }catch(err){
+    console.error(err);
+    if(spotDecisionText)spotDecisionText.textContent="Falha ao carregar spot.";
+    if(spotDecisionMeta)spotDecisionMeta.textContent=String(err?.message||err);
+  }
+}
+
 function recordSpotDecision(action,amount,button){
   const label=action==="raise"&&amount?`RAISE ${amount}bb`:action==="allin"?"ALL IN":action.toUpperCase();
   const context=getCurrentSpotContext();
   const evaluation=evaluateDecisionContext(action,amount,context);
   const profile=buildActionProfile(action,amount,evaluation);
   const decision={
-    spot_id:`heroes_spot_${currentSpotSequence}`,
+    spot_id:context.spot_id||`heroes_spot_${currentSpotSequence}`,
+    solve_id:context.solve_id||null,
+    solver:context.solver||null,
+    family:context.family||null,
     timestamp:new Date().toISOString(),
-    game:"NLH",
-    format:"MTT",
-    table_size:9,
-    street:"turn",
-    hero_position:"BTN",
-    effective_stack_bb:44,
-    pot_bb:10.5,
-    facing_bet_bb:6,
-    board:["Qs","8h","3c","Jd"],
-    hero_hand:["As","Kh"],
+    game:context.game||"NLH",
+    format:context.format||"MTT",
+    table_size:Number(context.table_size||9),
+    street:context.street,
+    hero_position:context.hero_position,
+    villain_position:context.villain_position||null,
+    effective_stack_bb:Number(context.effective_stack_bb||0),
+    pot_bb:Number(context.pot_bb||0),
+    facing_bet_bb:Number(context.facing_bet_bb||0),
+    board:[...(context.board||[])],
+    hero_hand:[...(context.hero_hand||[])],
     action,
     amount_bb:amount||0,
     profile_signals:profile.scores,
     action_analysis:profile.comment,
-    analysis_version:"action-profile-v2",
+    analysis_version:"action-profile-v2-solved-spots",
     context_snapshot:evaluation.context_snapshot,
     decision_quality:evaluation,
     ev_analysis:evaluation.solver?{
@@ -1581,12 +1792,9 @@ function recordSpotDecision(action,amount,button){
       ev_loss_bb:evaluation.solver.ev_loss_bb,
       alignment:evaluation.solver.ev_alignment
     }:{
-      status:"pending_solver_reference",
-      source:"contextual-model",
-      chosen_ev_bb:null,
-      best_ev_bb:null,
-      ev_loss_bb:null,
-      alignment:null
+      status:"solver_strategy_validated_ev_unavailable",
+      source:context.solver||"solver",
+      chosen_ev_bb:null,best_ev_bb:null,ev_loss_bb:null,alignment:null
     }
   };
   const history=getSpotDecisionHistory();
@@ -1597,45 +1805,17 @@ function recordSpotDecision(action,amount,button){
   renderDecisionQuality(evaluation);
   renderDNA();
   renderSwot();
-
-  document.querySelectorAll("[data-poker-action]").forEach(btn=>{
-    btn.classList.toggle("selected",btn===button);
-    btn.disabled=true;
-  });
+  document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.classList.toggle("selected",btn===button);btn.disabled=true});
   if(spotDecisionText)spotDecisionText.textContent=`${label} registrado`;
-  if(spotDecisionMeta)spotDecisionMeta.textContent="Decisão adicionada à amostra do DNA Player.";
+  if(spotDecisionMeta)spotDecisionMeta.textContent=`Solve ${context.solve_id||"validado"} · decisão adicionada ao DNA Player.`;
   if(nextSpotBtn)nextSpotBtn.hidden=false;
 }
 pokerActions?.addEventListener("click",e=>{
-  const btn=e.target.closest("[data-poker-action]");
+  const btn=e.target.closest("[data-action-slot]");
   if(!btn||btn.disabled)return;
-  const action=btn.dataset.pokerAction;
-  const amount=Number(btn.dataset.amount||0);
-  recordSpotDecision(action,amount,btn);
+  recordSpotDecision(btn.dataset.pokerAction,Number(btn.dataset.amount||0),btn);
 });
-nextSpotBtn?.addEventListener("click",()=>{
-  currentSpotSequence=currentSpotSequence>=50?1:currentSpotSequence+1;
-  if(spotNumber)spotNumber.textContent=`${currentSpotSequence} / 50`;
-  document.querySelectorAll("[data-poker-action]").forEach(btn=>{
-    btn.classList.remove("selected");
-    if(btn.dataset.pokerAction!=="check")btn.disabled=false;
-  });
-  if(spotDecisionText)spotDecisionText.textContent="Escolha sua ação.";
-  if(spotDecisionMeta)spotDecisionMeta.textContent="A resposta será registrada no DNA Player.";
-  const actionAnalysis=document.getElementById("actionAnalysis");
-  if(actionAnalysis)actionAnalysis.hidden=true;
-  const indicators=document.getElementById("actionProfileIndicators");
-  if(indicators)indicators.innerHTML="";
-  const qualityMetrics=document.getElementById("actionQualityMetrics");
-  if(qualityMetrics)qualityMetrics.innerHTML="";
-  const qualityGrade=document.getElementById("actionQualityGrade");
-  if(qualityGrade)qualityGrade.textContent="—";
-  const qualityMode=document.getElementById("actionQualityMode");
-  if(qualityMode)qualityMode.textContent="AGUARDANDO AÇÃO";
-  const aggressionRead=document.getElementById("actionAggressionRead");
-  if(aggressionRead)aggressionRead.textContent="";
-  nextSpotBtn.hidden=true;
-});
+nextSpotBtn?.addEventListener("click",()=>loadNextSolvedSpot());
 
 window.StackUpHeroesDecisionEngine=Object.freeze({
   evaluate:evaluateDecisionContext,
@@ -1649,6 +1829,7 @@ window.StackUpHeroesDecisionEngine=Object.freeze({
   }
 });
 renderDNA();renderLeaks();renderScenarios();renderPatterns();renderSwot();
+loadNextSolvedSpot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
 </script>
