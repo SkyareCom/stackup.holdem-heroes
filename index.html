@@ -644,14 +644,9 @@ strong,b,em,i{
           <div class="photo-slot" data-photo-slot="home" style="background-image:url('https://images.unsplash.com/photo-1638057628438-4b42313f19e3?auto=format&fit=crop&w=1600&q=82')"></div>
           <div class="eyebrow">SEU POKER DNA</div>
           <h1 class="display-xl">Quem é você<br>como jogador hoje?</h1>
-          <p class="hero-copy">Seu perfil atual combina agressividade acima da média com forte adaptação. O principal ponto de atenção surge quando a pressão aumenta e a decisão exige disciplina.</p>
+          <p class="hero-copy" id="homeHeroCopy">Seu Poker DNA usa uma única base sincronizada em todo o HEROES.</p>
 
-          <div class="dna-grid">
-            <div class="dna-stat"><div class="dna-label">Agressividade</div><div class="dna-value" data-count="78">78</div><div class="dna-bar"><span style="--v:78%"></span></div></div>
-            <div class="dna-stat"><div class="dna-label">Disciplina</div><div class="dna-value" data-count="62">62</div><div class="dna-bar"><span style="--v:62%"></span></div></div>
-            <div class="dna-stat"><div class="dna-label">Adaptabilidade</div><div class="dna-value" data-count="84">84</div><div class="dna-bar"><span style="--v:84%"></span></div></div>
-            <div class="dna-stat"><div class="dna-label">Pressão</div><div class="dna-value" data-count="57">57</div><div class="dna-bar"><span style="--v:57%"></span></div></div>
-          </div>
+          <div class="dna-grid" id="homeIndicatorGrid"></div>
         </div>
 
         <div class="section">
@@ -660,29 +655,15 @@ strong,b,em,i{
             <button class="section-link" data-go="dna">DNA completo</button>
           </div>
           <div class="editorial-panel">
-            <div class="archetype">O AGRESSOR CONTROLADO</div>
-            <div class="body-copy">Você combina agressividade acima da média com boa adaptação, mas perde precisão sob pressão.</div>
-            <div class="secondary-tendencies">
-              <span class="pill">Jogador Adaptável</span>
-              <span class="pill">Disciplinador de Range</span>
-            </div>
+            <div class="archetype" id="homeArchetype">PERFIL EM EVOLUÇÃO</div>
+            <div class="body-copy" id="homeArchetypeCopy">Os mesmos indicadores são usados em todas as páginas e seções.</div>
+            <div class="secondary-tendencies" id="homeTendencies"></div>
           </div>
         </div>
 
         <div class="section">
           <div class="section-head"><div><div class="section-kicker">SINAIS DE HOJE</div><h2 class="section-title">O que define seu jogo agora</h2></div></div>
-          <div class="feature-line">
-            <div><div class="feature-meta">LEAK PRINCIPAL</div><div class="feature-title">Agressividade excessiva perto da bolha</div><div class="feature-note">Sua frequência de pressão sobe 18% quando o field se aproxima da bolha.</div></div>
-            <div class="feature-score">-12</div>
-          </div>
-          <div class="feature-line">
-            <div><div class="feature-meta">MAIOR VANTAGEM</div><div class="feature-title">CO aggression</div><div class="feature-note">Alta eficiência entre 30–50bb contra perfis recreativos.</div></div>
-            <div class="feature-score">86</div>
-          </div>
-          <div class="feature-line">
-            <div><div class="feature-meta">MUDANÇA RECENTE</div><div class="feature-title">Disciplina improving</div><div class="feature-note">Você reduziu hero calls em rivers grandes nas últimas 3 sessões.</div></div>
-            <div class="feature-score">+6</div>
-          </div>
+          <div id="homeSignals"></div>
 
           <div class="cta-row">
             <button class="btn primary" id="analyzeBtn">ANALISAR MEU JOGO</button>
@@ -704,9 +685,7 @@ strong,b,em,i{
 
         <div class="section">
           <div class="section-head"><div><div class="section-kicker">EVOLUÇÃO DO PERFIL</div><h2 class="section-title">Mudanças recentes</h2></div></div>
-          <div class="feature-line"><div><div class="feature-title">Agressividade</div><div class="feature-note">72 → 78</div></div><div class="feature-score">+6</div></div>
-          <div class="feature-line"><div><div class="feature-title">Disciplina</div><div class="feature-note">54 → 62</div></div><div class="feature-score">+8</div></div>
-          <div class="feature-line"><div><div class="feature-title">Pressão</div><div class="feature-note">48 → 57</div></div><div class="feature-score">+9</div></div>
+          <div id="dnaEvolution"></div>
         </div>
       </section>
 
@@ -871,6 +850,12 @@ strong,b,em,i{
         <div class="section-head">
           <div><div class="section-kicker">MATRIZ DE JOGO</div><h1 class="section-title">ANÁLISE</h1></div>
         </div>
+        <div class="section" id="analysisCoreProfile">
+          <div class="section-head"><div><div class="section-kicker">30 INDICADORES SINCRONIZADOS</div><h2 class="section-title">POKER DNA ATUAL</h2></div></div>
+          <div class="dna-grid" id="analysisIndicatorGrid"></div>
+          <div class="body-copy" id="analysisProfileMeta" style="margin-top:10px"></div>
+        </div>
+
         <div class="filterbar" id="analysisFilters">
           <button class="filter active" data-scenario-filter="all">TODOS</button>
           <button class="filter" data-scenario-filter="position">POSITION</button>
@@ -912,12 +897,8 @@ strong,b,em,i{
           <div class="pressure">
             <div class="section-kicker">DNA SOB PRESSÃO</div>
             <div class="archetype" style="font-size:29px;margin-top:6px">SOB PRESSÃO</div>
-            <div class="pressure-grid">
-              <div class="pressure-stat"><span>Calma</span><b>71</b></div>
-              <div class="pressure-stat"><span>Agressividade</span><b>86</b></div>
-              <div class="pressure-stat"><span>Disciplina</span><b>58</b></div>
-            </div>
-            <div class="insight">“Você tende a aumentar agressividade quando a pressão cresce, mas sua disciplina cai.”</div>
+            <div class="dna-grid" id="pressureIndicatorGrid"></div>
+            <div class="insight" id="pressureInsight">Aguardando amostra suficiente de decisões sob pressão.</div>
           </div>
         </div>
 
@@ -934,13 +915,19 @@ strong,b,em,i{
         <div class="profile-hero">
           <div class="section-kicker">STACKUP ID</div>
           <div class="profile-name">Player 0217</div>
-          <div class="profile-id">heroes / profile confidence 81%</div>
+          <div class="profile-id" id="profileConfidenceLine">heroes / profile confidence —</div>
           <div class="profile-grid">
             <div class="profile-item"><div class="mini-label">PLANO</div><div class="mini-value">GRÁTIS</div></div>
             <div class="profile-item"><div class="mini-label">SESSÕES</div><div class="mini-value">24</div></div>
-            <div class="profile-item"><div class="mini-label">CONFIANÇA DO DNA</div><div class="mini-value">81%</div></div>
-            <div class="profile-item"><div class="mini-label">ÚLTIMA ATUALIZAÇÃO</div><div class="mini-value">Hoje</div></div>
+            <div class="profile-item"><div class="mini-label">CONFIANÇA DO DNA</div><div class="mini-value" id="profileConfidenceValue">—</div></div>
+            <div class="profile-item"><div class="mini-label">ÚLTIMA ATUALIZAÇÃO</div><div class="mini-value" id="profileUpdatedAt">—</div></div>
           </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><div><div class="section-kicker">30 INDICADORES</div><h2 class="section-title">POKER DNA DO JOGADOR</h2></div></div>
+          <div class="dna-grid" id="profileIndicatorGrid"></div>
+          <div class="body-copy" id="profileIndicatorMeta" style="margin-top:10px"></div>
         </div>
 
         <div class="section">
@@ -1004,18 +991,41 @@ migrateLegacyKey("heroes.session","wraps.session");
 if(!store.get("heroes.lang"))store.set("heroes.lang","pt");
 if(!store.get("heroes.session"))store.set("heroes.session",JSON.stringify({mode:"mock",createdAt:new Date().toISOString()}));
 
-const dnaData=[
-  ["AGRESSIVIDADE",78,"Você pressiona ranges mais do que a média do seu próprio histórico.","baseline 69 · +9"],
-  ["DISCIPLINA",62,"Seu maior vazamento aparece quando o pote cresce e a decisão exige fold.","baseline 66 · -4"],
-  ["PACIÊNCIA",73,"Você sustenta espera por spots melhores sem perder atividade estratégica.","baseline 70 · +3"],
-  ["ADAPTABILIDADE",84,"Seu perfil muda bem contra recreativos e stacks médios.","baseline 76 · +8"],
-  ["PRESSÃO",57,"Sob pressão você mantém iniciativa, mas perde disciplina.","baseline 64 · -7"],
-  ["CONTROLE DE RISCO",68,"Você controla bem risco em potes médios, piorando em decisões all-in.","baseline 71 · -3"],
-  ["CONSCIÊNCIA POSICIONAL",81,"Sua eficiência cresce significativamente em CO e BTN.","baseline 74 · +7"],
-  ["CONTROLE PÓS-FLOP",75,"Boa manutenção de ranges no turn, com queda no river.","baseline 72 · +3"],
-  ["FREQUÊNCIA DE BLEFE",71,"Sua frequência sobe após sequências positivas e em posição.","baseline 67 · +4"],
-  ["DISCIPLINA NO SHOWDOWN",59,"Hero calls ainda aparecem acima do seu melhor padrão.","baseline 65 · -6"]
-];
+const PLAYER_INDICATORS=Object.freeze([
+  {key:"aggression",label:"AGRESSIVIDADE",baseline:78,kind:"trait",group:"ESTILO",description:"Intensidade com que você aplica pressão e escolhe linhas agressivas."},
+  {key:"bluffTendency",label:"TENDÊNCIA AO BLEFE",baseline:71,kind:"trait",group:"ESTILO",description:"Propensão a escolher blefes e semiblefes quando existe espaço estratégico."},
+  {key:"pressure",label:"REATIVIDADE À PRESSÃO",baseline:57,kind:"trait",group:"ESTILO",description:"Quanto situações de pressão alteram seu padrão normal de decisão."},
+  {key:"patience",label:"PACIÊNCIA",baseline:73,kind:"quality",group:"COMPORTAMENTO",description:"Capacidade de esperar spots melhores sem forçar volume de ação."},
+  {key:"discipline",label:"DISCIPLINA",baseline:62,kind:"quality",group:"COMPORTAMENTO",description:"Capacidade de abandonar linhas marginais e manter o plano estratégico."},
+  {key:"riskControl",label:"CONTROLE DE RISCO",baseline:68,kind:"quality",group:"COMPORTAMENTO",description:"Equilíbrio entre exposição de stack, variância e qualidade da oportunidade."},
+  {key:"adaptability",label:"ADAPTABILIDADE",baseline:84,kind:"quality",group:"COMPORTAMENTO",description:"Capacidade de ajustar decisões quando contexto, ranges e oponentes mudam."},
+  {key:"decisionConsistency",label:"CONSISTÊNCIA DECISÓRIA",baseline:70,kind:"quality",group:"COMPORTAMENTO",description:"Estabilidade da qualidade das decisões ao longo da amostra."},
+  {key:"rangeDiscipline",label:"DISCIPLINA DE RANGE",baseline:69,kind:"quality",group:"RANGES",description:"Respeito à força e composição dos ranges ao continuar, pressionar ou desistir."},
+  {key:"positionalAwareness",label:"CONSCIÊNCIA POSICIONAL",baseline:81,kind:"quality",group:"RANGES",description:"Uso de posição e guerra de ranges na seleção das linhas."},
+  {key:"opponentAdaptation",label:"ADAPTAÇÃO AO OPONENTE",baseline:72,kind:"quality",group:"RANGES",description:"Qualidade dos ajustes contra perfis e tendências adversárias."},
+  {key:"blockerAwareness",label:"CONSCIÊNCIA DE BLOCKERS",baseline:66,kind:"quality",group:"RANGES",description:"Uso de blockers e remoção de combinações na construção da decisão."},
+  {key:"sizingQuality",label:"QUALIDADE DE SIZING",baseline:70,kind:"quality",group:"MATEMÁTICA",description:"Coerência dos tamanhos escolhidos com pote, ranges, stack e objetivo da linha."},
+  {key:"stackManagement",label:"GESTÃO DE STACK",baseline:72,kind:"quality",group:"MATEMÁTICA",description:"Uso eficiente do stack efetivo e da exposição em cada decisão."},
+  {key:"potOddsAwareness",label:"POT ODDS",baseline:70,kind:"quality",group:"MATEMÁTICA",description:"Aderência da decisão às relações entre preço do call, pote e equity necessária."},
+  {key:"mathAwareness",label:"MATEMÁTICA DA DECISÃO",baseline:71,kind:"quality",group:"MATEMÁTICA",description:"Uso consistente de relações matemáticas relevantes para a ação."},
+  {key:"decisionQuality",label:"QUALIDADE GLOBAL DA DECISÃO",baseline:70,kind:"quality",group:"MATEMÁTICA",description:"Síntese da qualidade contextual da decisão; EV só entra quando há solve validado."},
+  {key:"raiseSelection",label:"SELEÇÃO DE RAISE",baseline:70,kind:"quality",group:"AÇÕES",description:"Qualidade das situações em que o raise é escolhido e do sizing correspondente."},
+  {key:"callSelection",label:"SELEÇÃO DE CALL",baseline:70,kind:"quality",group:"AÇÕES",description:"Qualidade das situações em que o call é escolhido."},
+  {key:"foldSelection",label:"SELEÇÃO DE FOLD",baseline:70,kind:"quality",group:"AÇÕES",description:"Disciplina e precisão das situações em que o fold é escolhido."},
+  {key:"allInSelection",label:"SELEÇÃO DE ALL-IN",baseline:68,kind:"quality",group:"AÇÕES",description:"Qualidade da exposição total do stack nos contextos em que all-in é escolhido."},
+  {key:"preflopControl",label:"CONTROLE PRÉ-FLOP",baseline:73,kind:"quality",group:"STREETS",description:"Qualidade das decisões pré-flop dentro da amostra observada."},
+  {key:"flopControl",label:"CONTROLE NO FLOP",baseline:74,kind:"quality",group:"STREETS",description:"Qualidade das decisões no flop dentro da amostra observada."},
+  {key:"turnControl",label:"CONTROLE NO TURN",baseline:71,kind:"quality",group:"STREETS",description:"Qualidade das decisões no turn dentro da amostra observada."},
+  {key:"riverControl",label:"CONTROLE NO RIVER",baseline:66,kind:"quality",group:"STREETS",description:"Qualidade das decisões no river dentro da amostra observada."},
+  {key:"showdownDiscipline",label:"DISCIPLINA NO SHOWDOWN",baseline:59,kind:"quality",group:"STREETS",description:"Qualidade da seleção de calls, folds e value bets próximos ao showdown."},
+  {key:"icmAwareness",label:"CONSCIÊNCIA DE ICM",baseline:67,kind:"quality",group:"TORNEIO",description:"Ajuste das decisões ao risco de eliminação, pay jumps e pressão de ICM."},
+  {key:"tournamentPhaseAdaptation",label:"ADAPTAÇÃO À FASE",baseline:72,kind:"quality",group:"TORNEIO",description:"Capacidade de mudar estratégia entre early, middle, bubble, late e final table."},
+  {key:"boardTextureReading",label:"LEITURA DE TEXTURA",baseline:71,kind:"quality",group:"PÓS-FLOP",description:"Leitura da textura do board e de como ela altera ranges e sizings."},
+  {key:"valueExtraction",label:"EXTRAÇÃO DE VALOR",baseline:69,kind:"quality",group:"PÓS-FLOP",description:"Capacidade de escolher linhas que capturam valor quando a vantagem é suficiente."}
+]);
+const PLAYER_INDICATOR_BY_KEY=Object.freeze(Object.fromEntries(PLAYER_INDICATORS.map(x=>[x.key,x])));
+const QUALITY_INDICATORS=Object.freeze(PLAYER_INDICATORS.filter(x=>x.kind==="quality"));
+
 
 const leaks=[
   {level:"critical",area:"PRESSÃO",title:"Agressividade excessiva perto da bolha",freq:"38%",impact:"-12 EV",context:"Bubble",rec:"Reduza a frequência de 3-bet shove marginal quando o field comprime e o stack efetivo fica abaixo de 24bb."},
@@ -1025,81 +1035,181 @@ const leaks=[
   {level:"moderate",area:"POSITION",title:"EV do BTN abaixo da baseline",freq:"18%",impact:"-4 EV",context:"BTN",rec:"Amplie pressão contra blinds passivos e refine defesa versus 3-bet."}
 ];
 
-const scenarioData={
-  position:{title:"POR POSIÇÃO",desc:"onde sua posição altera decisões",items:[["BTN",84,"forte"],["CO",86,"mais forte"],["HJ",78,"estável"],["UTG",76,"disciplinado"],["SB",67,"volátil"],["BB",61,"zona de leak"]]},
-  stack:{title:"POR STACK",desc:"como profundidade muda seu perfil",items:[["<20bb",58,"queda sob pressão"],["20–30bb",73,"em recuperação"],["30–50bb",88,"melhor stack"],["50–80bb",81,"controlado"],["80bb+",74,"mais passivo"]]},
-  street:{title:"POR STREET",desc:"onde a qualidade cai ao longo da mão",items:[["Pre-flop",79,"sólido"],["Flop",82,"melhor street"],["Turn",71,"spots passivos"],["River",64,"leak no showdown"]]},
-  phase:{title:"POR FASE DO TORNEIO",desc:"mudanças em momentos críticos",items:[["Early",77,"estável"],["Middle",81,"equilibrado"],["Bubble",59,"agressividade excessiva"],["Late",72,"adaptável"],["Final Table",68,"tensão de ICM"]]},
-  pressure:{title:"POR PRESSÃO",desc:"como você reage quando a decisão pesa",items:[["Big Pot",63,"queda de disciplina"],["All-in",57,"volátil"],["Deep Run",74,"focado"],["Large Field",76,"confortável"],["Bubble",58,"alta agressividade"]]},
-  opponent:{title:"POR TIPO DE OPONENTE",desc:"adaptação contra perfis diferentes",items:[["REC",87,"forte exploit"],["REG",75,"equilibrado"],["PRO",66,"mais passivo"],["Aggressive",72,"defensivo"],["Passive",84,"alta pressão"]]}
-};
+const SCENARIO_META=Object.freeze({
+  position:{title:"POR POSIÇÃO",desc:"qualidade por posição do herói"},
+  stack:{title:"POR STACK",desc:"qualidade por profundidade efetiva"},
+  street:{title:"POR STREET",desc:"qualidade por street"},
+  phase:{title:"POR FASE DO TORNEIO",desc:"qualidade por fase"},
+  pressure:{title:"POR PRESSÃO",desc:"qualidade conforme pressão/ICM"},
+  opponent:{title:"POR TIPO DE OPONENTE",desc:"qualidade por perfil adversário"}
+});
 
-const patterns=[
-  ["Decisões rápidas após perder um pote","Padrão de timing próximo de tilt"],
-  ["Hero calls excessivos","Mais visível em rivers grandes"],
-  ["Jogo mais tight sob pressão de ICM","A disciplina sobe e a agressividade fica mais polarizada"],
-  ["Defesa excessiva do BB","Mais frequente contra opens de posições iniciais"],
-  ["Frequência de blefe aumenta após vitórias","A confiança altera a escolha das linhas"]
-];
 
+function indicatorGridHTML(profile){
+  return PLAYER_INDICATORS.map(def=>{
+    const score=profile.scores[def.key];
+    const evidence=profile.evidenceCounts[def.key]||0;
+    return `<div class="dna-stat"><div class="dna-label">${def.label}</div><div class="dna-value">${score}</div><div class="dna-bar"><span style="--v:${score}%"></span></div><small style="font-size:7px;color:var(--muted-1)">n=${evidence}</small></div>`;
+  }).join("");
+}
 function renderDNA(){
-  const live=typeof getAggregatedActionProfile==="function"?getAggregatedActionProfile():{sampleSize:0,averages:{}};
-  const signalByTrait={
-    "AGRESSIVIDADE":"aggression",
-    "DISCIPLINA":"discipline",
-    "PACIÊNCIA":"patience",
-    "ADAPTABILIDADE":"adaptability",
-    "PRESSÃO":"pressure",
-    "CONTROLE DE RISCO":"riskControl",
-    "CONSCIÊNCIA POSICIONAL":"positionalAwareness",
-    "FREQUÊNCIA DE BLEFE":"bluffTendency"
-  };
-  const weight=Math.min(.72,(live.sampleSize||0)/40*.72);
-  document.getElementById("dnaList").innerHTML=dnaData.map(([n,baselineScore,copy,baseline])=>{
-    const signalKey=signalByTrait[n];
-    const liveScore=signalKey?Number(live.averages?.[signalKey]):NaN;
-    const score=Number.isFinite(liveScore)&&live.sampleSize
-      ?Math.round(baselineScore*(1-weight)+liveScore*weight)
-      :baselineScore;
-    const source=signalKey&&live.sampleSize
-      ?`DNA BASE ${baselineScore} · ${live.sampleSize} DECISÃO${live.sampleSize===1?"":"ÕES"} INCORPORADA${live.sampleSize===1?"":"S"}`
-      :baseline;
-    return `
-    <div class="dna-row">
-      <div class="dna-row-top"><div class="dna-row-name">${n}</div><div class="dna-row-score">${score}</div></div>
+  const profile=getUnifiedPlayerProfile();
+  const host=document.getElementById("dnaList");if(!host)return;
+  host.innerHTML=PLAYER_INDICATORS.map(def=>{
+    const score=profile.scores[def.key];
+    const n=profile.evidenceCounts[def.key]||0;
+    const delta=score-def.baseline;
+    const source=n?`BASE ${def.baseline} · ATUAL ${score} · ${delta>=0?"+":""}${delta} · n=${n}`:`BASE INICIAL ${def.baseline} · sem amostra específica`;
+    return `<div class="dna-row">
+      <div class="dna-row-top"><div class="dna-row-name">${def.label}</div><div class="dna-row-score">${score}</div></div>
       <div class="microtrack"><span style="--v:${score}%"></span></div>
-      <div class="dna-row-copy">${copy}</div>
-      <div class="baseline">${source}</div>
+      <div class="dna-row-copy">${def.description}</div><div class="baseline">${def.group} · ${source}</div>
     </div>`;
   }).join("");
 }
+function renderUnifiedProfileViews(){
+  const profile=getUnifiedPlayerProfile();
+  const grid=indicatorGridHTML(profile);
+  ["homeIndicatorGrid","analysisIndicatorGrid","profileIndicatorGrid"].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=grid;});
+
+  const ranked=[...QUALITY_INDICATORS].filter(x=>(profile.evidenceCounts[x.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
+  const strongest=ranked[0]||QUALITY_INDICATORS[0];
+  const weakest=ranked[ranked.length-1]||QUALITY_INDICATORS[1];
+  const heroCopy=document.getElementById("homeHeroCopy");
+  if(heroCopy)heroCopy.textContent=`Uma única matriz de 30 indicadores alimenta todo o HEROES. Amostra atual: ${profile.sampleSize} decisões; confiança do DNA: ${profile.confidence}%.`;
+
+  let archetype="PERFIL EM FORMAÇÃO";
+  if(profile.sampleSize>=5){
+    if(profile.scores.aggression>=80&&profile.scores.discipline>=70)archetype="AGRESSOR CONTROLADO";
+    else if(profile.scores.aggression>=82&&profile.scores.discipline<60)archetype="AGRESSOR DE ALTA VARIÂNCIA";
+    else if(profile.scores.adaptability>=80&&profile.scores.positionalAwareness>=78)archetype="ADAPTADOR POSICIONAL";
+    else if(profile.scores.riskControl>=78&&profile.scores.patience>=76)archetype="SELETIVO DISCIPLINADO";
+    else archetype="PERFIL HÍBRIDO";
+  }
+  const arch=document.getElementById("homeArchetype");if(arch)arch.textContent=archetype;
+  const archCopy=document.getElementById("homeArchetypeCopy");
+  if(archCopy)archCopy.textContent=`O arquétipo é derivado da mesma matriz central; ele não substitui os 30 indicadores. ${profile.sampleSize<20?"A amostra ainda é pequena para alta confiança.":""}`;
+  const tend=document.getElementById("homeTendencies");
+  if(tend)tend.innerHTML=ranked.slice(0,3).map(x=>`<span class="pill">${x.label} · ${profile.scores[x.key]}</span>`).join("");
+
+  const signals=document.getElementById("homeSignals");
+  if(signals){
+    const q=profile.decisionQualityAverage;
+    signals.innerHTML=`
+      <div class="feature-line"><div><div class="feature-meta">FORÇA ATUAL</div><div class="feature-title">${strongest.label}</div><div class="feature-note">${strongest.description}</div></div><div class="feature-score">${profile.scores[strongest.key]}</div></div>
+      <div class="feature-line"><div><div class="feature-meta">PONTO DE ATENÇÃO</div><div class="feature-title">${weakest.label}</div><div class="feature-note">${weakest.description}</div></div><div class="feature-score">${profile.scores[weakest.key]}</div></div>
+      <div class="feature-line"><div><div class="feature-meta">CONFIANÇA DO DNA</div><div class="feature-title">${profile.confidence}% · ${profile.sampleSize} decisões</div><div class="feature-note">${profile.solverValidated} decisão${profile.solverValidated===1?"":"ões"} com referência de solver validada; qualidade média ${q===null?"—":q}/100.</div></div><div class="feature-score">${profile.confidence}</div></div>`;
+  }
+
+  const evolution=document.getElementById("dnaEvolution");
+  if(evolution)evolution.innerHTML=PLAYER_INDICATORS.map(def=>{
+    const now=profile.scores[def.key],delta=now-def.baseline,n=profile.evidenceCounts[def.key]||0;
+    return `<div class="feature-line"><div><div class="feature-title">${def.label}</div><div class="feature-note">${def.baseline} → ${now} · n=${n}</div></div><div class="feature-score">${delta>=0?"+":""}${delta}</div></div>`;
+  }).join("");
+
+  const analysisMeta=document.getElementById("analysisProfileMeta");
+  if(analysisMeta)analysisMeta.textContent=`Fonte única: 30 indicadores · ${profile.sampleSize} decisões · confiança ${profile.confidence}% · qualidade média ${profile.decisionQualityAverage??"—"}/100.`;
+
+  const pressureProfile=getUnifiedPlayerProfile(d=>{
+    const p=Number(d?.context_snapshot?.icm_pressure||0);
+    const phase=String(d?.context_snapshot?.tournament_phase||"").toLowerCase();
+    return p>=40||["bubble","late","final table","final_table"].includes(phase);
+  });
+  const pressureGrid=document.getElementById("pressureIndicatorGrid");
+  if(pressureGrid)pressureGrid.innerHTML=indicatorGridHTML(pressureProfile);
+  const pressureInsight=document.getElementById("pressureInsight");
+  if(pressureInsight)pressureInsight.textContent=pressureProfile.sampleSize
+    ?`Mesmos 30 indicadores, filtrados para ${pressureProfile.sampleSize} decisões sob pressão. Confiança contextual: ${pressureProfile.confidence}%.`
+    :"Ainda não há decisões suficientes classificadas como pressão/ICM; nenhum valor contextual é inventado.";
+
+  const confLine=document.getElementById("profileConfidenceLine");if(confLine)confLine.textContent=`heroes / profile confidence ${profile.confidence}%`;
+  const confValue=document.getElementById("profileConfidenceValue");if(confValue)confValue.textContent=`${profile.confidence}%`;
+  const updated=document.getElementById("profileUpdatedAt");if(updated)updated.textContent=profile.updatedAt?new Date(profile.updatedAt).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"—";
+  const profileMeta=document.getElementById("profileIndicatorMeta");if(profileMeta)profileMeta.textContent=`Matriz única v3 · ${profile.sampleSize} decisões · cobertura média ${profile.coverage}%.`;
+}
+function getDynamicLeaks(){
+  const profile=getUnifiedPlayerProfile();
+  const rows=[];
+  QUALITY_INDICATORS.forEach(def=>{
+    const n=profile.evidenceCounts[def.key]||0;
+    if(!n)return;
+    const score=profile.scores[def.key];
+    if(score>=75)return;
+    rows.push({
+      level:score<50?"critical":score<62?"high":"moderate",
+      area:def.group,
+      title:def.label,
+      freq:`n=${n}`,
+      impact:"EV —",
+      context:"DNA central",
+      rec:`Priorize treinos que isolem ${def.label.toLowerCase()} até ampliar amostra e estabilidade.`,
+      score
+    });
+  });
+  if(profile.evidenceCounts.aggression&&profile.scores.aggression>88&&profile.scores.discipline<65){
+    rows.push({level:"high",area:"ESTILO",title:"Agressividade alta com disciplina insuficiente",freq:`n=${profile.evidenceCounts.aggression}`,impact:"EV —",context:"DNA central",rec:"Separar agressividade eficiente de frequência excessiva usando spots com solve validado.",score:profile.scores.discipline});
+  }
+  if(profile.evidenceCounts.bluffTendency&&profile.scores.bluffTendency>84&&profile.scores.riskControl<65){
+    rows.push({level:"high",area:"ESTILO",title:"Propensão ao blefe acima do controle de risco",freq:`n=${profile.evidenceCounts.bluffTendency}`,impact:"EV —",context:"DNA central",rec:"Revisar seleção de blefes, blockers, sizing e perda de EV quando houver referência validada.",score:profile.scores.riskControl});
+  }
+  return rows.sort((a,b)=>a.score-b.score);
+}
 function renderLeaks(filter="all"){
-  const rows=leaks.filter(x=>filter==="all"||x.level===filter);
-  document.getElementById("leakList").innerHTML=rows.map(x=>`
-    <div class="leak">
-      <div class="leak-top"><div><div class="feature-meta">${x.area}</div><div class="leak-title">${x.title}</div></div><div class="severity">${x.level}</div></div>
-      <div class="leak-meta">
-        <div class="mini-metric"><div class="mini-label">Frequência</div><div class="mini-value">${x.freq}</div></div>
-        <div class="mini-metric"><div class="mini-label">Impacto</div><div class="mini-value">${x.impact}</div></div>
-        <div class="mini-metric"><div class="mini-label">Contexto</div><div class="mini-value" style="font-size:14px">${x.context}</div></div>
-      </div>
-      <div class="recommend">${x.rec}</div>
-    </div>`).join("") || '<div class="body-copy">Nenhum leak nesta faixa.</div>';
+  const rows=getDynamicLeaks().filter(x=>filter==="all"||x.level===filter);
+  const host=document.getElementById("leakList");if(!host)return;
+  host.innerHTML=rows.map(x=>`<div class="leak">
+    <div class="leak-top"><div><div class="feature-meta">${x.area}</div><div class="leak-title">${x.title}</div></div><div class="severity">${x.level}</div></div>
+    <div class="leak-meta"><div class="mini-metric"><div class="mini-label">Amostra</div><div class="mini-value">${x.freq}</div></div><div class="mini-metric"><div class="mini-label">Impacto</div><div class="mini-value">${x.impact}</div></div><div class="mini-metric"><div class="mini-label">Score</div><div class="mini-value">${x.score}/100</div></div></div>
+    <div class="recommend">${x.rec}</div>
+  </div>`).join("")||'<div class="body-copy">Nenhum leak com amostra suficiente nesta faixa.</div>';
+}
+function scenarioBucket(decision,key){
+  const ctx=decision?.context_snapshot||decision||{};
+  if(key==="position")return ctx.hero_position||decision.hero_position||"—";
+  if(key==="stack"){const s=Number(ctx.effective_stack_bb??decision.effective_stack_bb);return !Number.isFinite(s)?"—":s<20?"<20bb":s<30?"20–29bb":s<50?"30–49bb":s<80?"50–79bb":"80bb+";}
+  if(key==="street")return String(ctx.street||decision.street||"—").toUpperCase();
+  if(key==="phase")return String(ctx.tournament_phase||"SEM FASE").toUpperCase();
+  if(key==="pressure"){const p=Number(ctx.icm_pressure||0);return p>=70?"ALTA":p>=40?"MÉDIA":"BAIXA";}
+  if(key==="opponent")return String(ctx.opponent_profile||"SEM PERFIL").toUpperCase();
+  return "—";
+}
+function buildScenarioGroups(key){
+  const history=getSpotDecisionHistory().filter(d=>Number.isFinite(Number(d?.decision_quality?.metrics?.decisionQuality)));
+  const map=new Map();
+  history.forEach(d=>{
+    const bucket=scenarioBucket(d,key);
+    if(!map.has(bucket))map.set(bucket,[]);
+    map.get(bucket).push(Number(d.decision_quality.metrics.decisionQuality));
+  });
+  return [...map.entries()].map(([label,values])=>[label,clamp100(values.reduce((s,v)=>s+v,0)/values.length),`n=${values.length}`]).sort((a,b)=>b[1]-a[1]);
 }
 function renderScenarios(filter="all"){
-  const entries=Object.entries(scenarioData).filter(([key])=>filter==="all"||key===filter);
-  document.getElementById("scenarioStack").innerHTML=entries.map(([key,group])=>`
-    <section class="scenario-section" data-scenario="${key}">
-      <div class="scenario-head"><div class="scenario-name">${group.title}</div><div class="scenario-desc">${group.desc}</div></div>
-      <div class="scenario-grid">${group.items.map(([label,score,note])=>`
-        <div class="scenario-cell"><span>${label}</span><strong>${score}</strong><em>${note}</em></div>`).join("")}
-      </div>
-    </section>`).join("");
+  const entries=Object.entries(SCENARIO_META).filter(([key])=>filter==="all"||key===filter);
+  const host=document.getElementById("scenarioStack");if(!host)return;
+  host.innerHTML=entries.map(([key,meta])=>{
+    const items=buildScenarioGroups(key);
+    return `<section class="scenario-section" data-scenario="${key}"><div class="scenario-head"><div class="scenario-name">${meta.title}</div><div class="scenario-desc">${meta.desc}</div></div><div class="scenario-grid">${items.length?items.map(([label,score,note])=>`<div class="scenario-cell"><span>${label}</span><strong>${score}</strong><em>${note}</em></div>`).join(""):'<div class="scenario-cell"><span>SEM AMOSTRA</span><strong>—</strong><em>aguardando decisões</em></div>'}</div></section>`;
+  }).join("");
 }
 function renderPatterns(){
-  document.getElementById("patternList").innerHTML=patterns.map(([t,n])=>`
-    <div class="feature-line"><div><div class="feature-title">${t}</div><div class="feature-note">${n}</div></div></div>`).join("");
+  const history=getSpotDecisionHistory();
+  const host=document.getElementById("patternList");if(!host)return;
+  if(!history.length){host.innerHTML='<div class="body-copy">Aguardando decisões para identificar padrões recorrentes.</div>';return;}
+  const counts={};history.forEach(d=>{const a=String(d.action||"—").toUpperCase();counts[a]=(counts[a]||0)+1;});
+  const dominant=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  const profile=getUnifiedPlayerProfile();
+  const efficient=history.filter(d=>/EFICIENTE|COERENTE/.test(String(d?.decision_quality?.aggressionClass||""))).length;
+  const excessive=history.filter(d=>/EXCESSIVA/.test(String(d?.decision_quality?.aggressionClass||""))).length;
+  const items=[
+    [`Ação mais frequente: ${dominant?.[0]||"—"}`,`${dominant?.[1]||0} de ${history.length} decisões`],
+    ["Qualidade média das decisões",`${profile.decisionQualityAverage??"—"}/100`],
+    ["Agressividade eficiente/coerente",`${efficient} decisões`],
+    ["Agressividade potencialmente excessiva",`${excessive} decisões`],
+    ["Cobertura por solver",`${profile.solverValidated} de ${history.length} decisões validadas`]
+  ];
+  host.innerHTML=items.map(([t,n])=>`<div class="feature-line"><div><div class="feature-title">${t}</div><div class="feature-note">${n}</div></div></div>`).join("");
 }
+
 
 const FOOTER_PAGES=["home","dna","spots","analysis","profile"];
 let pageTransitioning=false;
@@ -1130,6 +1240,7 @@ function showScreen(name,direction=0){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
   window.scrollTo({top:0,behavior:"auto"});
   history.replaceState({screen:name},"","#"+name);
+  renderUnifiedProfileViews();
   pageTransitioning=false;
 }
 document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{
@@ -1268,16 +1379,7 @@ function getSpotDecisionHistory(){
   }catch{return []}
 }
 
-const ACTION_PROFILE_META=[
-  ["aggression","AGRESSIVIDADE"],
-  ["discipline","DISCIPLINA"],
-  ["riskControl","CONTROLE DE RISCO"],
-  ["patience","PACIÊNCIA"],
-  ["pressure","PRESSÃO"],
-  ["adaptability","ADAPTABILIDADE"],
-  ["positionalAwareness","CONSCIÊNCIA POSICIONAL"],
-  ["bluffTendency","TENDÊNCIA AO BLEFE"]
-];
+const ACTION_PROFILE_META=PLAYER_INDICATORS.map(x=>[x.key,x.label]);
 const ACTION_PROFILE_LABELS=Object.fromEntries(ACTION_PROFILE_META);
 const clamp100=v=>Math.max(0,Math.min(100,Math.round(Number(v)||0)));
 
@@ -1426,6 +1528,52 @@ function renderDecisionQuality(evaluation){
   if(read)read.textContent=`${evaluation.aggressionClass}. ${evaluation.solver?`EV escolhido ${evaluation.solver.chosen_ev_bb.toFixed(2)}bb · melhor EV ${evaluation.solver.best_ev_bb.toFixed(2)}bb · perda ${evaluation.solver.ev_loss_bb.toFixed(2)}bb.`:"O EV não é afirmado sem referência de solver validada; posição, stack, sizing, pressão e matemática objetiva entram na leitura contextual."}`;
 }
 
+function buildCanonicalDecisionSignals(base,evaluation,context,action,amount=0){
+  const q=evaluation?.metrics?.decisionQuality??null;
+  const street=String(context?.street||"").toLowerCase();
+  const phase=String(context?.tournament_phase||"").toLowerCase();
+  const opponent=String(context?.opponent_profile||"unknown").toLowerCase();
+  const isRiver=street==="river";
+  const pressureReactivity=evaluation?clamp100(100-(evaluation.metrics.pressureControl??50)):base.pressure;
+  const positional=evaluation?clamp100(((base.positionalAwareness??70)+(evaluation.metrics.positionFit??70))/2):base.positionalAwareness;
+  const risk=evaluation?clamp100(((base.riskControl??70)+(evaluation.metrics.stackAwareness??70))/2):base.riskControl;
+  const discipline=evaluation?clamp100(((base.discipline??70)+(evaluation.metrics.rangeDiscipline??70))/2):base.discipline;
+  const adaptability=evaluation?clamp100(((base.adaptability??70)+(q??70))/2):base.adaptability;
+  const signals={
+    aggression:base.aggression,
+    bluffTendency:base.bluffTendency,
+    pressure:pressureReactivity,
+    patience:base.patience,
+    discipline,
+    riskControl:risk,
+    adaptability,
+    decisionConsistency:q,
+    rangeDiscipline:evaluation?.metrics?.rangeDiscipline??null,
+    positionalAwareness:positional,
+    opponentAdaptation:opponent!=="unknown"&&opponent!=="sem perfil"?q:null,
+    blockerAwareness:Number.isFinite(Number(context?.blocker_relevance))?clamp100(context.blocker_relevance):null,
+    sizingQuality:evaluation?.metrics?.sizingQuality??null,
+    stackManagement:evaluation?.metrics?.stackAwareness??null,
+    potOddsAwareness:action==="call"?(evaluation?.metrics?.mathAwareness??null):null,
+    mathAwareness:evaluation?.metrics?.mathAwareness??null,
+    decisionQuality:q,
+    raiseSelection:action==="raise"?q:null,
+    callSelection:action==="call"?q:null,
+    foldSelection:action==="fold"?q:null,
+    allInSelection:action==="allin"?q:null,
+    preflopControl:street==="pre-flop"||street==="preflop"?q:null,
+    flopControl:street==="flop"?q:null,
+    turnControl:street==="turn"?q:null,
+    riverControl:street==="river"?q:null,
+    showdownDiscipline:isRiver&&["call","fold"].includes(action)?q:null,
+    icmAwareness:(Number(context?.icm_pressure||0)>=40||["bubble","late","final table","final_table"].includes(phase))?evaluation?.metrics?.pressureControl??q:null,
+    tournamentPhaseAdaptation:phase?q:null,
+    boardTextureReading:["flop","turn","river"].includes(street)?q:null,
+    valueExtraction:["raise","call"].includes(action)?q:null
+  };
+  return Object.fromEntries(PLAYER_INDICATORS.map(def=>[def.key,Number.isFinite(Number(signals[def.key]))?clamp100(signals[def.key]):null]));
+}
+
 function buildActionProfile(action,amount=0,evaluation=null){
   let scores,comment;
   if(action==="fold"){
@@ -1460,7 +1608,9 @@ function buildActionProfile(action,amount=0,evaluation=null){
     comment="Ação registrada. O HEROES incorporará este sinal à amostra comportamental.";
   }
   const base={scores:Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,clamp100(v)])),comment};
-  return evaluation?enrichProfileWithDecisionQuality(base,evaluation):base;
+  const enriched=evaluation?enrichProfileWithDecisionQuality(base,evaluation):base;
+  const context=arguments.length>3&&arguments[3]?arguments[3]:getCurrentSpotContext();
+  return {scores:buildCanonicalDecisionSignals(enriched.scores,evaluation,context,action,amount),comment:enriched.comment};
 }
 function renderActionProfile(profile,label){
   const box=document.getElementById("actionAnalysis");
@@ -1472,61 +1622,91 @@ function renderActionProfile(profile,label){
   if(title)title.textContent=label||"Perfil da decisão";
   if(comment)comment.textContent=profile.comment;
   if(list)list.innerHTML=ACTION_PROFILE_META.map(([key,name])=>{
-    const score=clamp100(profile.scores?.[key]);
+    const raw=profile.scores?.[key];
+    const has=Number.isFinite(Number(raw));
+    const score=has?clamp100(raw):0;
     return `<div class="profile-indicator">
       <div class="profile-indicator-main">
         <div class="profile-indicator-name">${name}</div>
         <div class="profile-indicator-track"><span style="--score:${score}%"></span></div>
       </div>
-      <div class="profile-indicator-score">${score}</div>
+      <div class="profile-indicator-score">${has?score:"—"}</div>
     </div>`;
   }).join("");
 }
-function getAggregatedActionProfile(){
-  const history=getSpotDecisionHistory().filter(x=>x&&x.profile_signals);
-  const totals=Object.fromEntries(ACTION_PROFILE_META.map(([key])=>[key,0]));
-  history.forEach(d=>ACTION_PROFILE_META.forEach(([key])=>{totals[key]+=clamp100(d.profile_signals?.[key])}));
-  const averages={};
-  ACTION_PROFILE_META.forEach(([key])=>{
-    averages[key]=history.length?clamp100(totals[key]/history.length):({aggression:78,discipline:62,riskControl:68,patience:73,pressure:57,adaptability:84,positionalAwareness:81,bluffTendency:71}[key]||50);
+function getUnifiedPlayerProfile(filterFn=null){
+  const all=getSpotDecisionHistory().filter(x=>x&&x.profile_signals);
+  const history=filterFn?all.filter(filterFn):all;
+  const scores={},evidenceCounts={};
+  PLAYER_INDICATORS.forEach(def=>{
+    const values=history.map(d=>d.profile_signals?.[def.key]).filter(v=>Number.isFinite(Number(v))).map(Number);
+    evidenceCounts[def.key]=values.length;
+    if(!values.length){scores[def.key]=def.baseline;return;}
+    const avg=values.reduce((s,v)=>s+v,0)/values.length;
+    const weight=Math.min(.82,(values.length/40)*.82);
+    scores[def.key]=clamp100(def.baseline*(1-weight)+avg*weight);
   });
-  return {sampleSize:history.length,averages};
+
+  const qValues=history.map(d=>d?.decision_quality?.metrics?.decisionQuality).filter(v=>Number.isFinite(Number(v))).map(Number);
+  const decisionQualityAverage=qValues.length?clamp100(qValues.reduce((s,v)=>s+v,0)/qValues.length):null;
+  if(qValues.length>=2){
+    const mean=qValues.reduce((s,v)=>s+v,0)/qValues.length;
+    const variance=qValues.reduce((s,v)=>s+(v-mean)*(v-mean),0)/qValues.length;
+    const consistency=clamp100(100-Math.sqrt(variance)*2.2);
+    const def=PLAYER_INDICATOR_BY_KEY.decisionConsistency;
+    const weight=Math.min(.82,(qValues.length/40)*.82);
+    scores.decisionConsistency=clamp100(def.baseline*(1-weight)+consistency*weight);
+    evidenceCounts.decisionConsistency=qValues.length;
+  }
+
+  const solverValidated=history.filter(d=>d?.decision_quality?.solver?.validated).length;
+  const evidenceTotal=Object.values(evidenceCounts).reduce((s,v)=>s+v,0);
+  const possible=Math.max(1,history.length*PLAYER_INDICATORS.length);
+  const coverage=Math.round(Math.min(100,evidenceTotal/possible*100));
+  const sampleFactor=Math.min(1,history.length/60);
+  const solverFactor=history.length?solverValidated/history.length:0;
+  const confidence=clamp100(10+65*sampleFactor+15*(coverage/100)+10*solverFactor);
+  const updatedAt=history.map(d=>d.timestamp).filter(Boolean).sort().at(-1)||null;
+  return {version:"heroes-player-profile-v3",sampleSize:history.length,scores,evidenceCounts,decisionQualityAverage,solverValidated,coverage,confidence,updatedAt};
 }
+function persistUnifiedPlayerProfile(){
+  const profile=getUnifiedPlayerProfile();
+  store.set("heroes.playerProfile",JSON.stringify(profile));
+  store.set("heroes.actionProfile",JSON.stringify(profile));
+  return profile;
+}
+function getAggregatedActionProfile(){
+  const profile=getUnifiedPlayerProfile();
+  return {sampleSize:profile.sampleSize,averages:profile.scores,evidenceCounts:profile.evidenceCounts};
+}
+
 function buildActionProfileSummary(){
-  const profile=getAggregatedActionProfile();
-  const a=profile.averages;
-  const positiveKeys=["discipline","riskControl","patience","adaptability","positionalAwareness"];
-  const strengths=[...positiveKeys].sort((x,y)=>a[y]-a[x]).slice(0,2);
-  const leaks=[];
-  if(a.discipline<55)leaks.push("discipline");
-  if(a.riskControl<50)leaks.push("riskControl");
-  if(a.patience<50)leaks.push("patience");
-  if(a.aggression>88)leaks.push("aggression");
-  if(a.bluffTendency>82)leaks.push("bluffTendency");
-  if(!leaks.length)leaks.push(...positiveKeys.sort((x,y)=>a[x]-a[y]).slice(0,2));
-  const uniqLeaks=[...new Set(leaks)].slice(0,3);
+  const profile=getUnifiedPlayerProfile();
+  const qualityRanked=QUALITY_INDICATORS.filter(def=>(profile.evidenceCounts[def.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
+  const strengths=qualityRanked.slice(0,4);
+  const leaks=qualityRanked.slice(-4).reverse();
   const decisions=getSpotDecisionHistory().filter(x=>x&&x.decision_quality);
-  const qualities=decisions.map(x=>Number(x.decision_quality?.metrics?.decisionQuality)).filter(Number.isFinite);
-  const qualityAverage=qualities.length?clamp100(qualities.reduce((s,v)=>s+v,0)/qualities.length):null;
   const aggressionEfficient=decisions.filter(x=>/EFICIENTE|COERENTE/.test(String(x.decision_quality?.aggressionClass||""))).length;
   const aggressionExcessive=decisions.filter(x=>/EXCESSIVA/.test(String(x.decision_quality?.aggressionClass||""))).length;
-  const solverValidated=decisions.filter(x=>x.decision_quality?.solver?.validated).length;
-  const summary={
+  return {
     sample_size:profile.sampleSize,
-    averages:a,
-    strengths:strengths.map(key=>({key,label:ACTION_PROFILE_LABELS[key],score:a[key]})),
-    leaks:uniqLeaks.map(key=>({key,label:ACTION_PROFILE_LABELS[key],score:a[key]})),
-    decision_quality_average:qualityAverage,
+    averages:profile.scores,
+    evidence_counts:profile.evidenceCounts,
+    strengths:strengths.map(def=>({key:def.key,label:def.label,score:profile.scores[def.key]})),
+    leaks:leaks.map(def=>({key:def.key,label:def.label,score:profile.scores[def.key]})),
+    decision_quality_average:profile.decisionQualityAverage,
     aggression_quality:{efficient:aggressionEfficient,excessive:aggressionExcessive},
-    solver_validated_decisions:solverValidated,
-    updated_at:new Date().toISOString(),
-    version:"action-profile-v2"
+    solver_validated_decisions:profile.solverValidated,
+    confidence:profile.confidence,
+    coverage:profile.coverage,
+    updated_at:profile.updatedAt,
+    version:"heroes-player-profile-v3"
   };
-  return summary;
 }
 function persistActionProfileSummary(){
+  persistUnifiedPlayerProfile();
   const summary=buildActionProfileSummary();
-  store.set("heroes.actionProfile",JSON.stringify(summary));
+  store.set("heroes.profileSummary",JSON.stringify(summary));
   return summary;
 }
 function renderSwot(){
@@ -1543,9 +1723,7 @@ function renderSwot(){
   if(summary.aggression_quality.excessive>=2)weak.push(`Agressividade potencialmente excessiva em ${summary.aggression_quality.excessive} decisões`);
   if(summary.decision_quality_average!==null&&summary.decision_quality_average<55)weak.push(`Qualidade média das decisões ${summary.decision_quality_average}/100`);
   const opportunities=[];
-  if(a.discipline<70)opportunities.push("Treinar disciplina em potes grandes e decisões de alta pressão.");
-  if(a.riskControl<70)opportunities.push("Refinar seleção de sizings para preservar EV e stack.");
-  if(a.positionalAwareness<80)opportunities.push("Aumentar consciência de ranges por posição.");
+  summary.leaks.slice(0,3).forEach(x=>opportunities.push(`Criar bloco de treino direcionado para ${x.label.toLowerCase()} (atual ${x.score}/100).`));
   if(summary.solver_validated_decisions<summary.sample_size)opportunities.push("Ampliar a cobertura de spots com referência de solver para transformar sinais contextuais em leitura objetiva de EV.");
   if(!opportunities.length)opportunities.push("Aprofundar adaptação contra perfis de oponentes e texturas diferentes.");
   const threats=[];
@@ -1759,7 +1937,7 @@ function recordSpotDecision(action,amount,button){
   const label=action==="raise"&&amount?`RAISE ${amount}bb`:action==="allin"?"ALL IN":action.toUpperCase();
   const context=getCurrentSpotContext();
   const evaluation=evaluateDecisionContext(action,amount,context);
-  const profile=buildActionProfile(action,amount,evaluation);
+  const profile=buildActionProfile(action,amount,evaluation,context);
   const decision={
     spot_id:context.spot_id||`heroes_spot_${currentSpotSequence}`,
     solve_id:context.solve_id||null,
@@ -1804,6 +1982,10 @@ function recordSpotDecision(action,amount,button){
   renderActionProfile(profile,`${label} · PERFIL DA AÇÃO`);
   renderDecisionQuality(evaluation);
   renderDNA();
+  renderUnifiedProfileViews();
+  renderLeaks(document.querySelector("#leakFilters .filter.active")?.dataset.filter||"all");
+  renderScenarios(document.querySelector("#analysisFilters .filter.active")?.dataset.scenarioFilter||"all");
+  renderPatterns();
   renderSwot();
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.classList.toggle("selected",btn===button);btn.disabled=true});
   if(spotDecisionText)spotDecisionText.textContent=`${label} registrado`;
@@ -1818,6 +2000,8 @@ pokerActions?.addEventListener("click",e=>{
 nextSpotBtn?.addEventListener("click",()=>loadNextSolvedSpot());
 
 window.StackUpHeroesDecisionEngine=Object.freeze({
+  indicators:PLAYER_INDICATORS,
+  profile:getUnifiedPlayerProfile,
   evaluate:evaluateDecisionContext,
   currentContext:getCurrentSpotContext,
   potOddsRequired,
@@ -1828,7 +2012,7 @@ window.StackUpHeroesDecisionEngine=Object.freeze({
     actions:[{key:"fold",ev_bb:0,frequency:.1},{key:"call",ev_bb:.2,frequency:.5},{key:"raise:12",ev_bb:.3,frequency:.4}]
   }
 });
-renderDNA();renderLeaks();renderScenarios();renderPatterns();renderSwot();
+renderDNA();renderUnifiedProfileViews();renderLeaks();renderScenarios();renderPatterns();renderSwot();
 loadNextSolvedSpot();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
 setTimeout(()=>document.getElementById("splash").classList.add("hidden"),650);
