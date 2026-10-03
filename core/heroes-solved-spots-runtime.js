@@ -1,0 +1,21 @@
+/* StackUp Hold'em HEROES — solved spot runtime v1 */
+(function(global){
+'use strict';
+const BANKS=Object.freeze({preflop:'data/solver/heroes/preflop-v1.json',flop:'data/solver/heroes/flop-v1.json',turn:'data/solver/heroes/turn-v1.json',river:'data/solver/heroes/river-v1.json'});
+const TOTALS=Object.freeze({preflop:5000,flop:3000,turn:3000,river:3000});
+const SEEN_KEY='heroes.solvedSpotSeen.v1';
+const cache=new Map();
+function randomInt(max){if(max<=1)return 0;try{const x=new Uint32Array(1);global.crypto.getRandomValues(x);return x[0]%max}catch(_){return Math.floor(Math.random()*max)}}
+function normalizeStreet(value){const s=String(value||'').toLowerCase().replace(/[^a-z]/g,'');if(s==='preflop'||s==='pre')return'preflop';if(s==='flop')return'flop';if(s==='turn')return'turn';if(s==='river')return'river';return null}
+function emptySeen(){return{preflop:[],flop:[],turn:[],river:[]}}
+function readSeen(){try{const raw=global.localStorage.getItem(SEEN_KEY);const data=raw?JSON.parse(raw):{};return Object.fromEntries(Object.keys(TOTALS).map(k=>[k,Array.isArray(data[k])?data[k]:[]]))}catch(_){return emptySeen()}}
+function writeSeen(data){try{global.localStorage.setItem(SEEN_KEY,JSON.stringify(data))}catch(_){}}
+async function getJson(path){const attempts=[path];if(global.location?.hostname==='htmlpreview.github.io')attempts.push('https://raw.githubusercontent.com/SkyareCom/stackup.holdem-heroes/work/heroes-playstore-foundation/'+path);let last;for(const url of attempts){try{const res=await fetch(url,{cache:'force-cache'});if(res.ok)return await res.json();last=new Error('HTTP '+res.status+' for '+url)}catch(err){last=err}}throw last||new Error('unable to load solved spot bank')}
+function flatten(bank){const out=[];for(const spot of bank.spots||[])for(const entry of spot.strategy||[])out.push(Object.freeze({id:entry.solvedDecisionId,family:entry.family||'GENERAL',sourceBank:spot.sourceBank||null,spot:Object.freeze({...spot,strategy:[entry]}),entry}));return out}
+async function loadStreet(street){const key=normalizeStreet(street);if(!key||!BANKS[key])throw new Error('invalid street bank: '+street);if(cache.has(key))return cache.get(key);const bank=await getJson(BANKS[key]);if(bank.mode!=='STRICT_SOLVED_ONLY')throw new Error('bank is not strict solved-only');const flat=flatten(bank);if(flat.length!==TOTALS[key])throw new Error('bank count mismatch for '+key+': '+flat.length);const value=Object.freeze({bank,flat});cache.set(key,value);return value}
+function chooseStreet(seen){const weighted=[];let total=0;for(const [street,count] of Object.entries(TOTALS)){const remaining=Math.max(0,count-(seen[street]?.length||0));if(remaining>0){weighted.push([street,remaining]);total+=remaining}}if(!total)return null;let pick=randomInt(total);for(const [street,w] of weighted){if(pick<w)return street;pick-=w}return weighted[weighted.length-1][0]}
+function progress(){const seen=readSeen();const byStreet={};let viewed=0;for(const [street,total] of Object.entries(TOTALS)){const n=Math.min(total,seen[street]?.length||0);byStreet[street]={viewed:n,total,remaining:total-n};viewed+=n}return Object.freeze({viewed,total:14000,remaining:14000-viewed,byStreet})}
+async function next(options){const opt=options||{};let seen=readSeen();let street=normalizeStreet(opt.street)||chooseStreet(seen);if(!street){seen=emptySeen();writeSeen(seen);street=normalizeStreet(opt.street)||chooseStreet(seen)}const loaded=await loadStreet(street);let seenSet=new Set(seen[street]||[]);let pool=loaded.flat.filter(x=>!seenSet.has(x.id)&&(!opt.family||x.family===opt.family));if(!pool.length){if(opt.family)throw new Error('family exhausted: '+opt.family);seen[street]=[];seenSet=new Set();pool=loaded.flat}const item=pool[randomInt(pool.length)];seen[street].push(item.id);writeSeen(seen);const view=global.StackUpSpotsEngine?.toViewModel?global.StackUpSpotsEngine.toViewModel(item.spot,{positions:item.spot.scenario?.positions||[]}):null;return Object.freeze({...item,street,view,progress:progress()})}
+function reset(){try{global.localStorage.removeItem(SEEN_KEY)}catch(_){}return progress()}
+global.HeroesSolvedSpots=Object.freeze({VERSION:'1.0.0',BANKS,TOTALS,next,progress,reset,loadStreet});
+})(window);

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "product": "HEROES",
+  "mode": "STRICT_SOLVED_ONLY",
+  "generatedAt": "2026-10-02",
+  "countingUnit": "ONE_VALIDATED_SOLVER_DECISION_PER_SCENARIO_AND_HAND",
+  "totalValidatedSolvedDecisions": 14000,
+  "noRepeatPolicy": "PERSISTENT_WITHOUT_REPLACEMENT_UNTIL_BANK_EXHAUSTION",
+  "streetTargets": {
+    "preflop": 5000,
+    "flop": 3000,
+    "turn": 3000,
+    "river": 3000
+  },
+  "streetWeights": {
+    "preflop": 0.3571428571,
+    "flop": 0.2142857143,
+    "turn": 0.2142857143,
+    "river": 0.2142857143
+  },
+  "preflopDistribution": {
+    "MULTIWAY_ALLIN": 300,
+    "ICM_PKO": 500,
+    "SHOVE_RESHOVE": 900,
+    "SQUEEZE_LIMP_ISO": 500,
+    "BLIND_WAR_HU": 500,
+    "THREEBET_4BET": 900,
+    "VS_RFI": 700,
+    "RFI": 700
+  },
+  "postflopDistribution": {
+    "flop": {
+      "TEXTURE_SIZING": 1200,
+      "GENERAL_HU": 1800
+    },
+    "turn": {
+      "GENERAL_HU": 3000
+    },
+    "river": {
+      "MULTIWAY": 500,
+      "GENERAL_HU": 2500
+    }
+  },
+  "sourceRepository": "SkyareCom/stackup.holdem-grinder.evo",
+  "sourceBranch": "main",
+  "sourceBlobs": {
+    "preflop9max": "34f1f8568c0e75c1d3ec45cb597e7ac335f86567",
+    "tournament": "7ffd453c5e4e453c26a5387824fc7d4a7ec99533",
+    "multiwayTournament": "e53b7bf36e6dd8ca681855997d3d689163ce88d2",
+    "postflop": "b76137aeb002aabb2a3d488ab7485eacf874cd43",
+    "textureSizing": "a73a8ea20d3a4e00654291610a0fe23555987663",
+    "multiwayPostflop": "d4133b2ba397fd72d4795797288ee5d43c2c3e0f"
+  },
+  "core": {
+    "solvedSpotContractVersion": "1.0.0",
+    "primarySolver": "DCFR_SOLVER",
+    "productionUpstream": "exinori/DCFR-SOLVER",
+    "upstreamLicense": "MIT"
+  },
+  "validation": {
+    "preflop": {
+      "valid": 5000,
+      "invalid": 0,
+      "decisions": 5000,
+      "scenarios": 486,
+      "distribution": {
+        "MULTIWAY_ALLIN": 300,
+        "ICM_PKO": 500,
+        "SHOVE_RESHOVE": 900,
+        "SQUEEZE_LIMP_ISO": 500,
+        "BLIND_WAR_HU": 500,
+        "THREEBET_4BET": 900,
+        "VS_RFI": 700,
+        "RFI": 700
+      }
+    },
+    "flop": {
+      "valid": 3000,
+      "invalid": 0,
+      "decisions": 3000,
+      "scenarios": 56,
+      "distribution": {
+        "TEXTURE_SIZING": 1200,
+        "GENERAL_HU": 1800
+      }
+    },
+    "turn": {
+      "valid": 3000,
+      "invalid": 0,
+      "decisions": 3000,
+      "scenarios": 10,
+      "distribution": {
+        "GENERAL_HU": 3000
+      }
+    },
+    "river": {
+      "valid": 3000,
+      "invalid": 0,
+      "decisions": 3000,
+      "scenarios": 40,
+      "distribution": {
+        "MULTIWAY": 500,
+        "GENERAL_HU": 2500
+      }
+    }
+  }
+}
