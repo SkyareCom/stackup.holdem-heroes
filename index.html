@@ -879,6 +879,41 @@ strong,b,em,i{
 .hero .indicator-class-title{font-size:10px}
 .pressure .indicator-groups{gap:18px}
 
+/* GAME FORMAT CONTROLS */
+.game-context-panel{
+  margin:18px 0 20px;padding:16px;
+  border:1px solid var(--line-1);border-radius:18px;
+  background:linear-gradient(155deg,rgba(50,20,25,.58),rgba(22,11,13,.78))
+}
+.game-context-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
+.game-context-title{font-size:16px;font-weight:600;color:var(--cream-2)}
+.game-format-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.game-format-btn{
+  min-height:44px;border:1px solid var(--line-1);border-radius:10px;
+  background:rgba(15,9,9,.58);color:var(--muted-1);
+  font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase
+}
+.game-format-btn.active{
+  border-color:var(--champ-1);background:rgba(168,111,82,.18);color:var(--champ-2)
+}
+.cash-settings{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.cash-settings[hidden]{display:none!important}
+.cash-field{display:grid;gap:6px}
+.cash-field label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
+.cash-field select{
+  width:100%;min-height:42px;padding:0 10px;
+  border:1px solid var(--line-1);border-radius:10px;
+  background:var(--bg-1);color:var(--cream-1);
+  font:inherit;font-size:12px;font-weight:400
+}
+.game-context-note{margin-top:10px;font-size:10px;line-height:1.45;color:var(--muted-2);text-transform:uppercase;letter-spacing:.05em}
+.setting-control{display:grid;gap:10px;padding:14px 0;border-top:1px solid var(--line-1)}
+.setting-control:first-child{border-top:0}
+.setting-control-title{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.setting-control-title strong{font-size:14px;font-weight:600;color:var(--cream-1)}
+.setting-control-title span{font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.08em}
+.money-bb{white-space:nowrap}
+
 /* HEROES TYPOGRAPHY SYSTEM 10/12/14/16/20 · 400/600
    Brand identity (logo / STACKUP HOLD'EM / HEROES / POKER DNA) is intentionally excluded. */
 html,body,#app,.app,button,input,select,textarea{font-weight:400}
@@ -1067,6 +1102,41 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
           <div class="section-kicker">TREINO DE SPOTS</div>
           <div class="archetype">Treine seus spots. Revele seu Poker DNA.</div>
           <div class="body-copy">Cada decisão ajuda o HEROES a reconhecer padrões, forças, leaks e mudanças de comportamento. O DNA Player evolui conforme a amostra cresce.</div>
+        </div>
+
+        <div class="game-context-panel" id="spotGameContext">
+          <div class="game-context-head">
+            <div>
+              <div class="section-kicker">CONTEXTO DA SESSÃO</div>
+              <div class="game-context-title">FORMATO DE JOGO</div>
+            </div>
+            <div class="mini-label" id="spotFormatStatus">TORNEIO</div>
+          </div>
+          <div class="game-format-grid" data-format-scope="spots">
+            <button class="game-format-btn active" type="button" data-game-format="MTT">TORNEIO</button>
+            <button class="game-format-btn" type="button" data-game-format="CASH">CASH GAME</button>
+          </div>
+          <div class="cash-settings" id="spotCashSettings" hidden>
+            <div class="cash-field">
+              <label for="spotCurrency">MOEDA</label>
+              <select id="spotCurrency">
+                <option value="BRL">BRL · R$</option>
+                <option value="USD">USD · $</option>
+                <option value="EUR">EUR · €</option>
+              </select>
+            </div>
+            <div class="cash-field">
+              <label for="spotStake">BLINDS</label>
+              <select id="spotStake">
+                <option value="2">1 / 2</option>
+                <option value="5">2 / 5</option>
+                <option value="10">5 / 10</option>
+                <option value="20">10 / 20</option>
+                <option value="50">25 / 50</option>
+              </select>
+            </div>
+          </div>
+          <div class="game-context-note" id="spotContextNote">MTT · STACKS E POTE EM BB / FICHAS DE REFERÊNCIA.</div>
         </div>
 
         <div class="spot-session-head">
@@ -1295,6 +1365,40 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
           </div>
         </div>
 
+        <div class="section" id="profileGamePreferences">
+          <div class="section-head"><div><div class="section-kicker">PREFERÊNCIAS DE JOGO</div><h2 class="section-title">CONTEXTO PRINCIPAL</h2></div></div>
+          <div class="game-context-panel">
+            <div class="setting-control">
+              <div class="setting-control-title"><strong>FORMATO DE JOGO</strong><span id="profileFormatStatus">TORNEIO</span></div>
+              <div class="game-format-grid" data-format-scope="profile">
+                <button class="game-format-btn active" type="button" data-game-format="MTT">TORNEIO</button>
+                <button class="game-format-btn" type="button" data-game-format="CASH">CASH GAME</button>
+              </div>
+            </div>
+            <div class="cash-settings" id="profileCashSettings" hidden>
+              <div class="cash-field">
+                <label for="profileCurrency">MOEDA</label>
+                <select id="profileCurrency">
+                  <option value="BRL">BRL · R$</option>
+                  <option value="USD">USD · $</option>
+                  <option value="EUR">EUR · €</option>
+                </select>
+              </div>
+              <div class="cash-field">
+                <label for="profileStake">BLINDS</label>
+                <select id="profileStake">
+                  <option value="2">1 / 2</option>
+                  <option value="5">2 / 5</option>
+                  <option value="10">5 / 10</option>
+                  <option value="20">10 / 20</option>
+                  <option value="50">25 / 50</option>
+                </select>
+              </div>
+            </div>
+            <div class="game-context-note" id="profileGameNote">TORNEIO: BB, FASE E ICM QUANDO APLICÁVEL.</div>
+          </div>
+        </div>
+
         <div class="section" id="profileActivity">
           <div class="section-head"><div><div class="section-kicker">ATIVIDADE SINCRONIZADA</div><h2 class="section-title">USO DO HEROES</h2></div></div>
           <div class="profile-grid" id="usageMetricsGrid"></div>
@@ -1310,7 +1414,7 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
         <div class="section">
           <div class="section-head"><div><div class="section-kicker">PERFIL</div><h2 class="section-title">Conta & histórico</h2></div></div>
           <div class="setting"><strong>Histórico de decisões</strong><span id="profileHistoryCount">0 analisadas</span></div>
-          <div class="setting"><strong>Preferências de análise</strong><span>MTT · NLH</span></div>
+          <div class="setting"><strong>Preferências de análise</strong><span id="analysisPreferenceSummary">MTT · NLH</span></div>
           <div class="setting"><strong>Privacidade</strong><span>Gerenciar</span></div>
           <div class="setting"><strong>Plano HEROES</strong><span>GRÁTIS</span></div>
           <div class="setting"><strong>StackUp ID</strong><span id="stackupIdentityStatus">Modo local</span></div>
@@ -1375,6 +1479,61 @@ migrateLegacyKey("heroes.lang","wraps.lang");
 migrateLegacyKey("heroes.session","wraps.session");
 if(!store.get("heroes.lang"))store.set("heroes.lang","pt");
 if(!store.get("heroes.session"))store.set("heroes.session",JSON.stringify({mode:"local",createdAt:new Date().toISOString()}));
+
+const GAME_PREF_KEY="heroes.gamePreferences.v1";
+function readGamePreferences(){
+  const fallback={format:"MTT",currency:"BRL",bbValue:2};
+  try{
+    const raw=store.get(GAME_PREF_KEY);
+    const parsed=raw?JSON.parse(raw):{};
+    return {
+      format:parsed.format==="CASH"?"CASH":"MTT",
+      currency:["BRL","USD","EUR"].includes(parsed.currency)?parsed.currency:"BRL",
+      bbValue:[2,5,10,20,50].includes(Number(parsed.bbValue))?Number(parsed.bbValue):2
+    };
+  }catch{return fallback}
+}
+function writeGamePreferences(next){
+  const prev=readGamePreferences();
+  const value={...prev,...next};
+  store.set(GAME_PREF_KEY,JSON.stringify(value));
+  return value;
+}
+function cashMoney(bb,prefs=readGamePreferences()){
+  const value=(Number(bb)||0)*(Number(prefs.bbValue)||2);
+  return new Intl.NumberFormat("pt-BR",{style:"currency",currency:prefs.currency,minimumFractionDigits:value%1?2:0,maximumFractionDigits:2}).format(value);
+}
+function displayStackValue(bb,prefs=readGamePreferences()){
+  const n=Number(bb)||0;
+  return prefs.format==="CASH"?`${cashMoney(n,prefs)} · ${n}bb`:`${n}bb`;
+}
+function displayActionValue(bb,prefs=readGamePreferences()){
+  const n=Number(bb)||0;
+  return prefs.format==="CASH"?`${cashMoney(n,prefs)} · ${n}bb`:`${n}bb`;
+}
+function syncGamePreferenceUI(){
+  const prefs=readGamePreferences();
+  document.querySelectorAll("[data-game-format]").forEach(btn=>btn.classList.toggle("active",btn.dataset.gameFormat===prefs.format));
+  ["spotFormatStatus","profileFormatStatus"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=prefs.format==="CASH"?"CASH GAME":"TORNEIO"});
+  ["spotCashSettings","profileCashSettings"].forEach(id=>{const el=document.getElementById(id);if(el)el.hidden=prefs.format!=="CASH"});
+  ["spotCurrency","profileCurrency"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=prefs.currency});
+  ["spotStake","profileStake"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=String(prefs.bbValue)});
+  const spotNote=document.getElementById("spotContextNote");
+  if(spotNote)spotNote.textContent=prefs.format==="CASH"
+    ?`CASH GAME · ${prefs.currency} · BB = ${cashMoney(1,prefs)} · MOEDA + BB NA MESA.`
+    :"MTT · STACKS E POTE EM BB / FICHAS DE REFERÊNCIA.";
+  const profileNote=document.getElementById("profileGameNote");
+  if(profileNote)profileNote.textContent=prefs.format==="CASH"
+    ?`CASH: ${prefs.currency} · BLINDS ${prefs.bbValue/2} / ${prefs.bbValue} · VALORES EM MOEDA + BB.`
+    :"TORNEIO: BB, FASE E ICM QUANDO APLICÁVEL.";
+  const summary=document.getElementById("analysisPreferenceSummary");
+  if(summary)summary.textContent=prefs.format==="CASH"?`CASH · NLH · ${prefs.currency} ${prefs.bbValue/2}/${prefs.bbValue}`:"MTT · NLH";
+}
+function rerenderCurrentSpotForPreferences(){
+  syncGamePreferenceUI();
+  if(currentSolvedSpot)renderSolvedSpot(currentSolvedSpot);
+}
+
 
 
 const heroesBridge=window.StackUpAppBridge?.create?.('heroes')||null;
@@ -2493,13 +2652,13 @@ function configureSolvedActions(entry){
   const jam=actions.find(a=>solverActionKind(a)==="jam")||null;
   const check=byKind("check"),call=byKind("call"),fold=byKind("fold");
   setActionButton("check",check,"CHECK",check?`${Number(check.frequency||0).toFixed(0)}% solver`:"indisponível");
-  setActionButton("call",call,"CALL",call?`${solverActionAmount(call)||""}bb · ${Number(call.frequency||0).toFixed(0)}%`:"indisponível");
+  setActionButton("call",call,"CALL",call?`${displayActionValue(solverActionAmount(call)||0)} · ${Number(call.frequency||0).toFixed(0)}%`:"indisponível");
   setActionButton("fold",fold,"FOLD",fold?`${Number(fold.frequency||0).toFixed(0)}% solver`:"indisponível");
   const r0=raises[0]||null,r1=raises[1]||null,r2=raises[2]||null;
-  setActionButton("raise",r0,"RAISE",r0?`${solverActionAmount(r0)}bb · mínimo`:"indisponível");
-  setActionButton("raise1",r1,r1?`RAISE ${solverActionAmount(r1)}bb`:"RAISE —",r1?"sugerido pelo solve":"indisponível");
-  setActionButton("raise2",r2,r2?`RAISE ${solverActionAmount(r2)}bb`:"RAISE —",r2?"sugerido pelo solve":"indisponível");
-  setActionButton("allin",jam,"ALL IN",jam?`${solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||""}bb · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
+  setActionButton("raise",r0,"RAISE",r0?`${displayActionValue(solverActionAmount(r0))} · mínimo`:"indisponível");
+  setActionButton("raise1",r1,r1?`RAISE ${displayActionValue(solverActionAmount(r1))}`:"RAISE —",r1?"sugerido pelo solve":"indisponível");
+  setActionButton("raise2",r2,r2?`RAISE ${displayActionValue(solverActionAmount(r2))}`:"RAISE —",r2?"sugerido pelo solve":"indisponível");
+  setActionButton("allin",jam,"ALL IN",jam?`${displayActionValue(solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||0)} · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
 }
 function renderSolvedSeats(item){
   const view=item.view||{};
@@ -2513,7 +2672,7 @@ function renderSolvedSeats(item){
     seat.classList.toggle("inactive-seat",!isActive);
     seat.classList.toggle("hero-position-seat",isHero);
     const stack=seat.querySelector(".seat-stack");
-    if(stack)stack.textContent=isActive?`${Number((view.stackForPosition?.[pos]??scenario.effectiveStack) || 0)}bb`:"—";
+    if(stack)stack.textContent=isActive?displayStackValue(Number((view.stackForPosition?.[pos]??scenario.effectiveStack) || 0)):"—";
     seat.querySelector(".bet-chip")?.remove();
   });
   const last=[...(scenario.actionHistory||[])].reverse().find(a=>a?.position&&a.position!==view.heroPosition);
@@ -2521,7 +2680,7 @@ function renderSolvedSeats(item){
     const actor=document.querySelector(`.player-seat[data-seat-position="${last.position}"]`);
     const amount=Number(last.to??last.amount??scenario.currentBet);
     if(actor&&Number.isFinite(amount)&&amount>0){
-      const chip=document.createElement("div");chip.className="bet-chip";chip.textContent=`${amount}bb`;actor.appendChild(chip);
+      const chip=document.createElement("div");chip.className="bet-chip";chip.textContent=displayActionValue(amount);actor.appendChild(chip);
     }
   }
 }
@@ -2540,10 +2699,13 @@ function renderSolvedSpot(item){
   const street=String(view.street||scenario.street||"").replace("PRE-FLOP","PRÉ-FLOP");
   const villain=view.villainPosition||scenario.villainPosition||"FIELD";
   if(spotSessionTitle)spotSessionTitle.textContent=`${street} · ${view.heroPosition||scenario.heroPosition||"HERO"} vs ${villain}`;
-  if(spotSessionCopy)spotSessionCopy.textContent=`${String(scenario.gameType||"MTT").replace("TOURNAMENT","MTT")} ${view.tableSize||scenario.tableSize||9}-max · ${Number(scenario.effectiveStack||0)}bb efetivos · ${FAMILY_LABELS[item.family]||item.family}`;
+  const prefs=readGamePreferences();
+  if(spotSessionCopy)spotSessionCopy.textContent=prefs.format==="CASH"
+    ?`CASH GAME ${view.tableSize||scenario.tableSize||9}-max · ${displayStackValue(Number(scenario.effectiveStack||0),prefs)} efetivos · ${FAMILY_LABELS[item.family]||item.family}`
+    :`${String(scenario.gameType||"MTT").replace("TOURNAMENT","MTT")} ${view.tableSize||scenario.tableSize||9}-max · ${Number(scenario.effectiveStack||0)}bb efetivos · ${FAMILY_LABELS[item.family]||item.family}`;
   if(spotNumber)spotNumber.textContent=`${item.progress.viewed.toLocaleString("pt-BR")} / 14.000`;
   if(spotDifficulty)spotDifficulty.textContent="SOLVED";
-  const pot=document.getElementById("spotPot");if(pot)pot.textContent=`${Number(view.pot||scenario.pot||0)}bb`;
+  const pot=document.getElementById("spotPot");if(pot)pot.textContent=displayStackValue(Number(view.pot||scenario.pot||0),prefs);
   const board=document.getElementById("boardCards");
   if(board){
     const cards=[...(view.board||scenario.board||[])];
@@ -2554,7 +2716,7 @@ function renderSolvedSpot(item){
     heroCardsBox.innerHTML=cards.slice(0,2).map(x=>cardHtml(x,"hero-card")).join("");
   }
   if(heroPositionLabel)heroPositionLabel.textContent=view.heroPosition||scenario.heroPosition||"HERO";
-  const hs=document.getElementById("heroStack");if(hs)hs.textContent=`${Number((view.stackForPosition?.[view.heroPosition]??scenario.heroStack??scenario.effectiveStack) || 0)}bb`;
+  const hs=document.getElementById("heroStack");if(hs)hs.textContent=displayStackValue(Number((view.stackForPosition?.[view.heroPosition]??scenario.heroStack??scenario.effectiveStack) || 0),prefs);
   renderSolvedSeats({...item,view});
   configureSolvedActions(item.entry);
   const ref=buildSolverReference(item);
@@ -2565,7 +2727,7 @@ function renderSolvedSpot(item){
     solver:item.spot?.solver||null,
     family:item.family,
     game:"NLH",
-    format:String(scenario.gameType||"MTT").includes("TOURNAMENT")?"MTT":String(scenario.gameType||""),
+    format:prefs.format,
     table_size:Number(view.tableSize||scenario.tableSize||9),
     street:String(view.street||scenario.street||"").toLowerCase(),
     hero_position:view.heroPosition||scenario.heroPosition,
@@ -2583,7 +2745,9 @@ function renderSolvedSpot(item){
   };
   currentSpotSequence=item.progress.viewed;
   if(spotDecisionText)spotDecisionText.textContent="Escolha sua ação.";
-  if(spotDecisionMeta)spotDecisionMeta.textContent="Spot solver-resolvido · decisão será incorporada ao DNA Player.";
+  if(spotDecisionMeta)spotDecisionMeta.textContent=prefs.format==="CASH"
+    ?"Modo Cash · valores convertidos pela stake selecionada; estratégia mantém referência técnica do solve em bb."
+    :"Spot solver-resolvido · decisão será incorporada ao DNA Player.";
   if(nextSpotBtn)nextSpotBtn.hidden=true;
   resetActionAnalysis();
 }
@@ -2606,7 +2770,7 @@ async function loadNextSolvedSpot(){
 }
 
 function recordSpotDecision(action,amount,button){
-  const label=action==="raise"&&amount?`RAISE ${amount}bb`:action==="allin"?"ALL IN":action.toUpperCase();
+  const label=action==="raise"&&amount?`RAISE ${displayActionValue(amount)}`:action==="allin"?"ALL IN":action.toUpperCase();
   const context=getCurrentSpotContext();
   const evaluation=evaluateDecisionContext(action,amount,context);
   const profile=buildActionProfile(action,amount,evaluation,context);
@@ -2671,6 +2835,18 @@ function recordSpotDecision(action,amount,button){
     :`Solve ${context.solve_id||"validado"} · estratégia validada incorporada; EV numérico indisponível.`;
   if(nextSpotBtn)nextSpotBtn.hidden=false;
 }
+document.querySelectorAll("[data-game-format]").forEach(btn=>btn.addEventListener("click",()=>{
+  writeGamePreferences({format:btn.dataset.gameFormat==="CASH"?"CASH":"MTT"});
+  rerenderCurrentSpotForPreferences();
+}));
+["spotCurrency","profileCurrency"].forEach(id=>document.getElementById(id)?.addEventListener("change",e=>{
+  writeGamePreferences({currency:e.target.value});rerenderCurrentSpotForPreferences();
+}));
+["spotStake","profileStake"].forEach(id=>document.getElementById(id)?.addEventListener("change",e=>{
+  writeGamePreferences({bbValue:Number(e.target.value)});rerenderCurrentSpotForPreferences();
+}));
+syncGamePreferenceUI();
+
 pokerActions?.addEventListener("click",e=>{
   const btn=e.target.closest("[data-action-slot]");
   if(!btn||btn.disabled)return;
