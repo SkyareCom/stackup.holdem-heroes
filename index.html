@@ -1573,6 +1573,7 @@ function trackUsage(type,details={}){
   state.recentEvents=[{type,at,details},...(state.recentEvents||[])].slice(0,200);
   writeJsonKey(USAGE_KEY,state);
   try{window.dispatchEvent(new CustomEvent("heroes:usage-updated",{detail:state}))}catch(_){}
+  try{setTimeout(()=>notifyHeroesDataUpdated("usage"),0)}catch(_){}
   return state;
 }
 function usageSnapshot(){
@@ -1948,6 +1949,7 @@ function persistUnifiedPlayerProfile(){
     }
   }catch(_){}
   try{window.dispatchEvent(new CustomEvent("heroes:profile-updated",{detail:profile}))}catch(_){}
+  try{setTimeout(()=>notifyHeroesDataUpdated("profile"),0)}catch(_){}
   return profile;
 }
 window.addEventListener("storage",e=>{
@@ -2287,8 +2289,44 @@ pokerActions?.addEventListener("click",e=>{
 nextSpotBtn?.addEventListener("click",()=>loadNextSolvedSpot());
 
 if(heroesBridge){
-  try{heroesBridge.send('capabilities','grinder',{product:'heroes',version:'3.0',produces:['player_profile','training_prescription'],accepts:['training_progress','training_completed'],profileIndicators:PLAYER_INDICATORS.map(x=>x.key)});}catch(_){}
+  try{heroesBridge.send('capabilities','grinder',{product:'heroes',version:'3.0',produces:['player_profile','training_prescription'],accepts:['training_progress','training_completed'],profileIndicators:PLAYER_INDICATORS.map(x=>x.key),playerStateSchema:"stackup-heroes-player-state/1.0"});}catch(_){}
 }
+function buildHeroesDataSnapshot(){
+  const profile=getUnifiedPlayerProfile();
+  const summary=buildActionProfileSummary();
+  const usage=usageSnapshot();
+  const identity=heroesBridge?.identity?.()||{};
+  return Object.freeze({
+    schema:"stackup-heroes-player-state",
+    version:"1.0",
+    generatedAt:new Date().toISOString(),
+    identity:{mode:identity.mode||"local",stackupUserId:identity.stackupUserId||null,deviceId:identity.deviceId||null},
+    profile,
+    summary,
+    usage:{
+      sessions:usage.sessions,
+      totals:{...(usage.state.totals||{})},
+      current:usage.current?{...usage.current}:null,
+      recentEvents:[...(usage.state.recentEvents||[])].slice(0,50)
+    },
+    solvedSpots:usage.runtime,
+    recentDecisions:getSpotDecisionHistory().slice(0,100),
+    trainingRecommendations:buildTrainingRecommendations()
+  });
+}
+function notifyHeroesDataUpdated(reason){
+  try{window.dispatchEvent(new CustomEvent("heroes:data-updated",{detail:{reason,snapshot:buildHeroesDataSnapshot()}}))}catch(_){}
+}
+window.StackUpHeroesData=Object.freeze({
+  VERSION:"1.0",
+  snapshot:buildHeroesDataSnapshot,
+  profile:getUnifiedPlayerProfile,
+  summary:buildActionProfileSummary,
+  usage:usageSnapshot,
+  recentDecisions:()=>getSpotDecisionHistory().slice(0,100),
+  recommendations:buildTrainingRecommendations
+});
+
 window.StackUpHeroesDecisionEngine=Object.freeze({
   indicators:PLAYER_INDICATORS,
   profile:getUnifiedPlayerProfile,
