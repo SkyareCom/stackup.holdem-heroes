@@ -163,12 +163,25 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
 .tab.active{color:var(--champ-1)}
 
 .splash{position:fixed;inset:0;z-index:100;background:
-radial-gradient(circle at 50% 17%,rgba(188,128,98,.14),transparent 31%),
-radial-gradient(circle at 50% 78%,rgba(64,25,30,.28),transparent 42%),
-linear-gradient(180deg,var(--bg-2),var(--bg-0));
+radial-gradient(circle at 50% 17%,rgba(188,128,98,.12),transparent 31%),
+radial-gradient(circle at 50% 78%,rgba(64,25,30,.24),transparent 42%),
+linear-gradient(180deg,rgba(22,11,13,.88),rgba(15,9,9,.96));
 display:flex;align-items:stretch;justify-content:center;
 padding:calc(18px + env(safe-area-inset-top)) 22px calc(16px + env(safe-area-inset-bottom));
 transition:opacity .45s ease,visibility .45s ease;overflow:auto}
+.splash::before{
+  content:"";position:absolute;inset:-28px;z-index:-2;
+  background-image:url('https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=1600&q=78');
+  background-size:cover;background-position:center 46%;
+  filter:blur(12px) grayscale(.18) saturate(.58) brightness(.42);
+  transform:scale(1.08)
+}
+.splash::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:
+    linear-gradient(180deg,rgba(15,9,9,.44) 0%,rgba(15,9,9,.64) 42%,rgba(15,9,9,.88) 100%),
+    radial-gradient(circle at 50% 18%,rgba(216,178,142,.08),transparent 34%)
+}
 .splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .splash-inner{
   width:min(420px,100%);
