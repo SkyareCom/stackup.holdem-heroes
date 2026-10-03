@@ -46,6 +46,9 @@ expect(html.includes('const FOOTER_PAGES=["home","dna","spots","analysis","profi
 expect(html.includes('mainView.addEventListener("touchstart"') && html.includes('mainView.addEventListener("touchmove"') && html.includes('mainView.addEventListener("touchend"'),'footer pages must support touch swipe navigation');
 expect(html.includes('mainView.addEventListener("mousedown"') && html.includes('window.addEventListener("mousemove"') && html.includes('window.addEventListener("mouseup"'),'footer pages must support mouse drag navigation');
 expect(html.includes('function beginPageSwipe') && html.includes('function movePageSwipe') && html.includes('function endPageSwipe'),'footer page swipe engine must exist');
+expect(html.includes('requestAnimationFrame(applyPageDrag)'),'footer swipe must use requestAnimationFrame');
+expect(!html.includes('active.style.opacity'),'footer swipe must not animate opacity during drag');
+expect(!html.includes('setTimeout(()=>showScreen'),'footer swipe must not delay page changes with setTimeout');
 expect(!html.includes('spotsScreen.addEventListener("touchstart"'),'legacy Spots-only swipe handler must be removed');
 expect(html.includes('data-photo-slot="home"'),'Premium background/photo slot missing');
 expect((html.match(/images\.unsplash\.com\/photo-/g)||[]).length >= 5,'expected at least 5 real photographic poker backgrounds');
