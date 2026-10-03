@@ -1012,13 +1012,35 @@ const patterns=[
 ];
 
 function renderDNA(){
-  document.getElementById("dnaList").innerHTML=dnaData.map(([n,s,c,b])=>`
+  const live=typeof getAggregatedActionProfile==="function"?getAggregatedActionProfile():{sampleSize:0,averages:{}};
+  const signalByTrait={
+    "AGRESSIVIDADE":"aggression",
+    "DISCIPLINA":"discipline",
+    "PACIÊNCIA":"patience",
+    "ADAPTABILIDADE":"adaptability",
+    "PRESSÃO":"pressure",
+    "CONTROLE DE RISCO":"riskControl",
+    "CONSCIÊNCIA POSICIONAL":"positionalAwareness",
+    "FREQUÊNCIA DE BLEFE":"bluffTendency"
+  };
+  const weight=Math.min(.72,(live.sampleSize||0)/40*.72);
+  document.getElementById("dnaList").innerHTML=dnaData.map(([n,baselineScore,copy,baseline])=>{
+    const signalKey=signalByTrait[n];
+    const liveScore=signalKey?Number(live.averages?.[signalKey]):NaN;
+    const score=Number.isFinite(liveScore)&&live.sampleSize
+      ?Math.round(baselineScore*(1-weight)+liveScore*weight)
+      :baselineScore;
+    const source=signalKey&&live.sampleSize
+      ?`DNA BASE ${baselineScore} · ${live.sampleSize} DECISÃO${live.sampleSize===1?"":"ÕES"} INCORPORADA${live.sampleSize===1?"":"S"}`
+      :baseline;
+    return `
     <div class="dna-row">
-      <div class="dna-row-top"><div class="dna-row-name">${n}</div><div class="dna-row-score">${s}</div></div>
-      <div class="microtrack"><span style="--v:${s}%"></span></div>
-      <div class="dna-row-copy">${c}</div>
-      <div class="baseline">${b}</div>
-    </div>`).join("");
+      <div class="dna-row-top"><div class="dna-row-name">${n}</div><div class="dna-row-score">${score}</div></div>
+      <div class="microtrack"><span style="--v:${score}%"></span></div>
+      <div class="dna-row-copy">${copy}</div>
+      <div class="baseline">${source}</div>
+    </div>`;
+  }).join("");
 }
 function renderLeaks(filter="all"){
   const rows=leaks.filter(x=>filter==="all"||x.level===filter);
@@ -1369,6 +1391,7 @@ function recordSpotDecision(action,amount,button){
   store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,500)));
   persistActionProfileSummary();
   renderActionProfile(profile,`${label} · PERFIL DA AÇÃO`);
+  renderDNA();
   renderSwot();
 
   document.querySelectorAll("[data-poker-action]").forEach(btn=>{
