@@ -399,6 +399,23 @@ strong,b,em,i{
   font-family:"Antic Slab",serif !important;
   font-style:normal !important;
 }
+
+/* Spots horizontal swipe pager */
+.spot-pager{width:100%;overflow:hidden;position:relative;touch-action:pan-y}
+.spot-track{display:flex;width:100%;will-change:transform;transform:translate3d(0,0,0);transition:transform .32s cubic-bezier(.22,.8,.25,1)}
+.spot-track.dragging{transition:none}
+.spot-page{flex:0 0 100%;width:100%;min-width:0;padding:0 1px}
+.spot-page .scenario-section{height:100%;margin:0}
+.spot-pager-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px}
+.spot-counter{font-size:11px;letter-spacing:.12em;color:var(--muted-1)}
+.spot-dots{display:flex;align-items:center;gap:8px}
+.spot-dot{width:7px;height:7px;border:0;border-radius:999px;padding:0;background:var(--muted-2);opacity:.45;transition:width .2s ease,opacity .2s ease,background .2s ease}
+.spot-dot.active{width:22px;opacity:1;background:var(--champ-1)}
+.spot-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.spot-actions .btn:disabled{opacity:.32;cursor:default}
+@media (prefers-reduced-motion:reduce){
+  .spot-track,.spot-dot{transition:none}
+}
 </style>
 </head>
 <body>
@@ -518,39 +535,61 @@ strong,b,em,i{
         </div>
         <div class="body-copy" style="margin-bottom:18px">Revise situações representativas do seu jogo e observe como posição, stack, street e pressão moldam seu perfil.</div>
 
-        <div class="scenario-stack">
-          <section class="scenario-section">
-            <div class="scenario-head">
-              <div class="scenario-name">BOLHA · BTN vs BB</div>
-              <div class="scenario-desc">22bb · MTT · decisão sob pressão</div>
-            </div>
-            <div class="scenario-grid">
-              <div class="scenario-cell"><span>DECISÃO</span><strong>Raise</strong><em>agressividade acima da baseline</em></div>
-              <div class="scenario-cell"><span>PRESSÃO</span><strong>82</strong><em>zona de maior variação</em></div>
-            </div>
-          </section>
+        <div class="spot-pager" id="spotPager" aria-label="Navegação entre spots">
+          <div class="spot-track" id="spotTrack">
+            <article class="spot-page" data-spot-page="0">
+              <section class="scenario-section">
+                <div class="scenario-head">
+                  <div class="scenario-name">BOLHA · BTN vs BB</div>
+                  <div class="scenario-desc">22bb · MTT · decisão sob pressão</div>
+                </div>
+                <div class="scenario-grid">
+                  <div class="scenario-cell"><span>DECISÃO</span><strong>Raise</strong><em>agressividade acima da baseline</em></div>
+                  <div class="scenario-cell"><span>PRESSÃO</span><strong>82</strong><em>zona de maior variação</em></div>
+                </div>
+              </section>
+            </article>
 
-          <section class="scenario-section">
-            <div class="scenario-head">
-              <div class="scenario-name">CO vs BTN · 40bb</div>
-              <div class="scenario-desc">pot 3-bet · adaptação posicional</div>
-            </div>
-            <div class="scenario-grid">
-              <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>linha dentro do padrão</em></div>
-              <div class="scenario-cell"><span>DISCIPLINA</span><strong>74</strong><em>boa manutenção de range</em></div>
-            </div>
-          </section>
+            <article class="spot-page" data-spot-page="1">
+              <section class="scenario-section">
+                <div class="scenario-head">
+                  <div class="scenario-name">CO vs BTN · 40bb</div>
+                  <div class="scenario-desc">pot 3-bet · adaptação posicional</div>
+                </div>
+                <div class="scenario-grid">
+                  <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>linha dentro do padrão</em></div>
+                  <div class="scenario-cell"><span>DISCIPLINA</span><strong>74</strong><em>boa manutenção de range</em></div>
+                </div>
+              </section>
+            </article>
 
-          <section class="scenario-section">
-            <div class="scenario-head">
-              <div class="scenario-name">BB · River</div>
-              <div class="scenario-desc">pote grande · decisão de showdown</div>
+            <article class="spot-page" data-spot-page="2">
+              <section class="scenario-section">
+                <div class="scenario-head">
+                  <div class="scenario-name">BB · River</div>
+                  <div class="scenario-desc">pote grande · decisão de showdown</div>
+                </div>
+                <div class="scenario-grid">
+                  <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>hero call acima do padrão</em></div>
+                  <div class="scenario-cell"><span>IMPACTO</span><strong>-7 EV</strong><em>spot ligado a leak recorrente</em></div>
+                </div>
+              </section>
+            </article>
+          </div>
+
+          <div class="spot-pager-meta">
+            <div class="spot-counter" id="spotCounter">1 / 3</div>
+            <div class="spot-dots" id="spotDots" aria-label="Posição atual">
+              <button class="spot-dot active" type="button" data-spot-index="0" aria-label="Spot 1"></button>
+              <button class="spot-dot" type="button" data-spot-index="1" aria-label="Spot 2"></button>
+              <button class="spot-dot" type="button" data-spot-index="2" aria-label="Spot 3"></button>
             </div>
-            <div class="scenario-grid">
-              <div class="scenario-cell"><span>DECISÃO</span><strong>Call</strong><em>hero call acima do padrão</em></div>
-              <div class="scenario-cell"><span>IMPACTO</span><strong>-7 EV</strong><em>spot ligado a leak recorrente</em></div>
-            </div>
-          </section>
+          </div>
+
+          <div class="spot-actions">
+            <button class="btn secondary" id="spotPrev" type="button">ANTERIOR</button>
+            <button class="btn primary" id="spotNext" type="button">PRÓXIMO</button>
+          </div>
         </div>
       </section>
 
@@ -787,6 +826,67 @@ document.getElementById("analyzeBtn").addEventListener("click",()=>openSheet("DN
 document.getElementById("dnaInfo").addEventListener("click",()=>openSheet("COMO O DNA FUNCIONA","O HEROES combina decisões, contexto, posição, stack, street, pressão e evolução histórica para formar um perfil dinâmico do jogador."));
 document.getElementById("closeSheet").addEventListener("click",()=>{closeSheet();showScreen("dna")});
 sheet.addEventListener("click",e=>{if(e.target===sheet)closeSheet()});
+
+
+const spotPager=document.getElementById("spotPager");
+const spotTrack=document.getElementById("spotTrack");
+const spotPages=[...document.querySelectorAll(".spot-page")];
+const spotDots=[...document.querySelectorAll(".spot-dot")];
+const spotCounter=document.getElementById("spotCounter");
+const spotPrev=document.getElementById("spotPrev");
+const spotNext=document.getElementById("spotNext");
+let spotIndex=0;
+let spotStartX=0;
+let spotDeltaX=0;
+let spotDragging=false;
+
+function renderSpotPager(animate=true){
+  if(!spotTrack||!spotPages.length)return;
+  spotTrack.classList.toggle("dragging",!animate);
+  spotTrack.style.transform=`translate3d(${-spotIndex*100}%,0,0)`;
+  if(spotCounter)spotCounter.textContent=`${spotIndex+1} / ${spotPages.length}`;
+  spotDots.forEach((dot,i)=>dot.classList.toggle("active",i===spotIndex));
+  if(spotPrev)spotPrev.disabled=spotIndex===0;
+  if(spotNext)spotNext.disabled=spotIndex===spotPages.length-1;
+}
+function goToSpot(index){
+  spotIndex=Math.max(0,Math.min(spotPages.length-1,index));
+  renderSpotPager(true);
+}
+if(spotPager&&spotTrack){
+  spotPager.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1)return;
+    spotDragging=true;
+    spotStartX=e.touches[0].clientX;
+    spotDeltaX=0;
+    spotTrack.classList.add("dragging");
+  },{passive:true});
+  spotPager.addEventListener("touchmove",e=>{
+    if(!spotDragging||e.touches.length!==1)return;
+    spotDeltaX=e.touches[0].clientX-spotStartX;
+    const width=spotPager.clientWidth||1;
+    const base=-spotIndex*width;
+    const edgeResistance=(spotIndex===0&&spotDeltaX>0)||(spotIndex===spotPages.length-1&&spotDeltaX<0);
+    const drag=edgeResistance?spotDeltaX*.28:spotDeltaX;
+    spotTrack.style.transform=`translate3d(${base+drag}px,0,0)`;
+  },{passive:true});
+  spotPager.addEventListener("touchend",()=>{
+    if(!spotDragging)return;
+    spotDragging=false;
+    const threshold=Math.min(70,(spotPager.clientWidth||1)*.18);
+    if(spotDeltaX<=-threshold)goToSpot(spotIndex+1);
+    else if(spotDeltaX>=threshold)goToSpot(spotIndex-1);
+    else renderSpotPager(true);
+    spotDeltaX=0;
+  },{passive:true});
+  spotPager.addEventListener("touchcancel",()=>{
+    spotDragging=false;spotDeltaX=0;renderSpotPager(true);
+  },{passive:true});
+}
+spotPrev?.addEventListener("click",()=>goToSpot(spotIndex-1));
+spotNext?.addEventListener("click",()=>goToSpot(spotIndex+1));
+spotDots.forEach(dot=>dot.addEventListener("click",()=>goToSpot(Number(dot.dataset.spotIndex))));
+renderSpotPager(false);
 
 renderDNA();renderLeaks();renderScenarios();renderPatterns();
 const initial=location.hash.replace("#","");if(["home","dna","spots","analysis","profile"].includes(initial))showScreen(initial);
