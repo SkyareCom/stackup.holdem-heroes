@@ -914,6 +914,50 @@ strong,b,em,i{
 .setting-control-title span{font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.08em}
 .money-bb{white-space:nowrap}
 
+/* ENTRY + ELEGANT COMPACT DASHBOARDS */
+.home-entry-grid{display:grid;gap:10px;margin-top:18px}
+.home-entry-card{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:14px;min-height:74px;padding:14px 16px;border:1px solid var(--line-1);border-radius:18px;background:linear-gradient(155deg,rgba(50,20,25,.62),rgba(22,11,13,.86));color:var(--cream-1);text-align:left}
+.home-entry-card strong{display:block;font-size:16px;font-weight:600;color:var(--cream-2)}
+.home-entry-card span{display:block;margin-top:4px;font-size:10px;line-height:1.35;color:var(--muted-1);text-transform:uppercase;letter-spacing:.06em}
+.home-entry-card b{font-size:20px;font-weight:400;color:var(--champ-1)}
+.home-status-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.home-status-item{padding:12px 10px;border:1px solid var(--line-1);border-radius:14px;background:rgba(15,9,9,.42)}
+.home-status-item span{display:block;font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.07em}
+.home-status-item b{display:block;margin-top:5px;font-size:16px;font-weight:600;color:var(--champ-1)}
+.compact-dashboard{display:grid;gap:16px;margin-top:14px}
+.dashboard-card{padding:16px;border:1px solid var(--line-1);border-radius:18px;background:linear-gradient(155deg,rgba(50,20,25,.58),rgba(22,11,13,.82))}
+.dashboard-top{display:grid;grid-template-columns:112px 1fr;gap:16px;align-items:center}
+.confidence-donut{--pct:0;width:108px;height:108px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--champ-1) calc(var(--pct)*1%),rgba(216,178,142,.10) 0)}
+.confidence-donut::before{content:"";grid-area:1/1;width:78px;height:78px;border-radius:50%;background:var(--bg-1);border:1px solid var(--line-1)}
+.confidence-donut-content{grid-area:1/1;z-index:1;text-align:center}
+.confidence-donut-content b{display:block;font-size:20px;font-weight:600;color:var(--cream-2)}
+.confidence-donut-content span{display:block;margin-top:2px;font-size:10px;letter-spacing:.08em;color:var(--muted-2);text-transform:uppercase}
+.dashboard-identity .archetype{font-size:20px;line-height:1.05}
+.dashboard-state{margin-top:7px;font-size:10px;line-height:1.4;color:var(--muted-1);text-transform:uppercase;letter-spacing:.07em}
+.dashboard-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dashboard-metric{padding:11px;border:1px solid var(--line-1);border-radius:12px;background:rgba(15,9,9,.34)}
+.dashboard-metric span{display:block;font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.06em}
+.dashboard-metric b{display:block;margin-top:5px;font-size:14px;font-weight:600;color:var(--cream-1)}
+.summary-bars{display:grid;gap:13px}
+.summary-bar-row{display:grid;gap:6px}
+.summary-bar-head{display:flex;justify-content:space-between;gap:12px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.summary-bar-head span{color:var(--muted-1)}
+.summary-bar-head b{color:var(--champ-1);font-weight:600}
+.summary-bar-track{height:6px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.summary-bar-track i{display:block;height:100%;width:var(--v);background:linear-gradient(90deg,var(--copper-1),var(--champ-1))}
+.sparkline-wrap{display:grid;gap:9px}
+.sparkline-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.sparkline-head span{font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.07em}
+.sparkline-head b{font-size:14px;font-weight:600;color:var(--cream-1)}
+.sparkline{width:100%;height:64px;display:block}
+.sparkline polyline{fill:none;stroke:var(--champ-1);stroke-width:2;vector-effect:non-scaling-stroke}
+.sparkline line{stroke:rgba(216,178,142,.10);stroke-width:1;vector-effect:non-scaling-stroke}
+.dna-summary-list{display:grid;gap:0}
+.dna-summary-row{padding:14px 0;border-bottom:1px solid var(--line-1);display:flex;justify-content:space-between;gap:14px}
+.dna-summary-row:last-child{border-bottom:0}
+.dna-summary-row span{font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.07em}
+.dna-summary-row b{font-size:14px;font-weight:600;color:var(--cream-1);text-align:right}
+
 /* HEROES TYPOGRAPHY SYSTEM 10/12/14/16/20 · 400/600
    Brand identity (logo / STACKUP HOLD'EM / HEROES / POKER DNA) is intentionally excluded. */
 html,body,#app,.app,button,input,select,textarea{font-weight:400}
@@ -1042,50 +1086,57 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
       <section id="home" class="screen active" data-screen="home">
         <div class="hero">
           <div class="photo-slot" data-photo-slot="home" style="background-image:url('https://images.unsplash.com/photo-1638057628438-4b42313f19e3?auto=format&fit=crop&w=1600&q=82')"></div>
-          <div class="eyebrow">SEU POKER DNA</div>
-          <h1 class="display-xl">Quem é você<br>como jogador hoje?</h1>
-          <p class="hero-copy" id="homeHeroCopy">Seu Poker DNA usa uma única base sincronizada em todo o HEROES.</p>
-
-          <div class="dna-grid" id="homeIndicatorGrid"></div>
-        </div>
-
-        <div class="section">
-          <div class="section-head">
-            <div><div class="section-kicker">ARQUÉTIPO ATUAL</div><h2 class="section-title">Sua identidade atual</h2></div>
-            <button class="section-link" data-go="dna">DNA completo</button>
-          </div>
-          <div class="editorial-panel">
-            <div class="archetype" id="homeArchetype">PERFIL EM EVOLUÇÃO</div>
-            <div class="body-copy" id="homeArchetypeCopy">Os mesmos indicadores são usados em todas as páginas e seções.</div>
-            <div class="secondary-tendencies" id="homeTendencies"></div>
+          <div class="eyebrow">HEROES</div>
+          <h1 class="display-xl">Descubra seu<br>Poker DNA.</h1>
+          <p class="hero-copy" id="homeHeroCopy">Treine decisões, acompanhe seu perfil e entenda como o seu jogo evolui.</p>
+          <div class="home-status-strip">
+            <div class="home-status-item"><span>DNA</span><b id="homeDnaState">EM CONSTRUÇÃO</b></div>
+            <div class="home-status-item"><span>DECISÕES</span><b id="homeDecisionCount">0</b></div>
+            <div class="home-status-item"><span>FORMATO</span><b id="homeGameFormat">MTT</b></div>
           </div>
         </div>
-
         <div class="section">
-          <div class="section-head"><div><div class="section-kicker">SINAIS DE HOJE</div><h2 class="section-title">O que define seu jogo agora</h2></div></div>
-          <div id="homeSignals"></div>
-
-          <div class="cta-row">
-            <button class="btn primary" id="analyzeBtn">ANALISAR MEU JOGO</button>
-            <button class="btn secondary" data-go="dna">VER DNA COMPLETO</button>
+          <div class="section-head"><div><div class="section-kicker">ENTRAR</div><h2 class="section-title">O QUE VOCÊ QUER FAZER?</h2></div></div>
+          <div class="home-entry-grid">
+            <button class="home-entry-card" type="button" data-go="spots"><div><strong>TREINAR SPOTS</strong><span>Decisões solver-resolvidas para alimentar seu Poker DNA.</span></div><b>›</b></button>
+            <button class="home-entry-card" type="button" data-go="analysis"><div><strong>ANALISAR MEU JOGO</strong><span>Veja os 30 indicadores, leaks, cenários e padrões.</span></div><b>›</b></button>
+            <button class="home-entry-card" type="button" data-go="dna"><div><strong>VER MEU POKER DNA</strong><span>Resumo do perfil, arquétipo e evolução atual.</span></div><b>›</b></button>
+            <button class="home-entry-card" type="button" data-go="profile"><div><strong>PERFIL & AJUSTES</strong><span>Formato de jogo, conta, histórico e preferências.</span></div><b>›</b></button>
           </div>
         </div>
       </section>
 
       <section class="screen" data-screen="dna">
         <div class="screen-visual" style="--photo:url('https://images.unsplash.com/photo-1780091891244-8e6d48ce53a4?auto=format&fit=crop&w=1600&q=82');--pos:center 58%">
-          <div class="screen-visual-content"><div class="section-kicker">PERFIL DE IDENTIDADE</div><div class="screen-visual-title">Seu jogo deixa uma assinatura.</div><div class="screen-visual-copy">Cartas, decisões e padrões formam um perfil que muda conforme você joga.</div></div>
+          <div class="screen-visual-content"><div class="section-kicker">PERFIL DE IDENTIDADE</div><div class="screen-visual-title">Seu jogo deixa uma assinatura.</div><div class="screen-visual-copy">Um resumo objetivo do jogador que está sendo construído pelas suas decisões.</div></div>
         </div>
         <div class="section-head">
           <div><div class="section-kicker">IDENTIDADE DO JOGADOR</div><h1 class="section-title">SEU POKER DNA</h1></div>
           <button class="section-link" id="dnaInfo">Como funciona</button>
         </div>
-        <div class="body-copy" style="margin-bottom:18px">Seu DNA é uma leitura dinâmica de padrões de decisão. Ele não é um rótulo fixo: muda conforme suas sessões revelam novos comportamentos.</div>
-        <div id="dnaList" class="dna-list"></div>
-
-        <div class="section">
-          <div class="section-head"><div><div class="section-kicker">EVOLUÇÃO DO PERFIL</div><h2 class="section-title">Mudanças recentes</h2></div></div>
-          <div id="dnaEvolution"></div>
+        <div class="compact-dashboard">
+          <div class="dashboard-card">
+            <div class="dashboard-top">
+              <div class="confidence-donut" id="dnaConfidenceDonut"><div class="confidence-donut-content"><b id="dnaConfidenceValue">0%</b><span>CONFIANÇA</span></div></div>
+              <div class="dashboard-identity">
+                <div class="section-kicker">ARQUÉTIPO ATUAL</div>
+                <div class="archetype" id="dnaArchetype">PERFIL EM FORMAÇÃO</div>
+                <div class="dashboard-state" id="dnaStateCopy">Complete mais decisões para formar uma leitura estável.</div>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <div class="section-kicker">LEITURA RÁPIDA</div>
+            <div class="summary-bars">
+              <div class="summary-bar-row"><div class="summary-bar-head"><span id="dnaStrengthLabel">FORÇA PRINCIPAL</span><b id="dnaStrengthScore">—</b></div><div class="summary-bar-track"><i id="dnaStrengthBar" style="--v:0%"></i></div></div>
+              <div class="summary-bar-row"><div class="summary-bar-head"><span id="dnaWeakLabel">PONTO DE ATENÇÃO</span><b id="dnaWeakScore">—</b></div><div class="summary-bar-track"><i id="dnaWeakBar" style="--v:0%"></i></div></div>
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <div class="sparkline-head"><span>EVOLUÇÃO RECENTE</span><b id="dnaTrendValue">SEM AMOSTRA</b></div>
+            <svg class="sparkline" id="dnaSparkline" viewBox="0 0 300 64" preserveAspectRatio="none" aria-label="Evolução recente"><line x1="0" y1="52" x2="300" y2="52"></line><line x1="0" y1="32" x2="300" y2="32"></line><polyline points="0,52 60,52 120,52 180,52 240,52 300,52"></polyline></svg>
+          </div>
+          <button class="btn primary" type="button" data-go="analysis">ABRIR ANÁLISE COMPLETA</button>
         </div>
       </section>
 
@@ -1357,11 +1408,21 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
           <div class="section-kicker">STACKUP ID</div>
           <div class="profile-name" id="profileName">Jogador local</div>
           <div class="profile-id" id="profileConfidenceLine">heroes / profile confidence —</div>
-          <div class="profile-grid">
-            <div class="profile-item"><div class="mini-label">PLANO</div><div class="mini-value" id="profilePlan">GRÁTIS</div></div>
-            <div class="profile-item"><div class="mini-label">DECISÕES ANALISADAS</div><div class="mini-value" id="profileDecisionCount">0</div></div>
-            <div class="profile-item"><div class="mini-label">CONFIANÇA DO DNA</div><div class="mini-value" id="profileConfidenceValue">—</div></div>
-            <div class="profile-item"><div class="mini-label">ÚLTIMA ATUALIZAÇÃO</div><div class="mini-value" id="profileUpdatedAt">—</div></div>
+          <div class="compact-dashboard">
+            <div class="dashboard-card">
+              <div class="dashboard-top">
+                <div class="confidence-donut" id="profileConfidenceDonut"><div class="confidence-donut-content"><b id="profileConfidenceValue">0%</b><span>CONFIANÇA</span></div></div>
+                <div class="dashboard-identity"><div class="section-kicker">PERFIL ATUAL</div><div class="archetype" id="profileArchetype">EM CONSTRUÇÃO</div><div class="dashboard-state" id="profileStateCopy">Aguardando amostra suficiente.</div></div>
+              </div>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric"><span>DECISÕES</span><b id="profileDecisionCount">0</b></div>
+                <div class="dashboard-metric"><span>QUALIDADE MÉDIA</span><b id="profileQualityAverage">—</b></div>
+                <div class="dashboard-metric"><span>FORÇA</span><b id="profileStrength">EM FORMAÇÃO</b></div>
+                <div class="dashboard-metric"><span>ATENÇÃO</span><b id="profileWeakness">EM FORMAÇÃO</b></div>
+              </div>
+              <div class="mini-label" style="margin-top:12px">ÚLTIMA ATUALIZAÇÃO · <span id="profileUpdatedAt">—</span></div>
+              <div id="profilePlan" hidden>GRÁTIS</div>
+            </div>
           </div>
         </div>
 
@@ -1397,18 +1458,6 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
             </div>
             <div class="game-context-note" id="profileGameNote">TORNEIO: BB, FASE E ICM QUANDO APLICÁVEL.</div>
           </div>
-        </div>
-
-        <div class="section" id="profileActivity">
-          <div class="section-head"><div><div class="section-kicker">ATIVIDADE SINCRONIZADA</div><h2 class="section-title">USO DO HEROES</h2></div></div>
-          <div class="profile-grid" id="usageMetricsGrid"></div>
-          <div id="recentActivity" style="margin-top:12px"></div>
-        </div>
-
-        <div class="section">
-          <div class="section-head"><div><div class="section-kicker">30 INDICADORES</div><h2 class="section-title">POKER DNA DO JOGADOR</h2></div></div>
-          <div class="dna-grid" id="profileIndicatorGrid"></div>
-          <div class="body-copy" id="profileIndicatorMeta" style="margin-top:10px"></div>
         </div>
 
         <div class="section">
@@ -1683,30 +1732,58 @@ function groupedIndicatorHTML(profile){
 function indicatorGridHTML(profile){
   return groupedIndicatorHTML(profile);
 }
+function deriveArchetype(profile){
+  if(profile.sampleSize<5)return "PERFIL EM FORMAÇÃO";
+  if(profile.scores.aggression>=80&&profile.scores.discipline>=70)return "AGRESSOR CONTROLADO";
+  if(profile.scores.aggression>=82&&profile.scores.discipline<60)return "AGRESSOR DE ALTA VARIÂNCIA";
+  if(profile.scores.adaptability>=80&&profile.scores.positionalAwareness>=78)return "ADAPTADOR POSICIONAL";
+  if(profile.scores.riskControl>=78&&profile.scores.patience>=76)return "SELETIVO DISCIPLINADO";
+  return "PERFIL HÍBRIDO";
+}
+function recentQualitySeries(limit=12){
+  return getSpotDecisionHistory().slice(0,limit).reverse().map(d=>Number(d?.decision_quality?.metrics?.decisionQuality)).filter(Number.isFinite);
+}
+function sparklinePoints(values){
+  if(!values.length)return "0,52 60,52 120,52 180,52 240,52 300,52";
+  const min=Math.min(...values),max=Math.max(...values),span=Math.max(1,max-min);
+  return values.map((v,i)=>{
+    const x=values.length===1?150:i*(300/(values.length-1));
+    const y=54-((v-min)/span)*42;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+}
 function renderDNA(){
   const profile=getUnifiedPlayerProfile();
-  const host=document.getElementById("dnaList");if(!host)return;
-  host.innerHTML=groupedIndicatorHTML(profile);
+  const ranked=[...QUALITY_INDICATORS].filter(x=>(profile.evidenceCounts[x.key]||0)>=5&&(profile.indicatorConfidence?.[x.key]||0)>=20).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
+  const strongest=ranked[0]||null,weakest=ranked[ranked.length-1]||null;
+  const archetype=deriveArchetype(profile);
+  const donut=document.getElementById("dnaConfidenceDonut");if(donut)donut.style.setProperty("--pct",profile.confidence);
+  const cv=document.getElementById("dnaConfidenceValue");if(cv)cv.textContent=`${profile.confidence}%`;
+  const ar=document.getElementById("dnaArchetype");if(ar)ar.textContent=archetype;
+  const st=document.getElementById("dnaStateCopy");if(st)st.textContent=profile.sampleSize<20?"Perfil em construção · amplie a amostra para aumentar a confiança.":"Perfil ativo · leitura baseada no histórico acumulado.";
+  const sl=document.getElementById("dnaStrengthLabel");if(sl)sl.textContent=strongest?strongest.label:"FORÇA PRINCIPAL";
+  const ss=document.getElementById("dnaStrengthScore");if(ss)ss.textContent=strongest?profile.scores[strongest.key]:"—";
+  const sb=document.getElementById("dnaStrengthBar");if(sb)sb.style.setProperty("--v",`${strongest?profile.scores[strongest.key]:0}%`);
+  const wl=document.getElementById("dnaWeakLabel");if(wl)wl.textContent=weakest?weakest.label:"PONTO DE ATENÇÃO";
+  const ws=document.getElementById("dnaWeakScore");if(ws)ws.textContent=weakest?profile.scores[weakest.key]:"—";
+  const wb=document.getElementById("dnaWeakBar");if(wb)wb.style.setProperty("--v",`${weakest?profile.scores[weakest.key]:0}%`);
+  const vals=recentQualitySeries();
+  const poly=document.querySelector("#dnaSparkline polyline");if(poly)poly.setAttribute("points",sparklinePoints(vals));
+  const trend=document.getElementById("dnaTrendValue");
+  if(trend)trend.textContent=vals.length<2?"SEM AMOSTRA":`${vals[vals.length-1]>=vals[0]?"+":""}${Math.round(vals[vals.length-1]-vals[0])} PTS`;
 }
 function renderUnifiedProfileViews(){
   const profile=getUnifiedPlayerProfile();
   const grid=indicatorGridHTML(profile);
-  ["homeIndicatorGrid","analysisIndicatorGrid","profileIndicatorGrid"].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=grid;});
+  const analysisGrid=document.getElementById("analysisIndicatorGrid");if(analysisGrid)analysisGrid.innerHTML=grid;
 
   const ranked=[...QUALITY_INDICATORS].filter(x=>(profile.evidenceCounts[x.key]||0)>=5&&(profile.indicatorConfidence?.[x.key]||0)>=20).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
   const strongest=ranked[0]||null;
   const weakest=ranked[ranked.length-1]||null;
   const heroCopy=document.getElementById("homeHeroCopy");
-  if(heroCopy)heroCopy.textContent=`Uma única matriz de 30 indicadores alimenta todo o HEROES. Amostra atual: ${profile.sampleSize} decisões; confiança do DNA: ${profile.confidence}%.`;
+  if(heroCopy)heroCopy.textContent="Treine decisões, acompanhe seu perfil e entenda como o seu jogo evolui.";
 
-  let archetype="PERFIL EM FORMAÇÃO";
-  if(profile.sampleSize>=5){
-    if(profile.scores.aggression>=80&&profile.scores.discipline>=70)archetype="AGRESSOR CONTROLADO";
-    else if(profile.scores.aggression>=82&&profile.scores.discipline<60)archetype="AGRESSOR DE ALTA VARIÂNCIA";
-    else if(profile.scores.adaptability>=80&&profile.scores.positionalAwareness>=78)archetype="ADAPTADOR POSICIONAL";
-    else if(profile.scores.riskControl>=78&&profile.scores.patience>=76)archetype="SELETIVO DISCIPLINADO";
-    else archetype="PERFIL HÍBRIDO";
-  }
+  const archetype=deriveArchetype(profile);
   const arch=document.getElementById("homeArchetype");if(arch)arch.textContent=archetype;
   const archCopy=document.getElementById("homeArchetypeCopy");
   if(archCopy)archCopy.textContent=`O arquétipo é derivado da mesma matriz central; ele não substitui os 30 indicadores. ${profile.sampleSize<20?"A amostra ainda é pequena para alta confiança.":""}`;
@@ -1760,6 +1837,17 @@ function renderUnifiedProfileViews(){
     const labels={page_view:"Página aberta",spot_viewed:"Spot visualizado",decision:"Decisão registrada",analysis_view:"Análise consultada",filter_use:"Filtro utilizado",app_open:"App aberto"};
     recentHost.innerHTML=(usage.state.recentEvents||[]).slice(0,6).map(ev=>`<div class="feature-line"><div><div class="feature-title">${labels[ev.type]||ev.type}</div><div class="feature-note">${new Date(ev.at).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</div></div></div>`).join("")||'<div class="body-copy">A atividade aparecerá aqui conforme o uso.</div>';
   }
+  const prefs=readGamePreferences();
+  const homeState=document.getElementById("homeDnaState");if(homeState)homeState.textContent=profile.sampleSize>=20?"ATIVO":"EM CONSTRUÇÃO";
+  const homeCount=document.getElementById("homeDecisionCount");if(homeCount)homeCount.textContent=String(profile.sampleSize);
+  const homeFormat=document.getElementById("homeGameFormat");if(homeFormat)homeFormat.textContent=prefs.format==="CASH"?"CASH":"MTT";
+  const pDonut=document.getElementById("profileConfidenceDonut");if(pDonut)pDonut.style.setProperty("--pct",profile.confidence);
+  const pArch=document.getElementById("profileArchetype");if(pArch)pArch.textContent=archetype;
+  const pState=document.getElementById("profileStateCopy");if(pState)pState.textContent=profile.sampleSize<20?"PERFIL EM CONSTRUÇÃO":"PERFIL DEFINIDO";
+  const pQuality=document.getElementById("profileQualityAverage");if(pQuality)pQuality.textContent=profile.decisionQualityAverage??"—";
+  const pStrength=document.getElementById("profileStrength");if(pStrength)pStrength.textContent=strongest?strongest.label:"EM FORMAÇÃO";
+  const pWeak=document.getElementById("profileWeakness");if(pWeak)pWeak.textContent=weakest?weakest.label:"EM FORMAÇÃO";
+  renderDNA();
   const identity=heroesBridge?.identity?.()||{},session=readJsonKey("heroes.session",{});
   const displayName=session?.name||identity.emailHint?.split("@")?.[0]||(identity.stackupUserId?"StackUp Player":"Jogador local");
   const nameEl=document.getElementById("profileName");if(nameEl)nameEl.textContent=displayName;
@@ -1995,7 +2083,7 @@ function openSheet(title,copy){
   sheet.classList.add("open");
 }
 function closeSheet(){sheet.classList.remove("open")}
-document.getElementById("analyzeBtn").addEventListener("click",()=>{
+document.getElementById("analyzeBtn")?.addEventListener("click",()=>{
   trackUsage("analysis_view",{source:"home"});
   const profile=getUnifiedPlayerProfile();
   const ranked=QUALITY_INDICATORS.filter(def=>(profile.evidenceCounts[def.key]||0)>0).sort((a,b)=>profile.scores[b.key]-profile.scores[a.key]);
