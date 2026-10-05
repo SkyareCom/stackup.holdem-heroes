@@ -71,6 +71,9 @@ expect(html.includes('let spotLoadInFlight=false'),'SPOTS must serialize async s
 expect(html.includes('if(spotLoadInFlight)return'),'SPOTS must reject concurrent next-spot loads');
 expect(html.includes('preferredRaise=raises.length'),'primary RAISE must derive from actual solver raise branches');
 expect(html.includes('evaluation.solverVerdict'),'decision result must expose the solver-derived verdict');
+expect(html.includes('solver.chosen_ev_bb>0?"CORRETA · MELHOR EV (+EV)":"CORRETA · MELHOR EV"'),'(+EV) label must require positive chosen EV');
+expect(html.includes('"AÇÃO PRINCIPAL DO SOLVER":"AÇÃO MIXADA DO SOLVER"'),'EV-unavailable mixed strategies must remain solver-faithful');
+expect(!html.includes('solver.frequency>=10?"CORRETA"'),'solver frequency must not be converted into an arbitrary correctness threshold');
 expect(html.includes('id="spotSidePots"'),'solver table must expose side-pot state when present');
 expect(html.includes('AGUARDANDO A AÇÃO DO HERÓI'),'table must explicitly expose the hero decision state');
 expect(!html.includes('total:14000'),'legacy 14,000 runtime fallback must not remain');
