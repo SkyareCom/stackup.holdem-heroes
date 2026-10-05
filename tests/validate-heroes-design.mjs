@@ -51,9 +51,9 @@ expect(html.includes('class="poker-table"'),'Spots must contain a functional pok
 expect((html.match(/class="player-seat /g)||[]).length===8,'Spots table must contain 8 villain seats');
 expect(html.includes('class="hero-seat"'),'Spots table must contain the hero seat');
 expect(html.includes('class="hero-seat"') && html.includes('class="hero-avatar"'),'Hero must be anchored in the dedicated bottom seat');
-expect((html.match(/data-poker-action=/g)||[]).length===7,'Spots must expose exactly 7 poker action buttons');
+expect((html.match(/data-poker-action=/g)||[]).length===9,'Spots must expose exactly 9 solver-bound poker action buttons');
 for(const action of ['check','call','fold','raise','allin']) expect(html.includes(`data-poker-action="${action}"`),`missing poker action: ${action}`);
-expect((html.match(/class="poker-action suggested"/g)||[]).length===2,'Spots must contain 2 suggested raise buttons');
+expect((html.match(/class="poker-action suggested"/g)||[]).length===4,'Spots must contain 4 alternate solver raise buttons');
 expect(html.includes('heroes.spotDecisions'),'Spots decisions must feed the DNA Player decision history');
 expect(html.includes('table_size:Number(context.table_size||9)'),'Spots decision payload must preserve the solver table size with a safe fallback');
 expect(html.includes('hero_position:context.hero_position'),'Spots decision payload must store the solver hero position dynamically');
