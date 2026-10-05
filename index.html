@@ -2219,7 +2219,7 @@ function trackUsage(type,details={}){
 }
 function usageSnapshot(){
   const state=ensureUsageSession();writeJsonKey(USAGE_KEY,state);
-  const runtime=window.HeroesSolvedSpots?.progress?.()||{viewed:0,total:14000,remaining:14000};
+  const runtime=window.HeroesSolvedSpots?.progress?.()||{viewed:0,total:20000,remaining:20000};
   return {state,current:state.current,sessions:(state.sessions||[]).length+(state.current?1:0),runtime};
 }
 
@@ -2798,7 +2798,7 @@ function renderSolvedSpot(item){
   if(spotSessionCopy)spotSessionCopy.textContent=prefs.format==="CASH"
     ?`CASH GAME ${view.tableSize||scenario.tableSize||9}-max · ${displayStackValue(Number(scenario.effectiveStack||0),prefs)} efetivos · ${FAMILY_LABELS[item.family]||item.family}`
     :`${String(scenario.gameType||"MTT").replace("TOURNAMENT","MTT")} ${view.tableSize||scenario.tableSize||9}-max · ${Number(scenario.effectiveStack||0)}bb efetivos · ${FAMILY_LABELS[item.family]||item.family}`;
-  if(spotNumber)spotNumber.textContent=`${item.progress.viewed.toLocaleString("pt-BR")} / 14.000`;
+  if(spotNumber)spotNumber.textContent=`${item.progress.viewed.toLocaleString("pt-BR")} / ${Number(item.progress.total||20000).toLocaleString("pt-BR")}`;
   if(spotDifficulty)spotDifficulty.textContent="SOLVED";
   const pot=document.getElementById("spotPot");if(pot)pot.textContent=displayStackValue(Number(view.pot||scenario.pot||0),prefs);
   const board=document.getElementById("boardCards");
