@@ -55,8 +55,8 @@ expect((html.match(/data-poker-action=/g)||[]).length===7,'Spots must expose exa
 for(const action of ['check','call','fold','raise','allin']) expect(html.includes(`data-poker-action="${action}"`),`missing poker action: ${action}`);
 expect((html.match(/class="poker-action suggested"/g)||[]).length===2,'Spots must contain 2 suggested raise buttons');
 expect(html.includes('heroes.spotDecisions'),'Spots decisions must feed the DNA Player decision history');
-expect(html.includes('table_size:9'),'Spots decision payload must identify a 9-max table');
-expect(html.includes('hero_position:"BTN"'),'Spots decision payload must store hero position');
+expect(html.includes('table_size:Number(context.table_size||9)'),'Spots decision payload must preserve the solver table size with a safe fallback');
+expect(html.includes('hero_position:context.hero_position'),'Spots decision payload must store the solver hero position dynamically');
 expect(html.includes('spotDecisionText'),'Spots must provide decision feedback');
 expect(style.includes('.view{padding:4px 18px 28px;overflow-x:hidden;touch-action:pan-y}'),'main view must preserve vertical scrolling while handling horizontal navigation');
 expect(html.includes('const FOOTER_PAGES=["home","dna","spots","analysis","profile"]'),'footer swipe order must match navigation');
