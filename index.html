@@ -2126,6 +2126,7 @@ const heroPositionLabel=document.getElementById("heroPositionLabel");
 let currentSpotSequence=0;
 let currentSolvedSpot=null;
 let currentSpotAnswered=false;
+let spotLoadInFlight=false;
 function syncSpotTrainingControls(){
   const runtime=window.HeroesSolvedSpots;if(!runtime)return;
   const p=runtime.progress();
@@ -2877,16 +2878,19 @@ function renderSolvedSpot(item){
   if(spotDecisionMeta)spotDecisionMeta.textContent=prefs.format==="CASH"
     ?"Visualização Cash · moeda + bb pela stake selecionada. O solve carregado mantém seu formato técnico original."
     :"Spot solver-resolvido · decisão será incorporada ao DNA Player.";
-  if(nextSpotBtn)nextSpotBtn.hidden=true;
+  if(nextSpotBtn){nextSpotBtn.hidden=true;nextSpotBtn.textContent="PRÓXIMO SPOT";}
   resetActionAnalysis();
 }
 async function loadNextSolvedSpot(){
+  if(spotLoadInFlight)return;
   if(!window.HeroesSolvedSpots){
-    if(spotDecisionText)spotDecisionText.textContent="Motor de spots indisponível.";
+    if(spotDecisionText)spotDecisionText.textContent="MOTOR DE SPOTS INDISPONÍVEL.";
     return;
   }
+  spotLoadInFlight=true;
+  if(nextSpotBtn)nextSpotBtn.disabled=true;
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.disabled=true;btn.classList.add("loading")});
-  if(spotDecisionText)spotDecisionText.textContent="Carregando spot inédito…";
+  if(spotDecisionText)spotDecisionText.textContent="CARREGANDO SPOT INÉDITO…";
   try{
     const item=await window.HeroesSolvedSpots.next();
     renderSolvedSpot(item);
@@ -2894,8 +2898,12 @@ async function loadNextSolvedSpot(){
     trackUsage("spot_viewed",{spot_id:item.id,solve_id:item.spot?.solveId||null,street:item.street,family:item.family});
   }catch(err){
     console.error(err);
-    if(spotDecisionText)spotDecisionText.textContent="Falha ao carregar spot.";
-    if(spotDecisionMeta)spotDecisionMeta.textContent=String(err?.message||err);
+    if(spotDecisionText)spotDecisionText.textContent="FALHA AO CARREGAR SPOT.";
+    if(spotDecisionMeta)spotDecisionMeta.textContent=String(err?.message||err).toUpperCase();
+    if(nextSpotBtn){nextSpotBtn.hidden=false;nextSpotBtn.textContent="TENTAR NOVAMENTE";}
+  }finally{
+    spotLoadInFlight=false;
+    if(nextSpotBtn)nextSpotBtn.disabled=false;
   }
 }
 
