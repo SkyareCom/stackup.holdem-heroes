@@ -1201,7 +1201,7 @@ select,option,input,textarea,button{ text-transform:uppercase }
             <div class="spot-session-copy" id="spotSessionCopy">MTT 9-max · 44bb efetivos · pote single-raised</div>
           </div>
           <div class="spot-progress-card">
-            <span id="spotNumber">12 / 50</span>
+            <span id="spotNumber">0 / 20.000</span>
             <b id="spotDifficulty">SOLVED</b>
           </div>
         </div>
@@ -1320,6 +1320,12 @@ select,option,input,textarea,button{ text-transform:uppercase }
             </div>
             <div class="action-profile-kicker">PERFIL COMPORTAMENTAL DA AÇÃO · 0–100</div>
             <div class="profile-indicators" id="actionProfileIndicators"></div>
+          </div>
+
+          <div class="spot-training-tools">
+            <button class="section-link" id="newSpotSessionBtn" type="button">NOVO TREINO</button>
+            <button class="section-link" id="saveSpotTrainingBtn" type="button">SALVAR TREINO</button>
+            <button class="section-link" id="discardSpotTrainingBtn" type="button" hidden>ENCERRAR TREINO SALVO</button>
           </div>
 
           <div class="spot-decision" id="spotDecision" aria-live="polite">
@@ -1584,6 +1590,7 @@ function syncGamePreferenceUI(){
 }
 function rerenderCurrentSpotForPreferences(){
   syncGamePreferenceUI();
+syncSpotTrainingControls();
   if(currentSolvedSpot)renderSolvedSpot(currentSolvedSpot);
 }
 
@@ -2110,10 +2117,19 @@ const spotNumber=document.getElementById("spotNumber");
 const spotSessionTitle=document.getElementById("spotSessionTitle");
 const spotSessionCopy=document.getElementById("spotSessionCopy");
 const spotDifficulty=document.getElementById("spotDifficulty");
+const newSpotSessionBtn=document.getElementById("newSpotSessionBtn");
+const saveSpotTrainingBtn=document.getElementById("saveSpotTrainingBtn");
+const discardSpotTrainingBtn=document.getElementById("discardSpotTrainingBtn");
 const heroCardsBox=document.getElementById("heroCards");
 const heroPositionLabel=document.getElementById("heroPositionLabel");
 let currentSpotSequence=0;
 let currentSolvedSpot=null;
+function syncSpotTrainingControls(){
+  const runtime=window.HeroesSolvedSpots;if(!runtime)return;
+  const p=runtime.progress();
+  if(saveSpotTrainingBtn){saveSpotTrainingBtn.textContent=p.savedTraining?"TREINO SALVO":"SALVAR TREINO";saveSpotTrainingBtn.disabled=!!p.savedTraining;}
+  if(discardSpotTrainingBtn)discardSpotTrainingBtn.hidden=!p.savedTraining;
+}
 
 function getSpotDecisionHistory(){
   try{
@@ -2859,6 +2875,7 @@ async function loadNextSolvedSpot(){
   try{
     const item=await window.HeroesSolvedSpots.next();
     renderSolvedSpot(item);
+    syncSpotTrainingControls();
     trackUsage("spot_viewed",{spot_id:item.id,solve_id:item.spot?.solveId||null,street:item.street,family:item.family});
   }catch(err){
     console.error(err);
@@ -2957,6 +2974,9 @@ pokerActions?.addEventListener("click",e=>{
   recordSpotDecision(btn.dataset.pokerAction,Number(btn.dataset.amount||0),btn);
 });
 nextSpotBtn?.addEventListener("click",()=>loadNextSolvedSpot());
+newSpotSessionBtn?.addEventListener("click",async()=>{window.HeroesSolvedSpots?.startFreshSession?.();syncSpotTrainingControls();await loadNextSolvedSpot();});
+saveSpotTrainingBtn?.addEventListener("click",()=>{window.HeroesSolvedSpots?.saveTraining?.();syncSpotTrainingControls();if(spotDecisionMeta)spotDecisionMeta.textContent="TREINO SALVO. ESTA SEQUÊNCIA PODERÁ SER RETOMADA.";});
+discardSpotTrainingBtn?.addEventListener("click",()=>{window.HeroesSolvedSpots?.discardSavedTraining?.();syncSpotTrainingControls();if(spotDecisionMeta)spotDecisionMeta.textContent="TREINO SALVO ENCERRADO. O PRÓXIMO TREINO COMEÇARÁ COM NOVA SEQUÊNCIA.";});
 
 if(heroesBridge){
   try{heroesBridge.send('capabilities','grinder',{product:'heroes',version:'3.0',produces:['player_profile','training_prescription'],accepts:['training_progress','training_completed'],profileIndicators:PLAYER_INDICATORS.map(x=>x.key),playerStateSchema:"stackup-heroes-player-state/1.0"});}catch(_){}
