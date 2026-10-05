@@ -57,6 +57,17 @@ expect(runtime.includes("function startFreshSession"),'runtime must support a ne
 expect(runtime.includes("function saveTraining"),'runtime must support explicit training save/resume semantics');
 expect(runtime.includes("firstSpotId"),'fresh sessions must guard against repeating the previous opening spot');
 
+let maxRaiseBranches=0;
+let maxRaiseExample=null;
+for(const street of ['preflop','flop','turn','river']){
+  const bank=JSON.parse(fs.readFileSync(new URL(`../data/solver/heroes/${street}-v1.json`,import.meta.url),'utf8'));
+  for(const spot of bank.spots||[])for(const entry of spot.strategy||[]){
+    const raiseCount=(entry.actions||[]).filter(a=>String(a.kind||a.action||a.label||'').toLowerCase().includes('raise')||String(a.kind||'').toLowerCase()==='bet').length;
+    if(raiseCount>maxRaiseBranches){maxRaiseBranches=raiseCount;maxRaiseExample=`${street}:${spot.id||spot.solveId||'spot'}:${entry.hand}`;}
+  }
+}
+expect(maxRaiseBranches<=3,`UI exposes three raise branches but solver bank requires ${maxRaiseBranches} at ${maxRaiseExample}`);
+
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-engine.js','core/heroes-solved-spots-runtime.js']){
   expect(html.includes(`<script src="${src}"></script>`),`missing runtime script: ${src}`);
