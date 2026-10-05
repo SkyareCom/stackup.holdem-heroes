@@ -468,6 +468,20 @@ radial-gradient(circle at 50% 120%,rgba(216,178,142,.08),transparent 38%);pointe
   .hero{padding:32px 28px}
 }
 
+/* HOME MOBILE — compact entry point; keep content clear of fixed navigation */
+#home .hero{min-height:0;height:auto}
+#home .section{margin-top:24px}
+.view{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+@media (max-width:430px){
+  #home .hero{min-height:0;padding:24px 20px 20px}
+  #home .display-xl{margin:10px 0 10px}
+  #home .hero-copy{line-height:1.5}
+  #home .home-status-strip{margin-top:18px}
+  #home .section{margin-top:22px}
+  #home .section-head{margin-bottom:12px}
+  #home .home-entry-grid{gap:10px}
+}
+
 /* Mobile scale correction */
 html,body,#app,.app{width:100%;max-width:none;min-width:0}
 .shell{width:100%;max-width:none;margin:0;min-height:100dvh}
