@@ -2,21 +2,21 @@
   "schemaVersion": 1,
   "product": "HEROES",
   "mode": "STRICT_SOLVED_ONLY",
-  "generatedAt": "2026-10-02",
+  "generatedAt": "2026-10-05",
   "countingUnit": "ONE_VALIDATED_SOLVER_DECISION_PER_SCENARIO_AND_HAND",
-  "totalValidatedSolvedDecisions": 14000,
+  "totalValidatedSolvedDecisions": 20000,
   "noRepeatPolicy": "PERSISTENT_WITHOUT_REPLACEMENT_UNTIL_BANK_EXHAUSTION",
   "streetTargets": {
     "preflop": 5000,
-    "flop": 3000,
-    "turn": 3000,
-    "river": 3000
+    "flop": 5000,
+    "turn": 5000,
+    "river": 5000
   },
   "streetWeights": {
-    "preflop": 0.3571428571,
-    "flop": 0.2142857143,
-    "turn": 0.2142857143,
-    "river": 0.2142857143
+    "preflop": 0.25,
+    "flop": 0.25,
+    "turn": 0.25,
+    "river": 0.25
   },
   "preflopDistribution": {
     "MULTIWAY_ALLIN": 300,
@@ -30,15 +30,13 @@
   },
   "postflopDistribution": {
     "flop": {
-      "TEXTURE_SIZING": 1200,
-      "GENERAL_HU": 1800
+      "DCFR_POSTFLOP": 5000
     },
     "turn": {
-      "GENERAL_HU": 3000
+      "DCFR_POSTFLOP": 5000
     },
     "river": {
-      "MULTIWAY": 500,
-      "GENERAL_HU": 2500
+      "DCFR_POSTFLOP": 5000
     }
   },
   "sourceRepository": "SkyareCom/stackup.holdem-grinder.evo",
@@ -75,33 +73,48 @@
       }
     },
     "flop": {
-      "valid": 3000,
+      "valid": 5000,
       "invalid": 0,
-      "decisions": 3000,
-      "scenarios": 56,
+      "decisions": 5000,
+      "scenarios": 25,
       "distribution": {
-        "TEXTURE_SIZING": 1200,
-        "GENERAL_HU": 1800
+        "DCFR_POSTFLOP": 5000
       }
     },
     "turn": {
-      "valid": 3000,
+      "valid": 5000,
       "invalid": 0,
-      "decisions": 3000,
-      "scenarios": 10,
+      "decisions": 5000,
+      "scenarios": 26,
       "distribution": {
-        "GENERAL_HU": 3000
+        "DCFR_POSTFLOP": 5000
       }
     },
     "river": {
-      "valid": 3000,
+      "valid": 5000,
       "invalid": 0,
-      "decisions": 3000,
-      "scenarios": 40,
+      "decisions": 5000,
+      "scenarios": 27,
       "distribution": {
-        "MULTIWAY": 500,
-        "GENERAL_HU": 2500
+        "DCFR_POSTFLOP": 5000
       }
     }
+  },
+  "sourceWorkflow": {
+    "repository": "SkyareCom/stackup.holdem-grinder.evo",
+    "runId": 37269044428,
+    "headSha": "fc14ff4adee3e0cb8ddaefe34c72132dd555938a",
+    "completedShards": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ]
   }
 }

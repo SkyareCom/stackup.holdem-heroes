@@ -13,7 +13,7 @@ const BANKS=Object.freeze({
   turn:'data/solver/heroes/turn-v1.json',
   river:'data/solver/heroes/river-v1.json'
 });
-const TOTALS=Object.freeze({preflop:5000,flop:3000,turn:3000,river:3000});
+const TOTALS=Object.freeze({preflop:5000,flop:5000,turn:5000,river:5000});
 const SESSION_KEY='heroes.solvedSpotSession.v2';
 const SAVED_TRAINING_KEY='heroes.savedSpotTraining.v1';
 const LAST_SESSION_KEY='heroes.lastSpotSession.v1';
