@@ -1340,8 +1340,14 @@ select,option,input,textarea,button{ text-transform:uppercase }
             <button class="poker-action suggested" type="button" data-action-slot="raise1" data-poker-action="raise" data-amount="15">
               <span>RAISE 15bb</span><small>sugerido</small>
             </button>
-            <button class="poker-action suggested" type="button" data-action-slot="raise2" data-poker-action="raise" data-amount="20">
-              <span>RAISE 20bb</span><small>sugerido</small>
+            <button class="poker-action suggested" type="button" data-action-slot="raise2" data-poker-action="raise" disabled>
+              <span>RAISE —</span><small>INDISPONÍVEL</small>
+            </button>
+            <button class="poker-action suggested" type="button" data-action-slot="raise3" data-poker-action="raise" disabled>
+              <span>RAISE —</span><small>INDISPONÍVEL</small>
+            </button>
+            <button class="poker-action suggested" type="button" data-action-slot="raise4" data-poker-action="raise" disabled>
+              <span>RAISE —</span><small>INDISPONÍVEL</small>
             </button>
             <button class="poker-action allin" type="button" data-action-slot="allin" data-poker-action="allin" data-amount="44">
               <span>ALL IN</span><small>44bb</small>
@@ -2828,11 +2834,12 @@ function configureSolvedActions(entry){
   setActionButton("call",call,"CALL",call?`${displayActionValue(solverActionAmount(call)||0)} · ${Number(call.frequency||0).toFixed(0)}%`:"indisponível");
   setActionButton("fold",fold,"FOLD",fold?`${Number(fold.frequency||0).toFixed(0)}% solver`:"indisponível");
   const preferredRaise=raises.length?[...raises].sort((a,b)=>(Number(b.frequency)||0)-(Number(a.frequency)||0))[0]:null;
-  const alternateRaises=raises.filter(a=>a!==preferredRaise).slice(0,2);
-  const r1=alternateRaises[0]||null,r2=alternateRaises[1]||null;
+  const alternateRaises=raises.filter(a=>a!==preferredRaise).slice(0,4);
   setActionButton("raise",preferredRaise,"RAISE",preferredRaise?`${displayActionValue(solverActionAmount(preferredRaise))} · ${Number(preferredRaise.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
-  setActionButton("raise1",r1,r1?`RAISE ${displayActionValue(solverActionAmount(r1))}`:"RAISE —",r1?`${Number(r1.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
-  setActionButton("raise2",r2,r2?`RAISE ${displayActionValue(solverActionAmount(r2))}`:"RAISE —",r2?`${Number(r2.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
+  ["raise1","raise2","raise3","raise4"].forEach((slot,index)=>{
+    const branch=alternateRaises[index]||null;
+    setActionButton(slot,branch,branch?`RAISE ${displayActionValue(solverActionAmount(branch))}`:"RAISE —",branch?`${Number(branch.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
+  });
   setActionButton("allin",jam,"ALL IN",jam?`${displayActionValue(solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||0)} · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
 }
 function renderSolvedSeats(item){
