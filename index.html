@@ -1319,7 +1319,7 @@ select,option,input,textarea,button{ text-transform:uppercase }
                 <span class="section-kicker">ANÁLISE DA AÇÃO</span>
                 <div class="action-analysis-title" id="actionAnalysisTitle">Perfil da decisão</div>
               </div>
-              <div class="action-analysis-scale">INDICADORES · 0–100</div>
+              <div class="action-analysis-scale">LEITURA HEROES · 0–100</div>
             </div>
             <div class="action-comment" id="actionAnalysisComment">Escolha uma ação para gerar a leitura comportamental.</div>
             <div class="action-quality" id="actionQuality">
@@ -1333,7 +1333,7 @@ select,option,input,textarea,button{ text-transform:uppercase }
               <div class="action-quality-grid" id="actionQualityMetrics"></div>
               <div class="action-aggression-read" id="actionAggressionRead"></div>
             </div>
-            <div class="action-profile-kicker">PERFIL COMPORTAMENTAL DA AÇÃO · 0–100</div>
+            <div class="action-profile-kicker">LEITURA COMPORTAMENTAL HEROES · NÃO É SAÍDA DO SOLVER</div>
             <div class="profile-indicators" id="actionProfileIndicators"></div>
           </div>
 
@@ -2262,15 +2262,15 @@ const ACTION_PROFILE_LABELS=Object.fromEntries(ACTION_PROFILE_META);
 const clamp100=v=>Math.max(0,Math.min(100,Math.round(Number(v)||0)));
 
 const DECISION_QUALITY_META=[
-  ["decisionQuality","QUALIDADE GLOBAL"],
-  ["rangeDiscipline","DISCIPLINA DE RANGE"],
-  ["sizingQuality","QUALIDADE DO SIZING"],
-  ["stackAwareness","GESTÃO DE STACK"],
-  ["positionFit","AJUSTE POSICIONAL"],
-  ["pressureControl","CONTROLE SOB PRESSÃO"],
-  ["mathAwareness","QUALIDADE MATEMÁTICA"],
-  ["strategyAlignment","ALINHAMENTO À ESTRATÉGIA"],
-  ["evAlignment","ALINHAMENTO DE EV"]
+  ["decisionQuality","QUALIDADE COMPOSTA HEROES"],
+  ["rangeDiscipline","DISCIPLINA DE RANGE · HEROES"],
+  ["sizingQuality","QUALIDADE DO SIZING · HEROES"],
+  ["stackAwareness","GESTÃO DE STACK · HEROES"],
+  ["positionFit","AJUSTE POSICIONAL · HEROES"],
+  ["pressureControl","CONTROLE SOB PRESSÃO · HEROES"],
+  ["mathAwareness","QUALIDADE MATEMÁTICA · HEROES"],
+  ["strategyAlignment","ALINHAMENTO SOLVER"],
+  ["evAlignment","ALINHAMENTO DE EV · SOLVER"]
 ];
 
 const STATIC_SPOT_CONTEXT=Object.freeze({
