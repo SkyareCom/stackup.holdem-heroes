@@ -2125,6 +2125,7 @@ const heroCardsBox=document.getElementById("heroCards");
 const heroPositionLabel=document.getElementById("heroPositionLabel");
 let currentSpotSequence=0;
 let currentSolvedSpot=null;
+let currentSpotAnswered=false;
 function syncSpotTrainingControls(){
   const runtime=window.HeroesSolvedSpots;if(!runtime)return;
   const p=runtime.progress();
@@ -2816,6 +2817,7 @@ function resetActionAnalysis(){
 }
 function renderSolvedSpot(item){
   currentSolvedSpot=item;
+  currentSpotAnswered=false;
   const view=item.view||window.StackUpSpotsEngine?.toViewModel?.(item.spot,{positions:item.spot?.scenario?.positions||[]})||{};
   const scenario=item.spot?.scenario||{};
   const street=String(view.street||scenario.street||"").replace("PRE-FLOP","PRÉ-FLOP");
@@ -2898,6 +2900,9 @@ async function loadNextSolvedSpot(){
 }
 
 function recordSpotDecision(action,amount,button){
+  if(currentSpotAnswered||!currentSolvedSpot)return;
+  currentSpotAnswered=true;
+  document.querySelectorAll("[data-action-slot]").forEach(btn=>btn.disabled=true);
   const label=action==="raise"&&amount?`RAISE ${displayActionValue(amount)}`:action==="allin"?"ALL IN":action.toUpperCase();
   const context=getCurrentSpotContext();
   const evaluation=evaluateDecisionContext(action,amount,context);
@@ -2944,8 +2949,14 @@ function recordSpotDecision(action,amount,button){
       chosen_ev_bb:null,best_ev_bb:null,ev_loss_bb:null,alignment:null,strategy_alignment:null,frequency:null
     }
   };
-  updateProfileAccumulator(decision);
   const history=getSpotDecisionHistory();
+  if(history.some(x=>x?.spot_id===decision.spot_id&&x?.solve_id===decision.solve_id)){
+    currentSpotAnswered=true;
+    if(spotDecisionMeta)spotDecisionMeta.textContent="ESTE SPOT JÁ POSSUI UMA DECISÃO REGISTRADA NESTA AMOSTRA.";
+    if(nextSpotBtn)nextSpotBtn.hidden=false;
+    return;
+  }
+  updateProfileAccumulator(decision);
   history.unshift(decision);
   store.set("heroes.spotDecisions",JSON.stringify(history.slice(0,RECENT_DECISION_LIMIT)));
   trackUsage("decision",{spot_id:decision.spot_id,action:decision.action,quality:decision.decision_quality?.metrics?.decisionQuality??null,solver_validated:!!decision.decision_quality?.solver?.validated});
