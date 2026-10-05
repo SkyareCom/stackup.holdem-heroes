@@ -1,0 +1,42 @@
+name: Import HEROES DCFR Bank
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/import-heroes-dcfr-artifacts.mjs
+      - .github/workflows/import-heroes-dcfr.yml
+permissions:
+  contents: write
+  actions: read
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download completed Grinder.EVO solver shards
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/solver-artifacts
+          for spec in "1:11331986415" "2:11331902394" "3:11331699254" "4:11332554959" "6:11334679118" "7:11330614233" "8:11334107849" "9:11332972187" "10:11332878174" "11:11331173415"; do
+            shard="${spec%%:*}"; id="${spec##*:}"
+            mkdir -p "/tmp/solver-artifacts/shard-$shard"
+            curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/SkyareCom/stackup.holdem-grinder.evo/actions/artifacts/$id/zip" -o "/tmp/shard-$shard.zip"
+            unzip -q "/tmp/shard-$shard.zip" -d "/tmp/solver-artifacts/shard-$shard"
+          done
+      - name: Build strict 20k HEROES bank
+        run: node scripts/import-heroes-dcfr-artifacts.mjs
+      - name: Validate HEROES
+        run: node tests/validate-solved-spots.mjs
+      - name: Commit generated bank
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/solver/heroes/flop-v1.json data/solver/heroes/turn-v1.json data/solver/heroes/river-v1.json data/solver/heroes/manifest-v1.json core/heroes-solved-spots-runtime.js tests/validate-solved-spots.mjs
+          git commit -m "feat(heroes): expand strict solver bank to 20k decisions"
+          git push origin HEAD:main
