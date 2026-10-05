@@ -16,6 +16,8 @@ expect(style.includes('.shell{width:100%;max-width:none'),'mobile shell must use
 expect(style.includes('.tabbar{left:0;right:0;transform:none;width:100%;max-width:none'),'tab bar must span full mobile width');
 expect(style.includes('.brand-title{font-size:36px'),'mobile brand scale must remain readable');
 expect(style.includes('.scenario-cell strong{font-size:30px'),'scenario scores must remain readable on mobile');
+expect(style.includes('#home .hero{min-height:0;height:auto;padding-bottom:22px}'),'Home hero must not retain the oversized global minimum height');
+expect(style.includes('.view{padding-bottom:calc(96px + env(safe-area-inset-bottom))}'),'main content must reserve space above the fixed bottom navigation');
 
 
 for(const token of ['#0F0909','#160B0D','#2A1114','#8D5B46','#D8B28E','#EEE1D1']) expect(html.includes(token),`missing HEROES palette token ${token}`);
