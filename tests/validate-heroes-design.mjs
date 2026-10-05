@@ -59,6 +59,8 @@ expect(html.includes('table_size:Number(context.table_size||9)'),'Spots decision
 expect(html.includes('hero_position:context.hero_position'),'Spots decision payload must store the solver hero position dynamically');
 expect(html.includes('spotDecisionText'),'Spots must provide decision feedback');
 expect(style.includes('.view{padding:4px 18px 28px;overflow-x:hidden;touch-action:pan-y}'),'main view must preserve vertical scrolling while handling horizontal navigation');
+expect(style.includes('#home .hero{min-height:0;height:auto'),'mobile Home hero must not reserve artificial vertical dead space');
+expect(style.includes('.view{padding-bottom:calc(92px + env(safe-area-inset-bottom))}'),'main view must reserve fixed-footer safe space');
 expect(html.includes('const FOOTER_PAGES=["home","dna","spots","analysis","profile"]'),'footer swipe order must match navigation');
 expect(html.includes('mainView.addEventListener("touchstart"') && html.includes('mainView.addEventListener("touchmove"') && html.includes('mainView.addEventListener("touchend"'),'footer pages must support touch swipe navigation');
 expect(html.includes('mainView.addEventListener("mousedown"') && html.includes('window.addEventListener("mousemove"') && html.includes('window.addEventListener("mouseup"'),'footer pages must support mouse drag navigation');
