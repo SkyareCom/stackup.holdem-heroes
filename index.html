@@ -742,6 +742,20 @@ strong,b,em,i{
 .swot-sample{font-size:8px;letter-spacing:.12em;color:var(--muted-1);margin-top:5px}
 @media (max-width:360px){.swot-grid{grid-template-columns:1fr}}
 
+.spot-training-tools{
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--line-1);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px
+}
+.spot-training-tools .section-link{
+  width:100%;min-height:42px;justify-content:center;text-align:center;
+  border:1px solid var(--line-1);border-radius:12px;padding:10px 8px
+}
+.spot-training-tools .section-link:disabled{opacity:.45;pointer-events:none}
+@media (max-width:380px){
+  .spot-training-tools{grid-template-columns:1fr 1fr}
+  .spot-training-tools .section-link:last-child{grid-column:1/-1}
+}
+
 .spot-decision{
   margin-top:12px;padding:14px 0 0;border-top:1px solid var(--line-1);
   display:flex;align-items:center;justify-content:space-between;gap:14px
