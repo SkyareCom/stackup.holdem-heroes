@@ -2771,10 +2771,12 @@ function configureSolvedActions(entry){
   setActionButton("check",check,"CHECK",check?`${Number(check.frequency||0).toFixed(0)}% solver`:"indisponível");
   setActionButton("call",call,"CALL",call?`${displayActionValue(solverActionAmount(call)||0)} · ${Number(call.frequency||0).toFixed(0)}%`:"indisponível");
   setActionButton("fold",fold,"FOLD",fold?`${Number(fold.frequency||0).toFixed(0)}% solver`:"indisponível");
-  const r0=raises[0]||null,r1=raises[1]||null,r2=raises[2]||null;
-  setActionButton("raise",r0,"RAISE",r0?`${displayActionValue(solverActionAmount(r0))} · mínimo`:"indisponível");
-  setActionButton("raise1",r1,r1?"RAISE 1":"RAISE —",r1?`${displayActionValue(solverActionAmount(r1))} · sugerido`:"indisponível");
-  setActionButton("raise2",r2,r2?"RAISE 2":"RAISE —",r2?`${displayActionValue(solverActionAmount(r2))} · sugerido`:"indisponível");
+  const preferredRaise=raises.length?[...raises].sort((a,b)=>(Number(b.frequency)||0)-(Number(a.frequency)||0))[0]:null;
+  const alternateRaises=raises.filter(a=>a!==preferredRaise).slice(0,2);
+  const r1=alternateRaises[0]||null,r2=alternateRaises[1]||null;
+  setActionButton("raise",preferredRaise,"RAISE",preferredRaise?`${displayActionValue(solverActionAmount(preferredRaise))} · ${Number(preferredRaise.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
+  setActionButton("raise1",r1,r1?`RAISE ${displayActionValue(solverActionAmount(r1))}`:"RAISE —",r1?`${Number(r1.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
+  setActionButton("raise2",r2,r2?`RAISE ${displayActionValue(solverActionAmount(r2))}`:"RAISE —",r2?`${Number(r2.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
   setActionButton("allin",jam,"ALL IN",jam?`${displayActionValue(solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||0)} · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
 }
 function renderSolvedSeats(item){
