@@ -64,6 +64,17 @@ for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-eng
 expect(html.includes('await window.HeroesSolvedSpots.next()'),'SPOTS table must request real solved decisions');
 expect(html.includes('solver_reference:ref'),'DNA decision context must receive the solver reference');
 expect((html.match(/<button[^>]*data-action-slot="/g)||[]).length===7,'SPOTS must expose exactly seven solver-bound action slots');
+expect(html.includes('let currentSpotAnswered=false'),'SPOTS must track whether the current solve was already answered');
+expect(html.includes('if(currentSpotAnswered||!currentSolvedSpot)return'),'SPOTS must reject a second answer to the same loaded solve');
+expect(html.includes('x?.spot_id===decision.spot_id&&x?.solve_id===decision.solve_id'),'decision history must reject duplicate spot_id + solve_id samples');
+expect(html.includes('let spotLoadInFlight=false'),'SPOTS must serialize async solve loading');
+expect(html.includes('if(spotLoadInFlight)return'),'SPOTS must reject concurrent next-spot loads');
+expect(html.includes('preferredRaise=raises.length'),'primary RAISE must derive from actual solver raise branches');
+expect(html.includes('evaluation.solverVerdict'),'decision result must expose the solver-derived verdict');
+expect(html.includes('id="spotSidePots"'),'solver table must expose side-pot state when present');
+expect(html.includes('AGUARDANDO A AÇÃO DO HERÓI'),'table must explicitly expose the hero decision state');
+expect(!html.includes('total:14000'),'legacy 14,000 runtime fallback must not remain');
+expect(!html.includes('/ 14.000'),'legacy 14,000 visible progress must not remain');
 
 if(failures.length){
   console.error('Solved spot engine validation failed:');
