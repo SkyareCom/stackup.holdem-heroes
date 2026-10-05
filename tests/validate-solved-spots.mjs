@@ -66,7 +66,7 @@ for(const street of ['preflop','flop','turn','river']){
     if(raiseCount>maxRaiseBranches){maxRaiseBranches=raiseCount;maxRaiseExample=`${street}:${spot.id||spot.solveId||'spot'}:${entry.hand}`;}
   }
 }
-expect(maxRaiseBranches<=3,`UI exposes three raise branches but solver bank requires ${maxRaiseBranches} at ${maxRaiseExample}`);
+expect(maxRaiseBranches<=5,`UI exposes five raise branches but solver bank requires ${maxRaiseBranches} at ${maxRaiseExample}`);
 
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-engine.js','core/heroes-solved-spots-runtime.js']){
@@ -74,7 +74,8 @@ for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-eng
 }
 expect(html.includes('await window.HeroesSolvedSpots.next()'),'SPOTS table must request real solved decisions');
 expect(html.includes('solver_reference:ref'),'DNA decision context must receive the solver reference');
-expect((html.match(/<button[^>]*data-action-slot="/g)||[]).length===7,'SPOTS must expose exactly seven solver-bound action slots');
+expect((html.match(/<button[^>]*data-action-slot="/g)||[]).length===9,'SPOTS must expose exactly nine solver-bound action slots');
+expect(html.includes('data-action-slot="raise3"')&&html.includes('data-action-slot="raise4"'),'SPOTS must expose all five raise branches supported by the validated bank');
 expect(html.includes('let currentSpotAnswered=false'),'SPOTS must track whether the current solve was already answered');
 expect(html.includes('if(currentSpotAnswered||!currentSolvedSpot)return'),'SPOTS must reject a second answer to the same loaded solve');
 expect(html.includes('x?.spot_id===decision.spot_id&&x?.solve_id===decision.solve_id'),'decision history must reject duplicate spot_id + solve_id samples');
