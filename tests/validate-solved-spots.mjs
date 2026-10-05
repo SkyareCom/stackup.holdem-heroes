@@ -50,8 +50,12 @@ expect(manifest.totalValidatedSolvedDecisions===14000,'manifest total must be 14
 expect(manifest.noRepeatPolicy==='PERSISTENT_WITHOUT_REPLACEMENT_UNTIL_BANK_EXHAUSTION','manifest must enforce no-repeat cycle');
 
 const runtime=fs.readFileSync(new URL('../core/heroes-solved-spots-runtime.js',import.meta.url),'utf8');
-expect(runtime.includes("const SEEN_KEY='heroes.solvedSpotSeen.v1'"),'runtime must persist seen IDs');
-expect(runtime.includes("pool=loaded.flat.filter(x=>!seenSet.has(x.id)"),'runtime must sample without replacement');
+expect(runtime.includes("const SESSION_KEY='heroes.solvedSpotSession.v2'"),'runtime must keep the active sampling sequence in session scope');
+expect(runtime.includes("const SAVED_TRAINING_KEY='heroes.savedSpotTraining.v1'"),'runtime must persist only explicitly saved training state');
+expect(runtime.includes("pool=loaded.flat.filter(x=>!seenSet.has(x.id)"),'runtime must sample without replacement inside the active sampling cycle');
+expect(runtime.includes("function startFreshSession"),'runtime must support a new randomized sequence when the user returns');
+expect(runtime.includes("function saveTraining"),'runtime must support explicit training save/resume semantics');
+expect(runtime.includes("firstSpotId"),'fresh sessions must guard against repeating the previous opening spot');
 
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-engine.js','core/heroes-solved-spots-runtime.js']){
