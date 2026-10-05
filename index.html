@@ -2903,6 +2903,7 @@ async function loadNextSolvedSpot(){
   }
   spotLoadInFlight=true;
   if(nextSpotBtn)nextSpotBtn.disabled=true;
+  [newSpotSessionBtn,saveSpotTrainingBtn,discardSpotTrainingBtn].forEach(btn=>{if(btn)btn.disabled=true;});
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.disabled=true;btn.classList.add("loading")});
   if(spotDecisionText)spotDecisionText.textContent="CARREGANDO SPOT INÉDITO…";
   try{
@@ -2918,6 +2919,9 @@ async function loadNextSolvedSpot(){
   }finally{
     spotLoadInFlight=false;
     if(nextSpotBtn)nextSpotBtn.disabled=false;
+    syncSpotTrainingControls();
+    if(newSpotSessionBtn)newSpotSessionBtn.disabled=false;
+    if(discardSpotTrainingBtn)discardSpotTrainingBtn.disabled=false;
   }
 }
 
@@ -3023,7 +3027,7 @@ pokerActions?.addEventListener("click",e=>{
 nextSpotBtn?.addEventListener("click",()=>loadNextSolvedSpot());
 newSpotSessionBtn?.addEventListener("click",async()=>{window.HeroesSolvedSpots?.startFreshSession?.();syncSpotTrainingControls();await loadNextSolvedSpot();});
 saveSpotTrainingBtn?.addEventListener("click",()=>{window.HeroesSolvedSpots?.saveTraining?.();syncSpotTrainingControls();if(spotDecisionMeta)spotDecisionMeta.textContent="TREINO SALVO. ESTA SEQUÊNCIA PODERÁ SER RETOMADA.";});
-discardSpotTrainingBtn?.addEventListener("click",()=>{window.HeroesSolvedSpots?.discardSavedTraining?.();syncSpotTrainingControls();if(spotDecisionMeta)spotDecisionMeta.textContent="TREINO SALVO ENCERRADO. O PRÓXIMO TREINO COMEÇARÁ COM NOVA SEQUÊNCIA.";});
+discardSpotTrainingBtn?.addEventListener("click",()=>{window.HeroesSolvedSpots?.discardSavedTraining?.();syncSpotTrainingControls();if(spotDecisionMeta)spotDecisionMeta.textContent="TREINO SALVO ENCERRADO. A SESSÃO ATUAL CONTINUA; NOVO TREINO INICIA OUTRA SEQUÊNCIA.";});
 
 if(heroesBridge){
   try{heroesBridge.send('capabilities','grinder',{product:'heroes',version:'3.0',produces:['player_profile','training_prescription'],accepts:['training_progress','training_completed'],profileIndicators:PLAYER_INDICATORS.map(x=>x.key),playerStateSchema:"stackup-heroes-player-state/1.0"});}catch(_){}
