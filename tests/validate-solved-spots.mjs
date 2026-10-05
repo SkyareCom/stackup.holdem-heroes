@@ -75,6 +75,8 @@ expect(html.includes('id="spotSidePots"'),'solver table must expose side-pot sta
 expect(html.includes('AGUARDANDO A AÇÃO DO HERÓI'),'table must explicitly expose the hero decision state');
 expect(!html.includes('total:14000'),'legacy 14,000 runtime fallback must not remain');
 expect(!html.includes('/ 14.000'),'legacy 14,000 visible progress must not remain');
+expect(html.includes('LEITURA COMPORTAMENTAL HEROES · NÃO É SAÍDA DO SOLVER'),'behavioral interpretation must be explicitly separated from solver output');
+expect(html.includes('ALINHAMENTO DE EV · SOLVER'),'EV alignment must be labeled as solver-derived');
 
 if(failures.length){
   console.error('Solved spot engine validation failed:');
