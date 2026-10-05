@@ -1247,6 +1247,7 @@ select,option,input,textarea,button{ text-transform:uppercase }
 
               <div class="table-center">
                 <div class="pot-label">POT <strong id="spotPot">10.5bb</strong></div>
+                <div class="pot-label" id="spotSidePots" hidden></div>
                 <div class="board-cards" id="boardCards">
                   <div class="poker-card black"><span>Q</span><b>♠</b></div>
                   <div class="poker-card red"><span>8</span><b>♥</b></div>
@@ -1254,7 +1255,7 @@ select,option,input,textarea,button{ text-transform:uppercase }
                   <div class="poker-card red"><span>J</span><b>♦</b></div>
                   <div class="poker-card back"><span>?</span></div>
                 </div>
-                <div class="hero-turn">SUA AÇÃO</div>
+                <div class="hero-turn" id="heroTurnStatus">AGUARDANDO A AÇÃO DO HERÓI</div>
               </div>
 
               <div class="hero-seat">
@@ -2794,13 +2795,15 @@ function renderSolvedSeats(item){
     if(stack)stack.textContent=isActive?displayStackValue(Number((view.stackForPosition?.[pos]??scenario.effectiveStack) || 0)):"—";
     seat.querySelector(".bet-chip")?.remove();
   });
-  const last=[...(scenario.actionHistory||[])].reverse().find(a=>a?.position&&a.position!==view.heroPosition);
-  if(last){
-    const actor=document.querySelector(`.player-seat[data-seat-position="${last.position}"]`);
-    const amount=Number(last.to??last.amount??scenario.currentBet);
-    if(actor&&Number.isFinite(amount)&&amount>0){
-      const chip=document.createElement("div");chip.className="bet-chip";chip.textContent=displayActionValue(amount);actor.appendChild(chip);
-    }
+  const latestByPosition=new Map();
+  for(const a of scenario.actionHistory||[]){
+    if(!a?.position||a.position===view.heroPosition)continue;
+    const amount=Number(a.to??a.amount);
+    if(Number.isFinite(amount)&&amount>0)latestByPosition.set(a.position,amount);
+  }
+  for(const [position,amount] of latestByPosition){
+    const actor=document.querySelector(`.player-seat[data-seat-position="${position}"]`);
+    if(actor){const chip=document.createElement("div");chip.className="bet-chip";chip.textContent=displayActionValue(amount);actor.appendChild(chip);}
   }
 }
 function resetActionAnalysis(){
@@ -2825,6 +2828,8 @@ function renderSolvedSpot(item){
   if(spotNumber)spotNumber.textContent=`${item.progress.viewed.toLocaleString("pt-BR")} / ${Number(item.progress.total||20000).toLocaleString("pt-BR")}`;
   if(spotDifficulty)spotDifficulty.textContent="SOLVED";
   const pot=document.getElementById("spotPot");if(pot)pot.textContent=displayStackValue(Number(view.pot||scenario.pot||0),prefs);
+  const side=document.getElementById("spotSidePots");if(side){const values=(view.sidePots||scenario.sidePots||[]).map(Number).filter(x=>Number.isFinite(x)&&x>0);side.hidden=!values.length;side.textContent=values.length?`SIDE POT ${values.map(x=>displayStackValue(x,prefs)).join(" · ")}`:"";}
+  const turnStatus=document.getElementById("heroTurnStatus");if(turnStatus)turnStatus.textContent="AGUARDANDO A AÇÃO DO HERÓI";
   const board=document.getElementById("boardCards");
   if(board){
     const cards=[...(view.board||scenario.board||[])];
@@ -2956,6 +2961,7 @@ function recordSpotDecision(action,amount,button){
   renderTrainingRecommendations();
   document.querySelectorAll("[data-action-slot]").forEach(btn=>{btn.classList.toggle("selected",btn===button);btn.disabled=true});
   if(spotDecisionText)spotDecisionText.textContent=`${label} · ${evaluation.solverVerdict||"DECISÃO REGISTRADA"}`;
+  const turnStatus=document.getElementById("heroTurnStatus");if(turnStatus)turnStatus.textContent=evaluation.solverVerdict||"DECISÃO REGISTRADA";
   if(spotDecisionMeta){
     const displayNote=context.display_format==="CASH"&&context.format!=="CASH"?" · visualização Cash; solve original "+context.format:"";
     spotDecisionMeta.textContent=evaluation.solver?.has_ev
