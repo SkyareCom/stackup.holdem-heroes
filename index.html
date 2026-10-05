@@ -2412,8 +2412,12 @@ function evaluateDecisionContext(action,amount=0,context=getCurrentSpotContext()
   );
   const solverVerdict=solver
     ?(solver.has_ev
-      ?(solver.ev_loss_bb<=0.02?"CORRETA (+EV)":solver.ev_loss_bb<=0.15?"AJUSTÁVEL":"INCORRETA")
-      :(solver.frequency>=10?"CORRETA":solver.frequency>0?"AJUSTÁVEL":"INCORRETA"))
+      ?(solver.ev_loss_bb<=0.02
+        ?(solver.chosen_ev_bb>0?"CORRETA · MELHOR EV (+EV)":"CORRETA · MELHOR EV")
+        :solver.ev_loss_bb<=0.15?"AJUSTÁVEL · EV PRÓXIMO DO MELHOR":"INCORRETA · EV INFERIOR")
+      :(solver.frequency>0
+        ?(solver.frequency===solver.max_frequency?"AÇÃO PRINCIPAL DO SOLVER":"AÇÃO MIXADA DO SOLVER")
+        :"AÇÃO NÃO SUPORTADA PELO SOLVER"))
     :"SEM REFERÊNCIA SOLVER";
   const confidence=solver?clamp100(context?.solver_reference?.confidence||95):clamp100(38+(context?.range_context?.confidence||0)*.35);
 
