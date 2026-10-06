@@ -2851,7 +2851,7 @@ function buildSolverReference(item){
   };
 }
 function setActionButton(slot,action,label,sub,forcedKind,forcedAmount){
-  const btn=document.querySelector(\`[data-action-slot="\${slot}"]\`);
+  const btn=document.querySelector(`[data-action-slot="${slot}"]`);
   if(!btn)return;
   btn.classList.remove("selected","loading","suggested");
   const kind=forcedKind||(action?solverActionKind(action):slot);
@@ -2879,8 +2879,8 @@ function configureSolvedActions(entry){
   setActionButton("call",null,"CALL",callAmount?displayActionValue(callAmount):"AÇÃO DISPONÍVEL","call",callAmount);
   setActionButton("fold",null,"FOLD","AÇÃO DISPONÍVEL","fold",0);
   setActionButton("raise",null,"RAISE",displayActionValue(minRaise),"raise",minRaise);
-  setActionButton("raise1",null,\`RAISE \${displayActionValue(raise1)}\`,"AÇÃO DISPONÍVEL","raise",raise1);
-  setActionButton("raise2",null,\`RAISE \${displayActionValue(raise2)}\`,"AÇÃO DISPONÍVEL","raise",raise2);
+  setActionButton("raise1",null,`RAISE ${displayActionValue(raise1)}`,"AÇÃO DISPONÍVEL","raise",raise1);
+  setActionButton("raise2",null,`RAISE ${displayActionValue(raise2)}`,"AÇÃO DISPONÍVEL","raise",raise2);
   setActionButton("allin",null,"ALL IN",displayActionValue(heroStack),"allin",heroStack);
 }
 function renderSolvedSeats(item){
