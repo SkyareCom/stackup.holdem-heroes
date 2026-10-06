@@ -1074,6 +1074,30 @@ html,body,#app,.app,button,input,select,textarea{font-weight:400}
 body,body *:not(script):not(style){text-transform:uppercase}
 input::placeholder,textarea::placeholder{text-transform:uppercase}
 select,option,input,textarea,button{ text-transform:uppercase }
+
+/* HEROES UX AUDIT 2026-10-05 */
+html,body{overflow-x:clip}
+img,svg,canvas,video{max-width:100%}
+.screen,.section,.hero,.screen-visual,.editorial-panel,.game-context-panel,.dashboard-card,.profile-hero,.setting,.spot-decision,.action-analysis{min-width:0;max-width:100%}
+.display-xl,.section-title,.screen-visual-title,.archetype,.profile-name,.spot-session-title,.body-copy,.hero-copy,.dashboard-state,.game-context-note,.setting strong,.setting span,.home-entry-card strong,.home-entry-card span{overflow-wrap:anywhere;word-break:normal}
+button,.btn,.section-link,.home-entry-card,.game-format-btn,.poker-action,.filter{font-weight:700!important}
+.home-entry-card{border-color:rgba(216,178,142,.28);background:linear-gradient(145deg,rgba(64,25,30,.72),rgba(15,9,9,.94));box-shadow:0 10px 28px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.025);transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.home-entry-card:active{transform:scale(.985)}
+.dashboard-card,.game-context-panel,.editorial-panel,.profile-hero,.scenario-section,.pressure,.setting{border-color:rgba(216,178,142,.22);box-shadow:0 10px 30px rgba(0,0,0,.14)}
+.setting{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,42%);gap:14px;align-items:center}
+.setting span{text-align:right}
+.filterbar{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-bottom:3px}
+.filterbar::-webkit-scrollbar{display:none}
+.filter{flex:0 0 auto;white-space:nowrap}
+.poker-actions{max-width:100%}.poker-action{min-width:0}
+.poker-action span,.poker-action small{overflow-wrap:anywhere}
+.home-status-item{min-width:0}.home-status-item b{display:block;overflow-wrap:anywhere}.tab{min-width:0}
+@media(max-width:380px){
+ .home-status-strip{grid-template-columns:1fr 1fr}.home-status-item:first-child{grid-column:1/-1}
+ .home-entry-card{grid-template-columns:minmax(0,1fr) auto;padding:14px}
+ .section-title{font-size:clamp(24px,8vw,34px)}.display-xl{font-size:clamp(34px,11vw,44px)}
+ .setting{grid-template-columns:1fr;gap:5px}.setting span{text-align:left}
+}
 </style>
 </head>
 <body data-build="heroes-emblem-97de056">
@@ -1214,12 +1238,6 @@ select,option,input,textarea,button{ text-transform:uppercase }
             <div class="screen-visual-title">Decisões que revelam seu perfil.</div>
             <div class="screen-visual-copy">Treine situações reais e transforme cada decisão em informação para o seu Poker DNA.</div>
           </div>
-        </div>
-
-        <div class="editorial-panel spot-intro">
-          <div class="section-kicker">TREINO DE SPOTS</div>
-          <div class="archetype">Treine seus spots. Revele seu Poker DNA.</div>
-          <div class="body-copy">Cada decisão ajuda o HEROES a reconhecer padrões, forças, leaks e mudanças de comportamento. O DNA Player evolui conforme a amostra cresce.</div>
         </div>
 
         <div class="game-context-panel" id="spotGameContext">
