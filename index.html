@@ -1369,16 +1369,10 @@ button,.btn,.section-link,.home-entry-card,.game-format-btn,.poker-action,.filte
             <button class="poker-action" type="button" data-action-slot="raise" data-poker-action="raise" data-amount="12">
               <span>RAISE</span><small>12bb · mínimo</small>
             </button>
-            <button class="poker-action suggested" type="button" data-action-slot="raise1" data-poker-action="raise" data-amount="15">
+            <button class="poker-action" type="button" data-action-slot="raise1" data-poker-action="raise" data-amount="15">
               <span>RAISE 15bb</span><small>sugerido</small>
             </button>
-            <button class="poker-action suggested" type="button" data-action-slot="raise2" data-poker-action="raise" disabled>
-              <span>RAISE —</span><small>INDISPONÍVEL</small>
-            </button>
-            <button class="poker-action suggested" type="button" data-action-slot="raise3" data-poker-action="raise" disabled>
-              <span>RAISE —</span><small>INDISPONÍVEL</small>
-            </button>
-            <button class="poker-action suggested" type="button" data-action-slot="raise4" data-poker-action="raise" disabled>
+            <button class="poker-action" type="button" data-action-slot="raise2" data-poker-action="raise" disabled>
               <span>RAISE —</span><small>INDISPONÍVEL</small>
             </button>
             <button class="poker-action allin" type="button" data-action-slot="allin" data-poker-action="allin" data-amount="44">
@@ -2843,36 +2837,38 @@ function buildSolverReference(item){
     actions
   };
 }
-function setActionButton(slot,action,label,sub){
-  const btn=document.querySelector(`[data-action-slot="${slot}"]`);
+function setActionButton(slot,action,label,sub,forcedKind,forcedAmount){
+  const btn=document.querySelector(\`[data-action-slot="\${slot}"]\`);
   if(!btn)return;
-  btn.classList.remove("selected","loading");
-  const kind=action?solverActionKind(action):slot;
-  const amount=action?solverActionAmount(action):0;
+  btn.classList.remove("selected","loading","suggested");
+  const kind=forcedKind||(action?solverActionKind(action):slot);
+  const amount=Number(forcedAmount??(action?solverActionAmount(action):0))||0;
   btn.dataset.pokerAction=kind==="jam"?"allin":kind==="raise"?"raise":kind;
-  btn.dataset.amount=String(amount||0);
-  btn.disabled=!action;
+  btn.dataset.amount=String(amount);
+  btn.disabled=false;
   const title=btn.querySelector("span"),small=btn.querySelector("small");
   if(title)title.textContent=label;
   if(small)small.textContent=sub;
 }
 function configureSolvedActions(entry){
   const actions=entry?.actions||[];
-  const byKind=k=>actions.find(a=>solverActionKind(a)===k)||null;
-  const raises=actions.filter(a=>solverActionKind(a)==="raise").sort((a,b)=>solverActionAmount(a)-solverActionAmount(b));
-  const jam=actions.find(a=>solverActionKind(a)==="jam")||null;
-  const check=byKind("check"),call=byKind("call"),fold=byKind("fold");
-  setActionButton("check",check,"CHECK",check?`${Number(check.frequency||0).toFixed(0)}% solver`:"indisponível");
-  setActionButton("call",call,"CALL",call?`${displayActionValue(solverActionAmount(call)||0)} · ${Number(call.frequency||0).toFixed(0)}%`:"indisponível");
-  setActionButton("fold",fold,"FOLD",fold?`${Number(fold.frequency||0).toFixed(0)}% solver`:"indisponível");
-  const preferredRaise=raises.length?[...raises].sort((a,b)=>(Number(b.frequency)||0)-(Number(a.frequency)||0))[0]:null;
-  const alternateRaises=raises.filter(a=>a!==preferredRaise).slice(0,4);
-  setActionButton("raise",preferredRaise,"RAISE",preferredRaise?`${displayActionValue(solverActionAmount(preferredRaise))} · ${Number(preferredRaise.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
-  ["raise1","raise2","raise3","raise4"].forEach((slot,index)=>{
-    const branch=alternateRaises[index]||null;
-    setActionButton(slot,branch,branch?`RAISE ${displayActionValue(solverActionAmount(branch))}`:"RAISE —",branch?`${Number(branch.frequency||0).toFixed(0)}% SOLVER`:"INDISPONÍVEL");
-  });
-  setActionButton("allin",jam,"ALL IN",jam?`${displayActionValue(solverActionAmount(jam)||currentSolvedSpot?.view?.stackForPosition?.[currentSolvedSpot?.view?.heroPosition]||0)} · ${Number(jam.frequency||0).toFixed(0)}%`:"indisponível");
+  const scenario=currentSolvedSpot?.spot?.scenario||{};
+  const view=currentSolvedSpot?.view||{};
+  const heroStack=Number((view.stackForPosition?.[view.heroPosition]??scenario.heroStack??scenario.effectiveStack)||0);
+  const facing=Number(scenario.currentBet??[...(scenario.actionHistory||[])].reverse().find(a=>a?.position!==view.heroPosition)?.to??0)||0;
+  const pot=Number(view.pot||scenario.pot||0)||0;
+  const solverRaises=actions.filter(a=>solverActionKind(a)==="raise").map(solverActionAmount).filter(x=>Number.isFinite(x)&&x>0).sort((x,y)=>x-y);
+  const minRaise=solverRaises[0]||Math.max(facing*2,Math.round(Math.max(2,pot*.5)*2)/2);
+  const raise1=solverRaises[1]||Math.max(minRaise,Math.round(Math.max(minRaise,pot*.75)*2)/2);
+  const raise2=solverRaises[2]||Math.max(raise1,Math.round(Math.max(raise1,pot)*2)/2);
+  const callAmount=Math.max(0,facing);
+  setActionButton("check",null,"CHECK","AÇÃO DISPONÍVEL","check",0);
+  setActionButton("call",null,"CALL",callAmount?displayActionValue(callAmount):"AÇÃO DISPONÍVEL","call",callAmount);
+  setActionButton("fold",null,"FOLD","AÇÃO DISPONÍVEL","fold",0);
+  setActionButton("raise",null,"RAISE",displayActionValue(minRaise),"raise",minRaise);
+  setActionButton("raise1",null,\`RAISE \${displayActionValue(raise1)}\`,"AÇÃO DISPONÍVEL","raise",raise1);
+  setActionButton("raise2",null,\`RAISE \${displayActionValue(raise2)}\`,"AÇÃO DISPONÍVEL","raise",raise2);
+  setActionButton("allin",null,"ALL IN",displayActionValue(heroStack),"allin",heroStack);
 }
 function renderSolvedSeats(item){
   const view=item.view||{};
