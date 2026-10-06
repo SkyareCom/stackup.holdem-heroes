@@ -82,7 +82,8 @@ expect(html.includes('if(currentSpotAnswered||!currentSolvedSpot)return'),'SPOTS
 expect(html.includes('x?.spot_id===decision.spot_id&&x?.solve_id===decision.solve_id'),'decision history must reject duplicate spot_id + solve_id samples');
 expect(html.includes('let spotLoadInFlight=false'),'SPOTS must serialize async solve loading');
 expect(html.includes('if(spotLoadInFlight)return'),'SPOTS must reject concurrent next-spot loads');
-expect(html.includes('preferredRaise=raises.length'),'primary RAISE must derive from actual solver raise branches');
+expect(html.includes('const solverRaises=actions.filter'),'raise sizing may derive from solver branches without exposing preference');
+expect(!html.includes('preferredRaise=raises.length'),'pre-decision UI must not select a preferred solver raise');
 expect(html.includes('evaluation.solverVerdict'),'decision result must expose the solver-derived verdict');
 expect(html.includes('solver.chosen_ev_bb>0?"CORRETA · MELHOR EV (+EV)":"CORRETA · MELHOR EV"'),'(+EV) label must require positive chosen EV');
 expect(html.includes('"AÇÃO PRINCIPAL DO SOLVER":"AÇÃO MIXADA DO SOLVER"'),'EV-unavailable mixed strategies must remain solver-faithful');
