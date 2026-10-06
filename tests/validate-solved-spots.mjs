@@ -66,7 +66,7 @@ for(const street of ['preflop','flop','turn','river']){
     if(raiseCount>maxRaiseBranches){maxRaiseBranches=raiseCount;maxRaiseExample=`${street}:${spot.id||spot.solveId||'spot'}:${entry.hand}`;}
   }
 }
-expect(maxRaiseBranches<=5,`UI exposes five raise branches but solver bank requires ${maxRaiseBranches} at ${maxRaiseExample}`);
+expect(maxRaiseBranches<=5,`solver bank exceeds supported internal raise branches: ${maxRaiseBranches} at ${maxRaiseExample}`);
 
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 for(const src of ['core/stackup-solved-spot-contract.js','core/stackup-spots-engine.js','core/heroes-solved-spots-runtime.js']){
