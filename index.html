@@ -1193,6 +1193,8 @@ button,.btn,.section-link,.home-entry-card,.game-format-btn,.poker-action,.filte
             <button class="home-entry-card" type="button" data-go="analysis"><div><strong>ANALISAR MEU JOGO</strong><span>Veja os 30 indicadores, leaks, cenários e padrões.</span></div><b>›</b></button>
             <button class="home-entry-card" type="button" data-go="dna"><div><strong>VER MEU POKER DNA</strong><span>Resumo do perfil, arquétipo e evolução atual.</span></div><b>›</b></button>
             <button class="home-entry-card" type="button" data-go="profile"><div><strong>PERFIL & AJUSTES</strong><span>Formato de jogo, conta, histórico e preferências.</span></div><b>›</b></button>
+            <button class="home-entry-card" type="button" data-home-feature="ai-hand-analysis"><div><strong>ANÁLISE DE MÃOS COM IA</strong><span>Importe ou descreva uma mão para análise contextual assistida por IA.</span></div><b>›</b></button>
+            <button class="home-entry-card" type="button" data-home-feature="interfaces"><div><strong>INTEGRAÇÃO COM INTERFACES</strong><span>Conecte fontes e interfaces compatíveis para importar dados do seu jogo.</span></div><b>›</b></button>
           </div>
         </div>
       </section>
@@ -2068,6 +2070,17 @@ document.querySelectorAll("[data-go]").forEach(btn=>btn.addEventListener("click"
   const to=FOOTER_PAGES.indexOf(btn.dataset.go);
   showScreen(btn.dataset.go,Math.sign(to-from));
 }));
+document.querySelectorAll("[data-home-feature]").forEach(btn=>btn.addEventListener("click",()=>{
+  const feature=btn.dataset.homeFeature;
+  trackUsage("home_feature_open",{feature});
+  const title=feature==="ai-hand-analysis"?"ANÁLISE DE MÃOS COM IA":"INTEGRAÇÃO COM INTERFACES";
+  const copy=feature==="ai-hand-analysis"
+    ?"MÓDULO DE ANÁLISE ASSISTIDA POR IA. IMPORTE OU DESCREVA UMA MÃO PARA INICIAR A LEITURA CONTEXTUAL."
+    :"CENTRAL DE INTEGRAÇÕES DO HEROES. CONECTE INTERFACES COMPATÍVEIS PARA IMPORTAR DADOS DO SEU JOGO.";
+  const backdrop=document.getElementById("sheetBackdrop"),titleEl=document.getElementById("sheetTitle"),copyEl=document.getElementById("sheetCopy");
+  if(titleEl)titleEl.textContent=title;if(copyEl)copyEl.textContent=copy;if(backdrop)backdrop.classList.add("open");
+}));
+
 
 document.getElementById("leakFilters")?.addEventListener("click",e=>{
   const btn=e.target.closest(".filter"); if(!btn)return;
